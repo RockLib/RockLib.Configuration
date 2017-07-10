@@ -1,1 +1,1 @@
-# RockLib.Configuration
+# RockLib Configuration
