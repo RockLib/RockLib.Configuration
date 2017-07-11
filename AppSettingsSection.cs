@@ -1,12 +1,13 @@
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace System.Configuration
 {
-    internal sealed class AppSettings
+    internal sealed class AppSettingsSection
     {
         private readonly Func<IConfigurationRoot> _getConfigurationRoot;
 
-        public AppSettings(Func<IConfigurationRoot> getConfigurationRoot)
+        public AppSettingsSection(Func<IConfigurationRoot> getConfigurationRoot)
         {
             _getConfigurationRoot = getConfigurationRoot;
         }
@@ -17,9 +18,9 @@ namespace System.Configuration
             {
                 var value = _getConfigurationRoot()[key];
 
-                if (string.IsNullOrEmpty(value))
+                if (value == null)
                 {
-                    throw new NullReferenceException($"The provided key ({key}) was not found in the configuration file.  Ensure you are requesting a valid key");
+                    throw new KeyNotFoundException();
                 }
 
                 return value;

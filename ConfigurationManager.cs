@@ -35,7 +35,7 @@ namespace System.Configuration
             }
         }
 
-        public static AppSettings AppSettings { get; } = new AppSettings(() => ConfigurationRoot);
+        public static AppSettingsSection AppSettings { get; } = new AppSettingsSection(() => ConfigurationRoot);
 
 
         public static object GetSection(string sectionName)
