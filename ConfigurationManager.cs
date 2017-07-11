@@ -80,12 +80,12 @@ namespace System.Configuration
 
         private static IConfigurationRoot GetDefaultConfigurationRoot()
         {
-            var builder = new ConfigurationBuilder()
+            var configurationRoot = new ConfigurationBuilder()
                 .AddRockLib()
+                .AddEnvironmentVariables()
                 .Build();
 
-            return builder;
+            return configurationRoot;
         }
     }
-
 }

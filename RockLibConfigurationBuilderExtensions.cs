@@ -42,8 +42,7 @@ namespace RockLib.Configuration
             // we want the optional value to be false so that it will throw a runtime exception if the file is not found
             // if this is set to true no exception is throw and no config values are found/returned.
             var builtBuilder = builder
-                .AddJsonFile(rockLibConfigJson, optional: false)
-                .AddEnvironmentVariables("RockLib");
+                .AddJsonFile(jsonConfigPath, optional: false);
 
             return builtBuilder;
         }
