@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using RockLib.Configuration;
 
 namespace RockLib.Configuration.Example.Core
@@ -9,7 +10,15 @@ namespace RockLib.Configuration.Example.Core
         {
             Console.WriteLine("Configuration Manager Exmple Harness");
 
-            var value = ConfigurationManager.AppSettings[""];
+            try
+            {
+                var value = ConfigurationManager.AppSettings[""];
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
             Console.ReadLine();
         }
