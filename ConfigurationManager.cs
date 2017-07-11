@@ -1,5 +1,4 @@
-﻿#if !NET45
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -36,6 +35,7 @@ namespace System.Configuration
         }
 
         public static AppSettingsSection AppSettings { get; } = new AppSettingsSection(() => ConfigurationRoot);
+        public static ConnectionStringsSection ConnectionStrings { get; } = new ConnectionStringsSection(() => ConfigurationRoot);
 
 
         public static object GetSection(string sectionName)
@@ -89,4 +89,3 @@ namespace System.Configuration
     }
 
 }
-#endif
