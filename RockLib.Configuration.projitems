@@ -11,5 +11,6 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AppSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConfigurationManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RockLibConfigurationBuilderExtensions.cs" />
   </ItemGroup>
 </Project>

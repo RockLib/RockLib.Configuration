@@ -1,25 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using Microsoft.Extensions.Configuration;
+using System;
 
 namespace RockLib.Configuration
 {
 
     public class AppSettings
     {
-        private readonly IConfigurationRoot _configuration;
+        private readonly Func<IConfigurationRoot> _getConfigurationRoot;
 
-        public AppSettings(IConfigurationRoot configuration)
+        public AppSettings(Func<IConfigurationRoot> getConfigurationRoot)
         {
-            _configuration = configuration;
+            _getConfigurationRoot = getConfigurationRoot;
         }
 
-        public string this[string key]
-        {
-            get
-            {
-                return _configuration[key];
-            }
-        }
+        public string this[string key] => _getConfigurationRoot()[key];
     }
 }

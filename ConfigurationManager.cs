@@ -1,5 +1,4 @@
 ﻿#if !NET45
-using System.Collections.Concurrent;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -19,30 +18,29 @@ namespace RockLib.Configuration
     /// </summary>
     public static class ConfigurationManager
     {
-        private static readonly IConfigurationRoot _configuration;
+        private static Lazy<IConfigurationRoot> _configurationRoot;
 
         static ConfigurationManager()
         {
-            var builder = new ConfigurationBuilder()
-                .AddJsonFile("rocklib.json", optional: true)
-                .AddEnvironmentVariables();
-
-            _configuration = builder.Build();
-
-            AppSettings = new AppSettings(_configuration);
+            _configurationRoot = new Lazy<IConfigurationRoot>(GetDefaultConfigurationRoot);
         }
 
-        public static AppSettings AppSettings { get; }
+        public static IConfigurationRoot ConfigurationRoot
+        {
+            get { return _configurationRoot.Value; }
+            set
+            {
+                if (value == null) _configurationRoot = new Lazy<IConfigurationRoot>(GetDefaultConfigurationRoot);
+                else _configurationRoot = new Lazy<IConfigurationRoot>(() => value);
+            }
+        }
+
+        public static AppSettings AppSettings { get; } = new AppSettings(() => ConfigurationRoot);
 
         public static object GetSection(string sectionName)
         {
-            var section = _configuration.GetSection(sectionName);
-
-            if (section == null)
-            {
-                return null;
-            }
-
+            var section = ConfigurationRoot.GetSection(sectionName);
+            if (section == null) return null;
             return GetLooselyTypedObject(section);
         }
 
@@ -52,15 +50,13 @@ namespace RockLib.Configuration
             {
                 bool b;
                 if (bool.TryParse(section.Value, out b))
-                {
                     return b;
-                }
 
                 int i;
                 if (int.TryParse(section.Value, out i))
-                {
                     return i;
-                }
+
+                // TODO: add additional conversions
 
                 return section.Value;
             }
@@ -79,6 +75,11 @@ namespace RockLib.Configuration
             }
 
             return expando;
+        }
+
+        private static IConfigurationRoot GetDefaultConfigurationRoot()
+        {
+            return new ConfigurationBuilder().AddRockLib().Build();
         }
     }
 
