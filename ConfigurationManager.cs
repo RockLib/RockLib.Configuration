@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 
 namespace System.Configuration
@@ -37,45 +36,11 @@ namespace System.Configuration
         public static AppSettingsSection AppSettings { get; } = new AppSettingsSection(() => ConfigurationRoot);
         public static ConnectionStringsSection ConnectionStrings { get; } = new ConnectionStringsSection(() => ConfigurationRoot);
 
-
-        public static object GetSection(string sectionName)
+        public static dynamic GetSection(string sectionName)
         {
             var section = ConfigurationRoot.GetSection(sectionName);
-            if (section == null) return null;
-            return GetLooselyTypedObject(section);
-        }
-
-        private static object GetLooselyTypedObject(IConfigurationSection section)
-        {
-            if (section.Value != null)
-            {
-                bool b;
-                if (bool.TryParse(section.Value, out b))
-                    return b;
-
-                int i;
-                if (int.TryParse(section.Value, out i))
-                    return i;
-
-                // TODO: add additional conversions
-
-                return section.Value;
-            }
-
-            IDictionary<string, object> expando = new ExpandoObject();
-
-            foreach (var child in section.GetChildren())
-            {
-                expando[child.Key] = GetLooselyTypedObject(child);
-            }
-
-            int dummy;
-            if (expando.Keys.Any() && expando.Keys.All(k => int.TryParse(k, out dummy)))
-            {
-                return expando.OrderBy(x => x.Key).Select(x => x.Value).ToArray();
-            }
-
-            return expando;
+            if (section.Value == null && !section.GetChildren().Any()) throw new KeyNotFoundException();
+            return new ConvertibleConfigurationSection(section);
         }
 
         private static IConfigurationRoot GetDefaultConfigurationRoot()
