@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 using RockLib.Configuration;
 
 namespace RockLib.Configuration.Example.Core
@@ -12,7 +13,9 @@ namespace RockLib.Configuration.Example.Core
 
             try
             {
-                var value = ConfigurationManager.AppSettings[""];
+
+                var value = ConfigurationManager.AppSettings["key"];
+                var section = ConfigurationManager.GetSection("appSettings");
             }
             catch (Exception e)
             {

@@ -14,6 +14,24 @@ namespace RockLib.Configuration
             _getConfigurationRoot = getConfigurationRoot;
         }
 
-        public string this[string key] => _getConfigurationRoot()[key];
+        public string this[string key]
+        {
+            get
+            {
+                var value = _getConfigurationRoot()[key];
+
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new NullReferenceException($"The provided key ({key}) was not found in the configuration file.  Ensure you are requesting a valid key");
+                }
+
+                return value;
+            }
+        }
+    }
+
+    public class ConnectionStings
+    {
+        
     }
 }

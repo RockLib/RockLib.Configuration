@@ -1,1 +1,8 @@
-﻿
+﻿{
+  "Key": "Value",
+  "appSettings": {
+    "ApplicationId": 201740,
+    "Environment": "Dev",
+    "AffectedSystem": "Log4NetExample"
+  }
+}

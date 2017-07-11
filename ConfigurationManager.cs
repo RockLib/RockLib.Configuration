@@ -37,6 +37,8 @@ namespace RockLib.Configuration
 
         public static AppSettings AppSettings { get; } = new AppSettings(() => ConfigurationRoot);
 
+        public static ConnectionStings ConnectionStings { get; }
+
         public static object GetSection(string sectionName)
         {
             var section = ConfigurationRoot.GetSection(sectionName);
@@ -79,7 +81,11 @@ namespace RockLib.Configuration
 
         private static IConfigurationRoot GetDefaultConfigurationRoot()
         {
-            return new ConfigurationBuilder().AddRockLib().Build();
+            var builder = new ConfigurationBuilder()
+                .AddRockLib()
+                .Build();
+
+            return builder;
         }
     }
 
