@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.IO;
+﻿using System;
 using Microsoft.Extensions.Configuration;
 
 namespace RockLib.Configuration
@@ -28,16 +26,8 @@ namespace RockLib.Configuration
         /// <returns>A built instance of IConfigurationbuilder</returns>
         public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder, string rockLibConfigJson)
         {
-            if (string.IsNullOrEmpty(rockLibConfigJson))
-            {
-                throw new NullReferenceException($"You attempted to provide a null or empty value for the configuration file name, this is not allowed.  Make sure you provide a valid file name.");
-            }
-
-            var fullFilePath = Path.Combine(Directory.GetCurrentDirectory(), rockLibConfigJson);
-            if (!File.Exists(fullFilePath))
-            {
-                throw new FileNotFoundException(rockLibConfigJson, $"Unable to use the configuration file at location {rockLibConfigJson} as it was not found. Please make sure you have included the configuration file in your project and that is being deployed at runtime.");
-            }
+            if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentNullException(nameof(builder));
+            if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentException($"'{nameof(jsonConfigPath)}' must be a non-empty string.", nameof(jsonConfigPath));
 
             // we want the optional value to be false so that it will throw a runtime exception if the file is not found
             // if this is set to true no exception is throw and no config values are found/returned.
