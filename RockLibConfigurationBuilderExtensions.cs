@@ -5,26 +5,29 @@ namespace RockLib.Configuration
 {
     public static class RockLibConfigurationBuilderExtensions
     {
-
         /// <summary>
-        /// 
+        /// Adds the RockLib configuration provider to the builder using the configuration file "rocklib.config.json",
+        /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <returns></returns>
+        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="jsonConfigPath"/> is null or empty.</exception>
+        /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder)
         {
             return builder.AddRockLib("rocklib.config.json");
         }
 
         /// <summary>
-        /// 
+        /// Adds the RockLib configuration provider to the builder using the specified configuration file,
+        /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
         /// </summary>
-        /// <param name="builder">Non-null instance of an IConfigurationBuilder</param>
-        /// <param name="rockLibConfigJson">Required value which provides the name of the file to pull the configuration values from</param>
-        /// <exception cref="NullReferenceException">Will be thrown if the value for rockLibConfigJson is null or empty</exception>
-        /// <exception cref="FileNotFoundException">Will be thrown if the provided file name is not found in the runtime folder</exception>
-        /// <returns>A built instance of IConfigurationbuilder</returns>
-        public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder, string rockLibConfigJson)
+        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <param name="jsonConfigPath">Required value which provides the name of the file to pull the configuration values from</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="jsonConfigPath"/> is null or empty.</exception>
+        /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
+        public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder, string jsonConfigPath)
         {
             if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentException($"'{nameof(jsonConfigPath)}' must be a non-empty string.", nameof(jsonConfigPath));
