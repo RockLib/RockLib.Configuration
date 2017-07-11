@@ -1,11 +1,11 @@
 ﻿#if !NET45
 using Microsoft.Extensions.Configuration;
-using System;
+using RockLib.Configuration;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 
-namespace RockLib.Configuration
+namespace System.Configuration
 {
     /// <summary>
     /// Provides access to configuration files for client applications. This class cannot be inherited.
@@ -16,7 +16,7 @@ namespace RockLib.Configuration
     /// Api for legacy system
     /// https://msdn.microsoft.com/en-us/library/system.configuration.configurationmanager(v=vs.110).aspx
     /// </summary>
-    public static class ConfigurationManager
+    internal static class ConfigurationManager
     {
         private static Lazy<IConfigurationRoot> _configurationRoot;
 
@@ -37,7 +37,6 @@ namespace RockLib.Configuration
 
         public static AppSettings AppSettings { get; } = new AppSettings(() => ConfigurationRoot);
 
-        public static ConnectionStings ConnectionStings { get; }
 
         public static object GetSection(string sectionName)
         {

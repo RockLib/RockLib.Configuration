@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using RockLib.Configuration;
+using System.Configuration;
 
 namespace RockLib.Configuration.Example.Core
 {

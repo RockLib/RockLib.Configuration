@@ -1,11 +1,8 @@
-﻿
 using Microsoft.Extensions.Configuration;
-using System;
 
-namespace RockLib.Configuration
+namespace System.Configuration
 {
-
-    public class AppSettings
+    internal sealed class AppSettings
     {
         private readonly Func<IConfigurationRoot> _getConfigurationRoot;
 
@@ -28,10 +25,5 @@ namespace RockLib.Configuration
                 return value;
             }
         }
-    }
-
-    public class ConnectionStings
-    {
-        
     }
 }
