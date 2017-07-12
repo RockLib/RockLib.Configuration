@@ -1,8 +1,15 @@
 ﻿{
-  "Key": "Value",
-  "appSettings": {
-    "ApplicationId": 201740,
-    "Environment": "Dev",
-    "AffectedSystem": "Log4NetExample"
-  }
+    "AppSettings": {
+        "ApplicationId": 201740,
+        "Environment": "Dev",
+        "AffectedSystem": "Log4NetExample"
+    },
+    "ConnectionStrings": {
+        "Default": "schema://path"
+    },
+    "Foo": {
+        "Bar": 123,
+        "Baz": "abc",
+        "Qux": true
+    }
 }

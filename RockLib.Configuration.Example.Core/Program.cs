@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
-using RockLib.Configuration;
+﻿using Newtonsoft.Json;
+using System;
+using System.Configuration;
 
 namespace RockLib.Configuration.Example.Core
 {
@@ -13,17 +12,29 @@ namespace RockLib.Configuration.Example.Core
 
             try
             {
+                string applicationId = ConfigurationManager.AppSettings["ApplicationId"];
+                string defaultConnectionString = ConfigurationManager.ConnectionStrings["Default"];
+                FooSection foo = (FooSection)ConfigurationManager.GetSection("Foo");
+                FooSection foo2 = (FooSection)ConfigurationManager.GetSection("Foo");
 
-                var value = ConfigurationManager.AppSettings["key"];
-                var section = ConfigurationManager.GetSection("appSettings");
+                Console.WriteLine($"applicationId: {applicationId}");
+                Console.WriteLine($"defaultConnectionString: {defaultConnectionString}");
+                Console.WriteLine($"foo: {JsonConvert.SerializeObject(foo)}");
+                Console.WriteLine($"foo is same instance as foo2: {ReferenceEquals(foo, foo2)}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
             }
 
             Console.ReadLine();
+        }
+
+        class FooSection
+        {
+            public int Bar { get; set; }
+            public string Baz { get; set; }
+            public bool Qux { get; set; }
         }
     }
 }
