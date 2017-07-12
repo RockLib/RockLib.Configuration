@@ -5,15 +5,32 @@ using System.Dynamic;
 
 namespace RockLib.Configuration
 {
+    /// <summary>
+    /// Provides a mechanism for converting an instance of <see cref="IConfigurationSection"/> to
+    /// a type specified via a cast.
+    /// </summary>
     internal class ConvertibleConfigurationSection : DynamicObject, IConfigurationSection
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConvertibleConfigurationSection"/> class.
+        /// </summary>
+        /// <param name="section">The backing <see cref="IConfigurationSection"/>.</param>
         public ConvertibleConfigurationSection(IConfigurationSection section)
         {
             Section = section;
         }
 
+        /// <summary>
+        /// Gets the backing <see cref="IConfigurationSection"/> for this instance.
+        /// </summary>
         public IConfigurationSection Section { get; }
 
+        /// <summary>
+        /// Attempts to convert this instance to the type specified by <see cref="ConvertBinder.Type"/>.
+        /// </summary>
+        /// <param name="binder">Provides information about the conversion operation.</param>
+        /// <param name="result">The result of the type conversion operation.</param>
+        /// <returns>true if the operation is successful; otherwise, false.</returns>
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
             try
