@@ -19,6 +19,12 @@ namespace System.Configuration
     {
         private static Lazy<IConfigurationRoot> _configurationRoot = new Lazy<IConfigurationRoot>(GetDefaultConfigurationRoot);
 
+        /// <summary>
+        /// Gets or sets the <see cref="IConfigurationRoot"/> that is the backing store for the other public
+        /// members of the <see cref="ConfigurationManager"/> class.
+        /// <para>NOTE: If the value is set to null, then the default <see cref="IConfigurationRoot"/>
+        /// of the <see cref="ConfigurationManager"/> class is used as the value instead.</para>
+        /// </summary>
         public static IConfigurationRoot ConfigurationRoot
         {
             get { return _configurationRoot.Value; }
@@ -29,9 +35,22 @@ namespace System.Configuration
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="AppSettingsSection"/> data for the current application's default configuration.
+        /// </summary>
         public static AppSettingsSection AppSettings { get; } = new AppSettingsSection(() => ConfigurationRoot);
+
+        /// <summary>
+        /// Gets the <see cref="ConnectionStringsSection"/> data for the current application's default configuration.
+        /// </summary>
         public static ConnectionStringsSection ConnectionStrings { get; } = new ConnectionStringsSection(() => ConfigurationRoot);
 
+        /// <summary>
+        /// Retrieves a specified configuration section for the current application's default configuration.
+        /// </summary>
+        /// <param name="sectionName">The configuration section path and name.</param>
+        /// <returns>The specified ConfigurationSection object.</returns>
+        /// <exception cref="KeyNotFoundException">If the section does not exist.</exception>
         public static dynamic GetSection(string sectionName)
         {
             var section = ConfigurationRoot.GetSection(sectionName);
