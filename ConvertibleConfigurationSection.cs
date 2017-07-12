@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Dynamic;
 
@@ -11,6 +13,8 @@ namespace RockLib.Configuration
     /// </summary>
     internal class ConvertibleConfigurationSection : DynamicObject, IConfigurationSection
     {
+        private ConcurrentDictionary<Type, object> _conversionCache = new ConcurrentDictionary<Type, object>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConvertibleConfigurationSection"/> class.
         /// </summary>
@@ -33,16 +37,12 @@ namespace RockLib.Configuration
         /// <returns>true if the operation is successful; otherwise, false.</returns>
         public override bool TryConvert(ConvertBinder binder, out object result)
         {
-            try
+            result = _conversionCache.GetOrAdd(binder.Type, type =>
             {
-                result = Section.Get(binder.Type);
-                return true;
-            }
-            catch
-            {
-                result = null;
-                return false;
-            }
+                try { return Section.Get(type); }
+                catch { return null; }
+            });
+            return result != null;
         }
 
         IEnumerable<IConfigurationSection> IConfiguration.GetChildren() => Section.GetChildren();

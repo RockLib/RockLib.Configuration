@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -17,6 +18,8 @@ namespace System.Configuration
     /// </remarks>
     internal static class ConfigurationManager
     {
+        private static readonly ConcurrentDictionary<string, ConvertibleConfigurationSection> _sectionCache = new ConcurrentDictionary<string, ConvertibleConfigurationSection>(StringComparer.OrdinalIgnoreCase);
+
         private static Lazy<IConfigurationRoot> _configurationRoot = new Lazy<IConfigurationRoot>(GetDefaultConfigurationRoot);
 
         /// <summary>
@@ -53,9 +56,12 @@ namespace System.Configuration
         /// <exception cref="KeyNotFoundException">If the section does not exist.</exception>
         public static dynamic GetSection(string sectionName)
         {
-            var section = ConfigurationRoot.GetSection(sectionName);
-            if (section.Value == null && !section.GetChildren().Any()) throw new KeyNotFoundException();
-            return new ConvertibleConfigurationSection(section);
+            return _sectionCache.GetOrAdd(sectionName, key =>
+            {
+                var section = ConfigurationRoot.GetSection(key);
+                if (section.Value == null && !section.GetChildren().Any()) return null;
+                return new ConvertibleConfigurationSection(section);
+            }) ?? throw new KeyNotFoundException();
         }
 
         private static IConfigurationRoot GetDefaultConfigurationRoot()

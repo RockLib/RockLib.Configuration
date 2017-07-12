@@ -15,10 +15,12 @@ namespace RockLib.Configuration.Example.Core
                 string applicationId = ConfigurationManager.AppSettings["ApplicationId"];
                 string defaultConnectionString = ConfigurationManager.ConnectionStrings["Default"];
                 FooSection foo = (FooSection)ConfigurationManager.GetSection("Foo");
+                FooSection foo2 = (FooSection)ConfigurationManager.GetSection("Foo");
 
                 Console.WriteLine($"applicationId: {applicationId}");
                 Console.WriteLine($"defaultConnectionString: {defaultConnectionString}");
                 Console.WriteLine($"foo: {JsonConvert.SerializeObject(foo)}");
+                Console.WriteLine($"foo is same instance as foo2: {ReferenceEquals(foo, foo2)}");
             }
             catch (Exception e)
             {
