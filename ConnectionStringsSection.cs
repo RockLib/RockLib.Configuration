@@ -16,7 +16,7 @@ namespace System.Configuration
         {
             get
             {
-                var value = _getConfigurationRoot().GetConnectionString(key);
+                var value = _getConfigurationRoot().GetSection("ConnectionStrings")[key];
 
                 if (value == null)
                 {

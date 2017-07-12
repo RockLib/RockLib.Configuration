@@ -16,7 +16,7 @@ namespace System.Configuration
         {
             get
             {
-                var value = _getConfigurationRoot()[key];
+                var value = _getConfigurationRoot().GetSection("AppSettings")[key];
 
                 if (value == null)
                 {

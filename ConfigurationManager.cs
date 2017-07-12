@@ -7,21 +7,17 @@ namespace System.Configuration
 {
     /// <summary>
     /// Provides access to configuration files for client applications. This class cannot be inherited.
-    /// 
+    /// </summary>
+    /// <remarks>
     /// The intent of our copy of ConfigurationManager is to mimic that of the existing/legacy configuration manager in .net 45+
     ///     The idea is that someone consuming our library should be able to drop this in and have it 'just work'
     /// 
     /// Api for legacy system
     /// https://msdn.microsoft.com/en-us/library/system.configuration.configurationmanager(v=vs.110).aspx
-    /// </summary>
+    /// </remarks>
     internal static class ConfigurationManager
     {
-        private static Lazy<IConfigurationRoot> _configurationRoot;
-
-        static ConfigurationManager()
-        {
-            _configurationRoot = new Lazy<IConfigurationRoot>(GetDefaultConfigurationRoot);
-        }
+        private static Lazy<IConfigurationRoot> _configurationRoot = new Lazy<IConfigurationRoot>(GetDefaultConfigurationRoot);
 
         public static IConfigurationRoot ConfigurationRoot
         {

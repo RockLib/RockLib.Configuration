@@ -1,6 +1,5 @@
-﻿using System;
-using System.IO;
-using Microsoft.Extensions.Configuration;
+﻿using Newtonsoft.Json;
+using System;
 using System.Configuration;
 
 namespace RockLib.Configuration.Example.Core
@@ -13,17 +12,27 @@ namespace RockLib.Configuration.Example.Core
 
             try
             {
+                string applicationId = ConfigurationManager.AppSettings["ApplicationId"];
+                string defaultConnectionString = ConfigurationManager.ConnectionStrings["Default"];
+                FooSection foo = (FooSection)ConfigurationManager.GetSection("Foo");
 
-                var value = ConfigurationManager.AppSettings["key"];
-                var section = ConfigurationManager.GetSection("appSettings");
+                Console.WriteLine($"applicationId: {applicationId}");
+                Console.WriteLine($"defaultConnectionString: {defaultConnectionString}");
+                Console.WriteLine($"foo: {JsonConvert.SerializeObject(foo)}");
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                throw;
             }
 
             Console.ReadLine();
+        }
+
+        class FooSection
+        {
+            public int Bar { get; set; }
+            public string Baz { get; set; }
+            public bool Qux { get; set; }
         }
     }
 }
