@@ -61,7 +61,7 @@ namespace System.Configuration
                 var section = ConfigurationRoot.GetSection(key);
                 if (section.Value == null && !section.GetChildren().Any()) return null;
                 return new ConvertibleConfigurationSection(section);
-            }) ?? throw new KeyNotFoundException();
+            }) ?? throw new KeyNotFoundException($"The given section name, '{sectionName}', was not present in the configuration.");
         }
 
         private static IConfigurationRoot GetDefaultConfigurationRoot()

@@ -34,7 +34,7 @@ namespace System.Configuration
 
                 if (value == null)
                 {
-                    throw new KeyNotFoundException();
+                    throw new KeyNotFoundException($"The given key, '{key}', was not present in the configuration's 'ConnectionStrings' section.");
                 }
 
                 return value;
