@@ -13,7 +13,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)ConfigurationManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConnectionStringsSection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ConvertibleConfigurationSection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)InternalsVisibleTo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RockLibConfigurationBuilderExtensions.cs" />
   </ItemGroup>
 </Project>
