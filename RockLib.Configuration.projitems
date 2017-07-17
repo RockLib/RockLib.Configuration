@@ -9,10 +9,8 @@
     <Import_RootNamespace>RockLib.Configuration</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)AppSettingsSection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConfigurationManager.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConnectionStringsSection.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ConvertibleConfigurationSection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AppSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Config.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RockLibConfigurationBuilderExtensions.cs" />
   </ItemGroup>
 </Project>
