@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace RockLib.Configuration
 {
-    public class AppSettings
+    public sealed class AppSettings
     {
-        internal AppSettings()
-        {
-        }
+        private AppSettings() { }
+
+        internal static AppSettings Instance { get; } = new AppSettings();
 
         public string this[string key] => Config.Root["AppSettings:" + key] ?? throw GetKeyNotFoundExeption(key);
 

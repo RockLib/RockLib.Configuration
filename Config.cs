@@ -15,7 +15,7 @@ namespace RockLib.Configuration
             ResetRootToDefault();
         }
 
-        public static AppSettings AppSettings { get; } = new AppSettings();
+        public static AppSettings AppSettings => AppSettings.Instance;
 
         public static bool IsDefault { get; private set; } = true;
 
