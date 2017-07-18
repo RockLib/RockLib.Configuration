@@ -3,14 +3,14 @@ using System;
 
 namespace RockLib.Configuration
 {
-    public static class Config
+    public static class ConfigurationManager
     {
         private static readonly object _locker = new object();
 
         private static Func<IConfigurationRoot> _getRoot;
         private static IConfigurationRoot _root;
 
-        static Config()
+        static ConfigurationManager()
         {
             ResetRootToDefault();
         }
@@ -19,7 +19,7 @@ namespace RockLib.Configuration
 
         public static bool IsDefault { get; private set; } = true;
 
-        public static IConfigurationRoot Root
+        public static IConfigurationRoot ConfigurationRoot
         {
             get
             {
@@ -71,7 +71,7 @@ namespace RockLib.Configuration
                 }
             }
 
-            throw new InvalidOperationException($"{nameof(Config)}.{nameof(Root)} has been locked. Its value cannot be changed after its value has been read.");
+            throw new InvalidOperationException($"{nameof(ConfigurationManager)}.{nameof(ConfigurationRoot)} has been locked. Its value cannot be changed after its value has been read.");
         }
 
         private static IConfigurationRoot GetDefaultConfigurationRoot()

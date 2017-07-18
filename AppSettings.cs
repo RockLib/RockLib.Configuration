@@ -9,9 +9,9 @@ namespace RockLib.Configuration
 
         internal static AppSettings Instance { get; } = new AppSettings();
 
-        public string this[string key] => Config.Root["AppSettings:" + key] ?? throw GetKeyNotFoundExeption(key);
+        public string this[string key] => ConfigurationManager.ConfigurationRoot["AppSettings:" + key] ?? throw GetKeyNotFoundExeption(key);
 
         private static Exception GetKeyNotFoundExeption(string key) =>
-            new KeyNotFoundException($"Unable to locate {nameof(Config.AppSettings)} key '{key}' in {typeof(Config).FullName}.{nameof(Config.Root)}.");
+            new KeyNotFoundException($"Unable to locate {nameof(ConfigurationManager.AppSettings)} key '{key}' in {typeof(ConfigurationManager).FullName}.{nameof(ConfigurationManager.ConfigurationRoot)}.");
     }
 }
