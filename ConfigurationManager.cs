@@ -19,6 +19,8 @@ namespace RockLib.Configuration
 
         public static bool IsDefault { get; private set; } = true;
 
+        public static bool IsLocked => _configurationRoot != null;
+
         public static IConfigurationRoot ConfigurationRoot
         {
             get
