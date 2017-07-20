@@ -7,12 +7,12 @@ namespace RockLib.Configuration
     {
         private static readonly object _locker = new object();
 
-        private static Func<IConfigurationRoot> _getRoot;
-        private static IConfigurationRoot _root;
+        private static Func<IConfigurationRoot> _getConfigurationRoot;
+        private static IConfigurationRoot _configurationRoot;
 
         static ConfigurationManager()
         {
-            ResetRootToDefault();
+            ResetConfigurationRoot();
         }
 
         public static AppSettings AppSettings => AppSettings.Instance;
@@ -23,48 +23,48 @@ namespace RockLib.Configuration
         {
             get
             {
-                if (_root == null)
+                if (_configurationRoot == null)
                 {
                     lock (_locker)
                     {
-                        if (_root == null)
+                        if (_configurationRoot == null)
                         {
-                            _root = _getRoot();
+                            _configurationRoot = _getConfigurationRoot();
                         }
                     }
                 }
-                return _root;
+                return _configurationRoot;
             }
         }
 
-        public static void SetRoot(IConfigurationRoot root)
+        public static void SetConfigurationRoot(IConfigurationRoot configurationRoot)
         {
-            if (root == null) throw new ArgumentNullException(nameof(root));
-            SetRoot(() => root);
+            if (configurationRoot == null) throw new ArgumentNullException(nameof(configurationRoot));
+            SetConfigurationRoot(() => configurationRoot);
         }
 
-        public static void SetRoot(Func<IConfigurationRoot> getRoot)
+        public static void SetConfigurationRoot(Func<IConfigurationRoot> getConfigurationRoot)
         {
-            if (getRoot == null) throw new ArgumentNullException(nameof(getRoot));
-            SetRoot(getRoot, false);
+            if (getConfigurationRoot == null) throw new ArgumentNullException(nameof(getConfigurationRoot));
+            SetConfigurationRoot(getConfigurationRoot, false);
         }
 
-        public static void ResetRootToDefault()
+        public static void ResetConfigurationRoot()
         {
-            SetRoot(GetDefaultConfigurationRoot, true);
+            SetConfigurationRoot(GetDefaultConfigurationRoot, true);
         }
 
-        private static void SetRoot(Func<IConfigurationRoot> getRoot, bool isDefault)
+        private static void SetConfigurationRoot(Func<IConfigurationRoot> getConfigurationRoot, bool isDefault)
         {
-            if (getRoot == null) throw new ArgumentNullException(nameof(getRoot));
+            if (getConfigurationRoot == null) throw new ArgumentNullException(nameof(getConfigurationRoot));
 
-            if (_root == null)
+            if (_configurationRoot == null)
             {
                 lock (_locker)
                 {
-                    if (_root == null)
+                    if (_configurationRoot == null)
                     {
-                        _getRoot = getRoot;
+                        _getConfigurationRoot = getConfigurationRoot;
                         IsDefault = isDefault;
                         return;
                     }
