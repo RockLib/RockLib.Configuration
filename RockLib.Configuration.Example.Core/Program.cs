@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using System;
-using System.Configuration;
 
 namespace RockLib.Configuration.Example.Core
 {
@@ -12,15 +12,17 @@ namespace RockLib.Configuration.Example.Core
 
             try
             {
-                string applicationId = ConfigurationManager.AppSettings["ApplicationId"];
-                string defaultConnectionString = ConfigurationManager.ConnectionStrings["Default"];
-                FooSection foo = (FooSection)ConfigurationManager.GetSection("Foo");
-                FooSection foo2 = (FooSection)ConfigurationManager.GetSection("Foo");
+                var applicationId = ConfigurationManager.AppSettings["ApplicationId"];
+                string defaultConnectionString = ConfigurationManager.ConfigurationRoot.GetConnectionString("Default");
+                var foo = ConfigurationManager.ConfigurationRoot.GetSection("Foo").Get<FooSection>();
+                var foo2 = ConfigurationManager.ConfigurationRoot.GetSection("Foo").Get<FooSection>();
 
                 Console.WriteLine($"applicationId: {applicationId}");
                 Console.WriteLine($"defaultConnectionString: {defaultConnectionString}");
                 Console.WriteLine($"foo: {JsonConvert.SerializeObject(foo)}");
                 Console.WriteLine($"foo is same instance as foo2: {ReferenceEquals(foo, foo2)}");
+
+                var notFound = ConfigurationManager.AppSettings["notFound"];
             }
             catch (Exception e)
             {
@@ -28,6 +30,7 @@ namespace RockLib.Configuration.Example.Core
             }
 
             Console.ReadLine();
+
         }
 
         class FooSection
