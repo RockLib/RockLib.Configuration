@@ -30,6 +30,9 @@ namespace RockLib.Configuration
                         if (_configurationRoot == null)
                         {
                             _configurationRoot = _getConfigurationRoot();
+                            if (_configurationRoot == null)
+                                throw new InvalidOperationException("A null value was returned from the Func<IConfigurationRoot> factory method.");
+                            _getConfigurationRoot = null;
                         }
                     }
                 }
