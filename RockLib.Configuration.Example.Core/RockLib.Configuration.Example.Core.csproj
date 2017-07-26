@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp1.1</TargetFramework>
   </PropertyGroup>
 
-  <Import Project="..\RockLib.Configuration.projitems" Label="Shared" />
+  <Import Project="..\RockLib.Configuration\RockLib.Configuration.projitems" Label="Shared" />
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.2" />
