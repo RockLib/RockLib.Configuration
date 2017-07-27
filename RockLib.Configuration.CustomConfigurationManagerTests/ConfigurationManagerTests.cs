@@ -19,21 +19,21 @@ namespace RockLib.Configuration.CustomConfigurationManagerTests
                         })
                     .Build();
 
-            ConfigurationManager.SetConfigurationRoot(_configurationRoot);
+            Config.SetRoot(_configurationRoot);
         }
 
         [Fact(DisplayName = "CustomConfigurationManagerTests: IsDefault is false when SetConfigurationRoot has been called.")]
         public void IsDefaultIsFalseWhenCustomized()
         {
-            Assert.False(ConfigurationManager.IsDefault);
+            Assert.False(Config.IsDefault);
         }
 
         [Fact(DisplayName = "CustomConfigurationManagerTests: The ConfigurationRoot property is the same instance passed to SetConfigurationRoot.")]
         public void TheCustomConfigurationRootIsUsed()
         {
-            Assert.Same(_configurationRoot, ConfigurationManager.ConfigurationRoot);
-            Assert.Equal("Test", ConfigurationManager.AppSettings["Environment"]);
-            Assert.Equal("200001", ConfigurationManager.AppSettings["ApplicationId"]);
+            Assert.Same(_configurationRoot, Config.Root);
+            Assert.Equal("Test", Config.AppSettings["Environment"]);
+            Assert.Equal("200001", Config.AppSettings["ApplicationId"]);
         }
     }
 }
