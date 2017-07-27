@@ -31,12 +31,20 @@ namespace RockLib.Configuration.DefaultConfigurationManagerTests
             Assert.Equal("Prod", ConfigurationManager.AppSettings["Environment"]);
         }
 
+        [Fact(DisplayName = "DefaultConfigurationManagerTests: IsLocked is true after the ConfigurationRoot property has been accessed.")]
+        public void IsLockedIsTrueAfterConfigurationRootHasBeenAccessed()
+        {
+            // Accessing ConfigurationRoot causes IsLocked to be true.
+            var root = ConfigurationManager.ConfigurationRoot;
+
+            Assert.True(ConfigurationManager.IsLocked);
+        }
+
         [Fact(DisplayName = "DefaultConfigurationManagerTests: Changing environment variable values when IsLocked is true has no effect.")]
         public void EnvironmentVariablesDoNotOverrideAfterLocked()
         {
-            // Getting a value from ConfigurationManager ensures that IsLocked will be true.
-            Assert.Equal("Prod", ConfigurationManager.AppSettings["Environment"]);
-            Assert.True(ConfigurationManager.IsLocked);
+            // Accessing ConfigurationRoot causes IsLocked to be true.
+            var root = ConfigurationManager.ConfigurationRoot;
 
             // This is the same environment variable that we successfully changed in the static constructor.
             // Setting it this time, however, is too late.
