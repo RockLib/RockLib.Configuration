@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RockLib.Configuration\RockLib.Configuration.csproj" />
+    <PackageReference Include="RockLib.Configuration" Version="0.0.1-alpha01" />
   </ItemGroup>
 
   <ItemGroup>
