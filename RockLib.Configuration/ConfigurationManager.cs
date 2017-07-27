@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 
 namespace RockLib.Configuration
 {
@@ -108,10 +109,12 @@ namespace RockLib.Configuration
         /// the <see cref="ConfigurationRoot"/> property has been accessed (i.e. when <see cref="IsLocked"/> is true) will
         /// result in an <see cref="InvalidOperationException"/> being thrown.</para>
         /// </summary>
+        /// <param name="additionalValues">When specified, these key/value pairs are applied to the resulting
+        /// instance of <see cref="IConfigurationRoot"/>.</param>
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
-        public static void ResetConfigurationRoot()
+        public static void ResetConfigurationRoot(IEnumerable<KeyValuePair<string, string>> additionalValues = null)
         {
-            SetConfigurationRoot(GetDefaultConfigurationRoot, true);
+            SetConfigurationRoot(() => GetDefaultConfigurationRoot(additionalValues), additionalValues == null);
         }
 
         private static void SetConfigurationRoot(Func<IConfigurationRoot> getConfigurationRoot, bool isDefault)
@@ -134,13 +137,16 @@ namespace RockLib.Configuration
             throw new InvalidOperationException($"{nameof(ConfigurationManager)}.{nameof(ConfigurationRoot)} has been locked. Its value cannot be changed after its value has been read.");
         }
 
-        private static IConfigurationRoot GetDefaultConfigurationRoot()
+        private static IConfigurationRoot GetDefaultConfigurationRoot(IEnumerable<KeyValuePair<string, string>> additionalValues)
         {
-            var configurationRoot = new ConfigurationBuilder()
-                .AddRockLib()
-                .AddEnvironmentVariables()
-                .Build();
+            var builder = new ConfigurationBuilder().AddRockLib();
 
+            if (additionalValues != null)
+                builder = builder.AddInMemoryCollection(additionalValues);
+
+            builder = builder.AddEnvironmentVariables();
+
+            var configurationRoot = builder.Build();
             return configurationRoot;
         }
     }
