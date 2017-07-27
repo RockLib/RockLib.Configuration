@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration", "RockLib.Configuration\RockLib.Configuration.csproj", "{33869C6F-C539-4FC7-89A6-114BFA3B05D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.Example.Core", "RockLib.Configuration.Example.Core\RockLib.Configuration.Example.Core.csproj", "{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Example.Core", "RockLib.Configuration.Example.Core\RockLib.Configuration.Example.Core.csproj", "{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.DefaultConfigurationManagerTests", "RockLib.Configuration.DefaultConfigurationManagerTests\RockLib.Configuration.DefaultConfigurationManagerTests.csproj", "{E795C763-9900-4D3B-BFF7-1CFD30BC2206}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33869C6F-C539-4FC7-89A6-114BFA3B05D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33869C6F-C539-4FC7-89A6-114BFA3B05D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33869C6F-C539-4FC7-89A6-114BFA3B05D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33869C6F-C539-4FC7-89A6-114BFA3B05D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E795C763-9900-4D3B-BFF7-1CFD30BC2206}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E795C763-9900-4D3B-BFF7-1CFD30BC2206}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E795C763-9900-4D3B-BFF7-1CFD30BC2206}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E795C763-9900-4D3B-BFF7-1CFD30BC2206}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
