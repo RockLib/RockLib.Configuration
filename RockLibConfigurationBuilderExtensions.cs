@@ -11,11 +11,13 @@ namespace RockLib.Configuration
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
-        /// <exception cref="ArgumentException">If <paramref name="jsonConfigPath"/> is null or empty.</exception>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder)
         {
-            return builder.AddRockLib("rocklib.config.json");
+            var environment = Environment.GetEnvironmentVariable("AppSettings:Environment")?.ToLower();
+            if (string.IsNullOrEmpty(environment)) environment = "dev";
+
+            return builder.AddRockLib("rocklib.config.json", $"{environment}.rocklib.config.json");
         }
 
         /// <summary>
@@ -23,21 +25,25 @@ namespace RockLib.Configuration
         /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
-        /// <param name="jsonConfigPath">Required value which provides the name of the file to pull the configuration values from</param>
+        /// <param name="jsonConfigPath">The path of the json config file.</param>
+        /// <param name="supplementalJsonConfigPath">The path of the supplemental json config file.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
         /// <exception cref="ArgumentException">If <paramref name="jsonConfigPath"/> is null or empty.</exception>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder, string jsonConfigPath)
+        public static IConfigurationBuilder AddRockLib(
+            this IConfigurationBuilder builder, string jsonConfigPath, string supplementalJsonConfigPath = null)
         {
-            if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentNullException(nameof(builder));
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentException($"'{nameof(jsonConfigPath)}' must be a non-empty string.", nameof(jsonConfigPath));
 
             // we want the optional value to be false so that it will throw a runtime exception if the file is not found
             // if this is set to true no exception is throw and no config values are found/returned.
-            var builtBuilder = builder
-                .AddJsonFile(jsonConfigPath, optional: false);
+            builder = builder.AddJsonFile(jsonConfigPath, optional: false);
 
-            return builtBuilder;
+            if (!string.IsNullOrEmpty(supplementalJsonConfigPath))
+                builder = builder.AddJsonFile(supplementalJsonConfigPath, optional: true);
+
+            return builder;
         }
     }
 }
