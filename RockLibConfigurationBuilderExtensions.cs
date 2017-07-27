@@ -14,10 +14,13 @@ namespace RockLib.Configuration
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder)
         {
-            var environment = Environment.GetEnvironmentVariable("AppSettings:Environment")?.ToLower();
-            if (string.IsNullOrEmpty(environment)) environment = "dev";
+            string supplementalJsonConfigPath = null;
 
-            return builder.AddRockLib("rocklib.config.json", $"{environment}.rocklib.config.json");
+            var environment = Environment.GetEnvironmentVariable("AppSettings:Environment");
+            if (!string.IsNullOrEmpty(environment))
+                supplementalJsonConfigPath = $"{environment.ToLower()}.rocklib.config.json";
+
+            return builder.AddRockLib("rocklib.config.json", supplementalJsonConfigPath);
         }
 
         /// <summary>
