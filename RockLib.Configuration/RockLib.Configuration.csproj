@@ -16,6 +16,10 @@
     <Version>0.0.1-alpha01</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard1.6|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard1.6\RockLib.Configuration.xml</DocumentationFile>
+  </PropertyGroup>
     
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.2" />
