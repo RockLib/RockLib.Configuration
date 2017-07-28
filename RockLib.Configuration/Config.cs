@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using RockLib.Immutable;
 using System;
 using System.Collections.Generic;
 
@@ -9,15 +10,7 @@ namespace RockLib.Configuration
     /// </summary>
     public static class Config
     {
-        private static readonly object _locker = new object();
-
-        private static Func<IConfigurationRoot> _getRoot;
-        private static IConfigurationRoot _configurationRoot;
-
-        static Config()
-        {
-            ResetRoot();
-        }
+        private static readonly Semimutable<IConfigurationRoot> _root = new Semimutable<IConfigurationRoot>(() => GetDefaultRoot(null));
 
         /// <summary>
         /// Gets an object that retrieves settings from the "AppSettings" section of the
@@ -29,7 +22,7 @@ namespace RockLib.Configuration
         /// Gets a value indicating whether the <see cref="Root"/> property is the default
         /// instance of <see cref="IConfigurationRoot"/>.
         /// </summary>
-        public static bool IsDefault { get; private set; } = true;
+        public static bool IsDefault => _root.HasDefaultValue;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="Root"/> property has been locked.
@@ -39,32 +32,13 @@ namespace RockLib.Configuration
         /// <see cref="SetRoot(Func{IConfigurationRoot})"/>, or <see cref="ResetRoot"/>
         /// methods will result in an <see cref="InvalidOperationException"/>.</para>
         /// </summary>
-        public static bool IsLocked => _configurationRoot != null;
+        public static bool IsLocked => _root.IsLocked;
 
         /// <summary>
         /// Gets the <see cref="IConfigurationRoot"/> associated with the <see cref="Config"/> class.
         /// This property is guaranteed not to change.
         /// </summary>
-        public static IConfigurationRoot Root
-        {
-            get
-            {
-                if (_configurationRoot == null)
-                {
-                    lock (_locker)
-                    {
-                        if (_configurationRoot == null)
-                        {
-                            _configurationRoot = _getRoot();
-                            if (_configurationRoot == null)
-                                throw new InvalidOperationException("A null value was returned from the Func<IConfigurationRoot> factory method.");
-                            _getRoot = null;
-                        }
-                    }
-                }
-                return _configurationRoot;
-            }
-        }
+        public static IConfigurationRoot Root => _root.Value;
 
         /// <summary>
         /// Sets the value of the <see cref="Root"/> property to the specified
@@ -100,7 +74,7 @@ namespace RockLib.Configuration
         public static void SetRoot(Func<IConfigurationRoot> getRoot)
         {
             if (getRoot == null) throw new ArgumentNullException(nameof(getRoot));
-            SetRoot(getRoot, false);
+            _root.SetValue(getRoot);
         }
 
         /// <summary>
@@ -114,27 +88,10 @@ namespace RockLib.Configuration
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void ResetRoot(IEnumerable<KeyValuePair<string, string>> additionalValues = null)
         {
-            SetRoot(() => GetDefaultRoot(additionalValues), additionalValues == null);
-        }
-
-        private static void SetRoot(Func<IConfigurationRoot> getRoot, bool isDefault)
-        {
-            if (getRoot == null) throw new ArgumentNullException(nameof(getRoot));
-
-            if (_configurationRoot == null)
-            {
-                lock (_locker)
-                {
-                    if (_configurationRoot == null)
-                    {
-                        _getRoot = getRoot;
-                        IsDefault = isDefault;
-                        return;
-                    }
-                }
-            }
-
-            throw new InvalidOperationException($"{nameof(Config)}.{nameof(Root)} has been locked. Its value cannot be changed after its value has been read.");
+            if (additionalValues == null)
+                _root.ResetValue();
+            else
+                SetRoot(() => GetDefaultRoot(additionalValues));
         }
 
         private static IConfigurationRoot GetDefaultRoot(IEnumerable<KeyValuePair<string, string>> additionalValues)
