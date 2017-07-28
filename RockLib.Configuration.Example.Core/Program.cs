@@ -8,7 +8,7 @@ namespace RockLib.Configuration.Example.Core
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Configuration Manager Exmple Harness");
+            Console.WriteLine("Configuration Manager Example Harness");
 
             try
             {

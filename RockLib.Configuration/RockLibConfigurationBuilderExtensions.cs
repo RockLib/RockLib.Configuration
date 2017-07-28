@@ -3,6 +3,9 @@ using Microsoft.Extensions.Configuration;
 
 namespace RockLib.Configuration
 {
+    /// <summary>
+    /// Extension methods for adding RockLib's standard JSON config file to a <see cref="IConfigurationBuilder"/>.
+    /// </summary>
     public static class RockLibConfigurationBuilderExtensions
     {
         /// <summary>

@@ -3,9 +3,9 @@ using Xunit;
 
 namespace RockLib.Configuration.DefaultConfigurationManagerTests
 {
-    public class ConfigurationManagerTests
+    public class ConfigTests
     {
-        static ConfigurationManagerTests()
+        static ConfigTests()
         {
             // Set the environment variable before ConfigurationManager is used.
             Environment.SetEnvironmentVariable("AppSettings:Environment", "Prod");
@@ -14,13 +14,13 @@ namespace RockLib.Configuration.DefaultConfigurationManagerTests
         [Fact(DisplayName = "DefaultConfigurationManagerTests: IsDefault is true by default.")]
         public void IsDefaultIsTrueByDefault()
         {
-            Assert.True(ConfigurationManager.IsDefault);
+            Assert.True(Config.IsDefault);
         }
 
         [Fact(DisplayName = "DefaultConfigurationManagerTests: 'rocklib.config.json' is used by default.")]
         public void FileConfigIsUsedByDefault()
         {
-            Assert.Equal("201740", ConfigurationManager.AppSettings["ApplicationId"]);
+            Assert.Equal("201740", Config.AppSettings["ApplicationId"]);
         }
 
         [Fact(DisplayName = "DefaultConfigurationManagerTests: Environment variables override values from 'rocklib.config.json'.")]
@@ -28,30 +28,30 @@ namespace RockLib.Configuration.DefaultConfigurationManagerTests
         {
             // Note that the "AppSettings:Environment" environment variable was
             // set in the static constructor with a value of "Prod".
-            Assert.Equal("Prod", ConfigurationManager.AppSettings["Environment"]);
+            Assert.Equal("Prod", Config.AppSettings["Environment"]);
         }
 
         [Fact(DisplayName = "DefaultConfigurationManagerTests: IsLocked is true after the ConfigurationRoot property has been accessed.")]
         public void IsLockedIsTrueAfterConfigurationRootHasBeenAccessed()
         {
             // Accessing ConfigurationRoot causes IsLocked to be true.
-            var root = ConfigurationManager.ConfigurationRoot;
+            var root = Config.Root;
 
-            Assert.True(ConfigurationManager.IsLocked);
+            Assert.True(Config.IsLocked);
         }
 
         [Fact(DisplayName = "DefaultConfigurationManagerTests: Changing environment variable values when IsLocked is true has no effect.")]
         public void EnvironmentVariablesDoNotOverrideAfterLocked()
         {
             // Accessing ConfigurationRoot causes IsLocked to be true.
-            var root = ConfigurationManager.ConfigurationRoot;
+            var root = Config.Root;
 
             // This is the same environment variable that we successfully changed in the static constructor.
             // Setting it this time, however, is too late.
             Environment.SetEnvironmentVariable("AppSettings:Environment", "Beta");
 
             // No effect.
-            Assert.Equal("Prod", ConfigurationManager.AppSettings["Environment"]);
+            Assert.Equal("Prod", Config.AppSettings["Environment"]);
         }
     }
 }
