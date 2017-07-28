@@ -3,9 +3,9 @@ using Xunit;
 
 namespace RockLib.Configuration.DefaultConfigurationManagerTests
 {
-    public class ConfigurationManagerTests
+    public class ConfigTests
     {
-        static ConfigurationManagerTests()
+        static ConfigTests()
         {
             // Set the environment variable before ConfigurationManager is used.
             Environment.SetEnvironmentVariable("AppSettings:Environment", "Prod");

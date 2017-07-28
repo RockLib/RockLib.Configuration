@@ -4,11 +4,11 @@ using Xunit;
 
 namespace RockLib.Configuration.CustomConfigurationManagerTests
 {
-    public class ConfigurationManagerTests
+    public class ConfigTests
     {
         private static readonly IConfigurationRoot _configurationRoot;
 
-        static ConfigurationManagerTests()
+        static ConfigTests()
         {
             _configurationRoot = new ConfigurationBuilder()
                     .AddInMemoryCollection(
