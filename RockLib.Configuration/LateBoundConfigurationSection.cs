@@ -54,7 +54,7 @@ namespace RockLib.Configuration
         {
             var type = System.Type.GetType(assemblyQualifiedName, true, true);
             if (!typeof(T).GetTypeInfo().IsAssignableFrom(type))
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"Unable to set the Type property. The specified value, '{assemblyQualifiedName}', is not assignable to type '{typeof(T).Name}'.");
             return type;
         }
 
