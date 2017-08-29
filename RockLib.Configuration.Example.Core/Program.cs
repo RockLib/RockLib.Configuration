@@ -12,12 +12,12 @@ namespace RockLib.Configuration.Example.Core
 
             try
             {
-                var applicationId = Config.AppSettings["ApplicationId"];
+                var key1 = Config.AppSettings["Key1"];
                 string defaultConnectionString = Config.Root.GetConnectionString("Default");
                 var foo = Config.Root.GetSection("Foo").Get<FooSection>();
                 var foo2 = Config.Root.GetSection("Foo").Get<FooSection>();
 
-                Console.WriteLine($"applicationId: {applicationId}");
+                Console.WriteLine($"key1: {key1}");
                 Console.WriteLine($"defaultConnectionString: {defaultConnectionString}");
                 Console.WriteLine($"foo: {JsonConvert.SerializeObject(foo)}");
                 Console.WriteLine($"foo is same instance as foo2: {ReferenceEquals(foo, foo2)}");
