@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using RockLib.Configuration;
 using System;
 
-namespace RockLib.Configuration.Example.Core
+namespace Example.FileConfig.DotNetCore
 {
     class Program
     {

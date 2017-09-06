@@ -1,17 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration", "RockLib.Configuration\RockLib.Configuration.csproj", "{33869C6F-C539-4FC7-89A6-114BFA3B05D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Example.Core", "RockLib.Configuration.Example.Core\RockLib.Configuration.Example.Core.csproj", "{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.FileConfig.DotNetCore", "Example.FileConfig.DotNetCore\Example.FileConfig.DotNetCore.csproj", "{19FCC5CE-4CDC-409A-918F-AE0C72B16D38}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.DefaultConfigTests", "RockLib.Configuration.DefaultConfigTests\RockLib.Configuration.DefaultConfigTests.csproj", "{E795C763-9900-4D3B-BFF7-1CFD30BC2206}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.CustomConfigTests", "RockLib.Configuration.CustomConfigTests\RockLib.Configuration.CustomConfigTests.csproj", "{39DDD7E6-739F-4631-AF64-7A7EB1D55A1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.UnitTests", "RockLib.Configuration.UnitTests\RockLib.Configuration.UnitTests.csproj", "{70A45EFE-5889-44D3-8E21-885C6ACB1AE9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.UnitTests", "RockLib.Configuration.UnitTests\RockLib.Configuration.UnitTests.csproj", "{70A45EFE-5889-44D3-8E21-885C6ACB1AE9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.EnvironmentVariableConfig.DotNetCore", "Example.EnvironmentVariableConfig.DotNetCore\Example.EnvironmentVariableConfig.DotNetCore.csproj", "{A3AD8BD0-AC40-46F4-BADD-80E63ED28E39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,8 +41,15 @@ Global
 		{70A45EFE-5889-44D3-8E21-885C6ACB1AE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70A45EFE-5889-44D3-8E21-885C6ACB1AE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70A45EFE-5889-44D3-8E21-885C6ACB1AE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3AD8BD0-AC40-46F4-BADD-80E63ED28E39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3AD8BD0-AC40-46F4-BADD-80E63ED28E39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3AD8BD0-AC40-46F4-BADD-80E63ED28E39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3AD8BD0-AC40-46F4-BADD-80E63ED28E39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DF36CA15-3280-487B-AA81-A9F8C00A4CBB}
 	EndGlobalSection
 EndGlobal
