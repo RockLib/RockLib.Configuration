@@ -42,9 +42,9 @@ namespace RockLib.Configuration
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentException($"'{nameof(jsonConfigPath)}' must be a non-empty string.", nameof(jsonConfigPath));
 
-            // we want the optional value to be false so that it will throw a runtime exception if the file is not found
-            // if this is set to true no exception is throw and no config values are found/returned.
-            builder = builder.AddJsonFile(jsonConfigPath, optional: false);
+            // we want the optional value to be true so that it will not throw a runtime exception if the file is not found
+            // the Rocklib.config.json is should not be required but just used.
+            builder = builder.AddJsonFile(jsonConfigPath, optional: true);
 
             if (!string.IsNullOrEmpty(supplementalJsonConfigPath))
                 builder = builder.AddJsonFile(supplementalJsonConfigPath, optional: true);
