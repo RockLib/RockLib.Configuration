@@ -96,14 +96,20 @@ namespace RockLib.Configuration
 
         private static IConfigurationRoot GetDefaultRoot(IEnumerable<KeyValuePair<string, string>> additionalValues)
         {
-            var builder = new ConfigurationBuilder().AddRockLib();
+            var builder = new ConfigurationBuilder();
 
-            if (additionalValues != null)
-                builder = builder.AddInMemoryCollection(additionalValues);
+#if NET451
 
-            builder = builder.AddEnvironmentVariables();
-
+            builder
+                .AddAppOrWebConfig();
+#endif
+            builder
+                .AddRockLib()
+                .AddEnvironmentVariables()
+                .AddInMemoryCollection(additionalValues ?? new List<KeyValuePair<string, string>>());
+            
             var configurationRoot = builder.Build();
+           
             return configurationRoot;
         }
     }

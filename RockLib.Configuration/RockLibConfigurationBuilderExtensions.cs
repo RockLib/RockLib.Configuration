@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace RockLib.Configuration
@@ -36,8 +38,7 @@ namespace RockLib.Configuration
         /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
         /// <exception cref="ArgumentException">If <paramref name="jsonConfigPath"/> is null or empty.</exception>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddRockLib(
-            this IConfigurationBuilder builder, string jsonConfigPath, string supplementalJsonConfigPath = null)
+        public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder, string jsonConfigPath, string supplementalJsonConfigPath = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentException($"'{nameof(jsonConfigPath)}' must be a non-empty string.", nameof(jsonConfigPath));
@@ -46,9 +47,33 @@ namespace RockLib.Configuration
             builder = builder.AddJsonFile(jsonConfigPath, optional: true);
 
             if (!string.IsNullOrEmpty(supplementalJsonConfigPath))
+            {
                 builder = builder.AddJsonFile(supplementalJsonConfigPath, optional: true);
+            }
+           
+            return builder;
+        }
+
+#if NET451
+        /// <summary>
+        /// Adds support for .Net Framework applications to pull in App or Web.config AppSettings values.
+        /// </summary>
+        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <returns>The <see cref="IConfigurationBuilder"/></returns>
+        public static IConfigurationBuilder AddAppOrWebConfig(this IConfigurationBuilder builder)
+        {
+
+
+            var appSettings = System.Configuration.ConfigurationManager.AppSettings;
+            var inMemoryKeys = appSettings
+                .AllKeys
+                .ToDictionary(k => $"AppSettings:{k}", k => appSettings[k]);
+          
+            builder.AddInMemoryCollection(inMemoryKeys);
 
             return builder;
         }
+
+#endif
     }
 }
