@@ -54,6 +54,7 @@ namespace RockLib.Configuration
             return builder;
         }
 
+#if NET451
         /// <summary>
         /// Adds support for .Net Framework applications to pull in App or Web.config AppSettings values.
         /// </summary>
@@ -62,7 +63,7 @@ namespace RockLib.Configuration
         public static IConfigurationBuilder AddAppOrWebConfig(this IConfigurationBuilder builder)
         {
 
-#if NET451
+
             var appSettings = System.Configuration.ConfigurationManager.AppSettings;
             var inMemoryKeys = appSettings
                 .AllKeys
@@ -70,8 +71,9 @@ namespace RockLib.Configuration
           
             builder.AddInMemoryCollection(inMemoryKeys);
 
-#endif
             return builder;
         }
+
+#endif
     }
 }
