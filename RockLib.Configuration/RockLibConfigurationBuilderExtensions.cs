@@ -60,7 +60,7 @@ namespace RockLib.Configuration
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
-        public static IConfigurationBuilder AddAppOrWebConfig(this IConfigurationBuilder builder)
+        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder)
         {
 
 

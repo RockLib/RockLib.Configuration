@@ -101,7 +101,7 @@ namespace RockLib.Configuration
 #if NET451
 
             builder
-                .AddAppOrWebConfig();
+                .AddConfigurationManager();
 #endif
             builder
                 .AddRockLib()
