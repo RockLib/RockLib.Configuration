@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Xml;
 
 namespace RockLib.Configuration
 {
@@ -21,9 +24,10 @@ namespace RockLib.Configuration
         /// <exception cref="KeyNotFoundException">
         /// If the given key is not found in the "AppSettings" section of <see cref="Config.Root"/>.
         /// </exception>
-        public string this[string key] => Config.Root["AppSettings:" + key] ?? throw GetKeyNotFoundExeption(key);
+        public string this[string key] => Config.Root[$"AppSettings:{key}"] ?? throw GetKeyNotFoundExeption(key);
 
         private static Exception GetKeyNotFoundExeption(string key) =>
             new KeyNotFoundException($"Unable to locate {nameof(Config.AppSettings)} key '{key}' in {typeof(Config).FullName}.{nameof(Config.Root)}.");
     }
+    
 }
