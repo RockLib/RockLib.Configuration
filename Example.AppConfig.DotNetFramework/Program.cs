@@ -1,4 +1,5 @@
 ﻿
+
 namespace Example.AppConfig.DotNetFramework
 {
     class Program
