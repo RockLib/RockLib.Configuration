@@ -64,12 +64,10 @@ namespace RockLib.Configuration
 
 #if NET451
             var appSettings = System.Configuration.ConfigurationManager.AppSettings;
-            var inMemoryKeys = (from settingKey in appSettings.AllKeys
-                                let value = appSettings[settingKey]
-                                let key = $"AppSettings:{settingKey}"
-                                select new KeyValuePair<string, string>(key, value))
-                                .ToList();
-
+            var inMemoryKeys = appSettings
+                .AllKeys
+                .ToDictionary(k => $"AppSettings:{k}", k => appSettings[k]);
+          
             builder.AddInMemoryCollection(inMemoryKeys);
 
 #endif
