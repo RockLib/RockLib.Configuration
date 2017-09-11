@@ -89,7 +89,7 @@ AppSettings:test_key1
 If you want to pull environment variables and use them as custom sections, this is also allowed.  To do this, assume you have a section called foo_section.  When you create your variables you will need to prefix your keys with foo_section as below.
 
 ```
-foo_section:Bar"
+foo_section:Bar
 foo_section:Baz
 ```
 
@@ -97,11 +97,13 @@ foo_section:Baz
 ## How To Use
 
 ### Accessing App Settings
-In order to access app settings you can use the .AppSettings propety and provide it the desired key.
+In order to access `AppSettings` you can use the .AppSettings propety and provide  the desired key.
 
 ```
 var key1Value = Config.AppSettings["Key1"];
 ```
+
+If the provided key is not found a KeyNotFoundException will be throw.
 
 #### Example Configuration Files
 
