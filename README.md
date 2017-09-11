@@ -4,9 +4,14 @@ All RockLib packages will depend on the RockLib.Configuration package to provide
 ## Table Of Contents
 * [Steps to Success](#steps-to-success)
 * [Nuget Packages](#packages)
-* RockLib.config.json
-  * [Setup App Config](#setup-app-config)
+* [Configuration Setup](#configuration-setup)
+  * [RockLib Configuration Setup](#rockLib-configuration-setup)
+  * [Application Configuration Setup](#application-configuration-setup)
+  * [Environment Variables Setup](#environment-variables-setup)
 * [How to use](#how-to-use)
+  * [Accessing App Settings](#accessing-app-settings)
+  * [Accessing Connection Strings](#accessing-connection-strings)
+  * [Accessing Custom Sections](#accessing-custom-sections)
 * [Example Application](#example-application)
 
 ## Steps to Success
@@ -33,8 +38,15 @@ How to install from the package manager console:
 PM> Install-Package RockLib.Configuration
 ```
 
-## Setup App Config
-You will need to have an RockLib.config.json file associated with your application.
+## Configuration Setup
+The RockLib.Configuration library will attempt to pull values from multiple sources.  These sources include App.config/web.config files, RockLib.Config.Json file, Environment variables, and application driven key/value pairs.
+
+The order of precedence is App/Web Configuration file, RockLib.Config.Json file, Environment variables, application provided values.  This means that if you have a app setting value in RockLib.Config.Json and an setting in an environment variable, the value from the environment variable will be the one provided by the RockLib.Configuration library.
+
+### RockLib Configuration Setup
+The RockLib.Config.Json is a Json formatted file that can contain `appSettings` section in order to store your key/value pairs.  In order for this file to be used by RockLib.Configuration you need to setup this file to be copied to your output directory.
+
+The usage of the RockLib.Config.Json file will normally be associated with .Net Core/Standard applications when needing to access only AppSettings key/value pairs.
 
 ### Copy Config file to Output Directory
 When you add the RockLib.config.json file to your project you will want to make sure the file is set to always Copy to Output Directory.  To configure this follow the steps below
@@ -51,7 +63,36 @@ Here is an example of the base app.config.json file
     "Key2": "anotherkey"
   }
 }
+
 ```
+
+### Application Configuration Setup
+The App.Config or Web.Config file is the standard configuration file used for .Net Framework applications.  If you only need to use the AppSettings values in your application you can ignore the need for the RockLib.Config.Json file.  The RockLib.Configuration library can pull `AppSetting` values from your App.Config or Web.Config file with no issues.
+
+Here is an example of how to store `AppSetting` values in your app/web.config files
+```
+  <appSettings>
+    <add key="Key1" value="Key1_Value"/>
+  </appSettings>
+```
+
+### Environment Variables Setup
+There are going to be times when you want to use environment variables inside your application, the RockLib.Configuration library can handle these.
+
+In order to have RockLib.Configuration pull the environment variables you will need to have the key formatted correctly.
+
+To pull values as `AppSetting` key/values you will want to format the key as below
+```
+AppSettings:test_key1
+```
+
+If you want to pull environment variables and use them as custom sections, this is also allowed.  To do this, assume you have a section called foo_section.  When you create your variables you will need to prefix your keys with foo_section as below.
+
+```
+foo_section:Bar"
+foo_section:Baz
+```
+
 
 ## How To Use
 
@@ -62,11 +103,42 @@ In order to access app settings you can use the .AppSettings propety and provide
 var key1Value = Config.AppSettings["Key1"];
 ```
 
+#### Example Configuration Files
+
+RockLib.Config.Json
+```
+{
+  "appSettings": {
+    "Key1": "somekey
+  }
+}
+```
+
+App.Config
+```
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <appSettings>
+    <add key="Key100" value="Key100_Value"/>
+  </appSettings>
+</configuration>
+```
+
 ### Accessing Connection Strings
 In order to access connection strings you can use the .GetConnectionString() method and provide it a name of the connection string.
 
 ```
 var defaultConnectionString = Config.Root.GetConnectionString("Default");
+```
+
+
+RockLib.Config.Json
+```
+{
+  "ConnectionStrings": {
+    "Default": "schema://path"
+  }
+}
 ```
 
 ### Accessing Custom Sections
