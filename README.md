@@ -18,7 +18,7 @@ All RockLib packages will depend on the RockLib.Configuration package to provide
 In order go get the RockLib.Configuration provider to work inside your application you will need to complete the following steps
 
 1. Install all the required [NuGet](#packages) packages.
-2. Create and configure the RockLib.config.json file (this is the application's configuration file)
+2. Create and configure the `rocklib.config.json` file (this is the application's configuration file)
 
 ## Packages 
 
@@ -39,17 +39,17 @@ PM> Install-Package RockLib.Configuration
 ```
 
 ## Configuration Setup
-The RockLib.Configuration library will attempt to pull values from multiple sources.  These sources include App.config/web.config files, RockLib.Config.Json file, Environment variables, and application driven key/value pairs.
+By default, the RockLib.Configuration library will attempt to pull values from multiple sources.  These sources include App.config/web.config files (for .NET Framework applications), the `rocklib.config.json` file, Environment variables, and application-driven key/value pairs.
 
-The order of precedence is App/Web Configuration file, RockLib.Config.Json file, Environment variables, application provided values.  This means that if you have a app setting value in RockLib.Config.Json and an setting in an environment variable, the value from the environment variable will be the one provided by the RockLib.Configuration library.
+he order of precedence, from lowest priority to highest, is App/Web Configuration file, `rocklib.config.json` file, Environment variables, application-provided values.  This means that if you have an app setting value in `rocklib.config.json` and a setting in an environment variable, the value from the environment variable will be the one provided by the RockLib.Configuration library.
 
 ### RockLib Configuration Setup
-The RockLib.Config.Json is a Json formatted file that can contain `appSettings` section in order to store your key/value pairs.  In order for this file to be used by RockLib.Configuration you need to setup this file to be copied to your output directory.
+The `rocklib.config.json` is a Json formatted file that can contain `appSettings` section in order to store your key/value pairs.  In order for this file to be used by RockLib.Configuration you need to setup this file to be copied to your output directory.
 
-The usage of the RockLib.Config.Json file will normally be associated with .Net Core/Standard applications when needing to access only AppSettings key/value pairs.
+The usage of the `rocklib.config.json` file will normally be associated with .NET Core/Standard applications when needing to access only AppSettings key/value pairs.
 
 ### Copy Config file to Output Directory
-When you add the RockLib.config.json file to your project you will want to make sure the file is set to always Copy to Output Directory.  To configure this follow the steps below
+When you add the `rocklib.config.json` file to your project you will want to make sure the file is set to always Copy to Output Directory.  To configure this follow the steps below
 
 1. Add the file to your solution
 2. Right click the file -> Properties (should open up the property page for the file)
@@ -67,7 +67,7 @@ Here is an example of the base app.config.json file
 ```
 
 ### Application Configuration Setup
-The App.Config or Web.Config file is the standard configuration file used for .Net Framework applications.  If you only need to use the AppSettings values in your application you can ignore the need for the RockLib.Config.Json file.  The RockLib.Configuration library can pull `AppSetting` values from your App.Config or Web.Config file with no issues.
+The App.Config or Web.Config file is the standard configuration file used for .NET Framework applications.  If you only need to use the AppSettings values in your application you can ignore the need for the `rocklib.config.json` file.  The RockLib.Configuration library can pull `AppSetting` values from your App.Config or Web.Config file with no issues.
 
 Here is an example of how to store `AppSetting` values in your app/web.config files
 ```
@@ -77,7 +77,7 @@ Here is an example of how to store `AppSetting` values in your app/web.config fi
 ```
 
 ### Environment Variables Setup
-There are going to be times when you want to use environment variables inside your application, the RockLib.Configuration library can handle these.
+By default, RockLib.Configuration configures itself by reading environment variables. It does so at a higher priority than the `rocklib.config.json` file. This allows some or all of an application's settings to be set via machine, user, or process environment variables. The [Microsoft.Extensions.Configuration documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration#simple-configuration) provides some details on the formatting of environment variables names.
 
 In order to have RockLib.Configuration pull the environment variables you will need to have the key formatted correctly.
 
@@ -107,7 +107,7 @@ If the provided key is not found a KeyNotFoundException will be throw.
 
 #### Example Configuration Files
 
-RockLib.Config.Json
+rocklib.config.json
 ```
 {
   "appSettings": {
@@ -134,7 +134,7 @@ var defaultConnectionString = Config.Root.GetConnectionString("Default");
 ```
 
 
-RockLib.Config.Json
+rocklib.config.json
 ```
 {
   "ConnectionStrings": {
@@ -144,7 +144,7 @@ RockLib.Config.Json
 ```
 
 ### Accessing Custom Sections
-If you would like to create a custom section, this is very straight forward to do.  You will first need to create a custom section in your RockLib.config.json file as below.
+If you would like to create a custom section, this is very straight forward to do.  You will first need to create a custom section in your `rocklib.config.json` file as below.
 
 ```
 "Foo": {
