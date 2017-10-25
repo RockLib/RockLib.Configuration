@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Immutable;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace RockLib.Configuration
@@ -29,7 +30,7 @@ namespace RockLib.Configuration
         public string Type
         {
             get => _type?.Value.AssemblyQualifiedName;
-            set => GetField(ref _type, _typeLocker).Value = GetType(value);
+            set => GetField(ref _type, _typeLocker).SetValue(() => GetType(value));
         }
 
         /// <summary>
@@ -48,29 +49,57 @@ namespace RockLib.Configuration
         /// mapped from the <see cref="Value"/> property.
         /// </summary>
         /// <returns>An instance of type <typeparamref name="T"/>.</returns>
-        public T CreateInstance()
+        public T CreateInstance() => (T)CreateObject();
+
+        private object CreateObject()
         {
-            if (Value != null)
+            if (_type == null) throw new InvalidOperationException("Unable to create object:\n- The Type property has not been set.");
+            var type = _type.Value;
+            if (_value == null) throw new InvalidOperationException($"Unable to create object of type '{type}':\n- The Value property has not been set.");
+
+            Exception bindingException;
+            string bindingErrorMessage;
+
+            try
             {
-                try
-                {
-                    var instance = Value.Get(_type.Value);
-                    if (instance != null) return (T)instance;
-                }
-                catch (InvalidOperationException)
-                {
-                }
+                var obj = Value.Get(type);
+                if (obj != null) return obj;
+                bindingException = null;
+                bindingErrorMessage = "The binding `Get(this IConfiguration, Type)` extension method returned null.";
             }
-            if (_type.Value.GetTypeInfo().GetConstructor(System.Type.EmptyTypes) != null)
-                return (T)Activator.CreateInstance(_type.Value);
-            throw new InvalidOperationException($"Unable to create instance of type '{_type.Value}'.");
+            catch (Exception ex)
+            {
+                bindingException = ex;
+                bindingErrorMessage = "The binding `Get(this IConfiguration, Type)` extension method threw an exception.";
+            }
+
+            try
+            {
+                return Activator.CreateInstance(type);
+            }
+            catch (Exception activatorException)
+            {
+                var activatorMessage = $"Attempting to invoke the default constructor of the '{type}' type with `Activator.CreateInstance(Type)` threw an exception.";
+                var message = $"Unable to create object of type '{type}':\n- {bindingErrorMessage}\n- {activatorMessage}";
+                if (bindingException == null) throw new InvalidOperationException(message, activatorException);
+                throw new InvalidOperationException(message, new AggregateException(bindingException, activatorException));
+            }
         }
 
         private static Type GetType(string assemblyQualifiedName)
         {
-            var type = System.Type.GetType(assemblyQualifiedName, true, true);
+            Type type;
+            try
+            {
+                type = System.Type.GetType(assemblyQualifiedName, throwOnError: true, ignoreCase: true);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Unable to set the Type property. The type specified by the assembly-qualified name, "
+                    + $"'{assemblyQualifiedName}', could not be found.", ex);
+            }
             if (!typeof(T).GetTypeInfo().IsAssignableFrom(type))
-                throw new InvalidOperationException($"Unable to set the Type property. The specified value, '{assemblyQualifiedName}', is not assignable to type '{typeof(T).Name}'.");
+                throw new InvalidOperationException($"Unable to set the Type property. The specified value, '{type}', is not assignable to type '{typeof(T)}'.");
             return type;
         }
 
