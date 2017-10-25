@@ -21,6 +21,11 @@ namespace RockLib.Configuration.UnitTests
                     { "foo2:bar:value:garplies:0:thud", "true" },
                     { "foo2:bar:value:garplies:1:grault", "xyz" },
                     { "foo2:bar:value:garplies:1:thud", "false" },
+                    { "foo3:bar:type", "RockLib.Configuration.UnitTests.EmptyBar, RockLib.Configuration.UnitTests" },
+                    { "foo4:bar:type", "RockLib.Configuration.UnitTests.EmptyBar, RockLib.Configuration.UnitTests" },
+                    { "foo4:bar:value", null },
+                    { "foo5:bar:type", "RockLib.Configuration.UnitTests.EmptyBar, RockLib.Configuration.UnitTests" },
+                    { "foo5:bar:value", "" },
                 })
                 .Build();
 
@@ -39,6 +44,18 @@ namespace RockLib.Configuration.UnitTests
             Assert.Equal(true, bar2.Garplies[0].Thud);
             Assert.Equal("xyz", bar2.Garplies[1].Grault);
             Assert.Equal(false, bar2.Garplies[1].Thud);
+
+            var foo3 = config.GetSection("foo3").Get<Foo>();
+            var bar3 = foo3.Bar.CreateInstance();
+            Assert.IsType<EmptyBar>(bar3);
+
+            var foo4 = config.GetSection("foo4").Get<Foo>();
+            var bar4 = foo4.Bar.CreateInstance();
+            Assert.IsType<EmptyBar>(bar4);
+
+            var foo5 = config.GetSection("foo5").Get<Foo>();
+            var bar5 = foo5.Bar.CreateInstance();
+            Assert.IsType<EmptyBar>(bar5);
         }
     }
 
@@ -60,6 +77,10 @@ namespace RockLib.Configuration.UnitTests
     public class AnotherBar : IBar
     {
         public List<Garply> Garplies { get; set; }
+    }
+
+    public class EmptyBar : IBar
+    {
     }
 
     public class Garply

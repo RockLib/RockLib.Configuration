@@ -48,7 +48,23 @@ namespace RockLib.Configuration
         /// mapped from the <see cref="Value"/> property.
         /// </summary>
         /// <returns>An instance of type <typeparamref name="T"/>.</returns>
-        public T CreateInstance() => (T)Value.Get(_type.Value);
+        public T CreateInstance()
+        {
+            if (Value != null)
+            {
+                try
+                {
+                    var instance = Value.Get(_type.Value);
+                    if (instance != null) return (T)instance;
+                }
+                catch (InvalidOperationException)
+                {
+                }
+            }
+            if (_type.Value.GetTypeInfo().GetConstructor(System.Type.EmptyTypes) != null)
+                return (T)Activator.CreateInstance(_type.Value);
+            throw new InvalidOperationException($"Unable to create instance of type '{_type.Value}'.");
+        }
 
         private static Type GetType(string assemblyQualifiedName)
         {
