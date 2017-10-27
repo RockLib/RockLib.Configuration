@@ -36,10 +36,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// <returns>An object with values set from the configuration.</returns>
         public static object Create(this IConfiguration configuration, Type type)
         {
-            if (IsConfigurationSection(configuration, out IConfigurationSection section))
-                return ConvertToType(section, type);
-            else
-            {
+            if (IsConfigurationValue(configuration, out IConfigurationSection section)) return ConvertToType(section, type);
             if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, type);
             if (type.IsArray) return BuildArray(configuration, type);
             if (IsList(type)) return BuildList(configuration, type);
@@ -47,9 +44,8 @@ namespace RockLib.Configuration.ObjectFactory
             if (type.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, type);
             return BuildObject(configuration, type);
         }
-        }
 
-        private static bool IsConfigurationSection(IConfiguration configuration, out IConfigurationSection section)
+        private static bool IsConfigurationValue(IConfiguration configuration, out IConfigurationSection section)
         {
             section = configuration as IConfigurationSection;
             return section != null && section.Value != null;
