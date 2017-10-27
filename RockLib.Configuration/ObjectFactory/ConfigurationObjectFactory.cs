@@ -113,7 +113,7 @@ namespace RockLib.Configuration.ObjectFactory
             var typeSection = configuration.GetSection(_typeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);
             if (!targetType.GetTypeInfo().IsAssignableFrom(specifiedType)) throw GetNotAssignableException(targetType, specifiedType);
-            return configuration.GetSection(_valueKey).Create(specifiedType, declaringType, memberName, convertFunc, defaultTypes);
+            return BuildObject(configuration.GetSection(_valueKey), specifiedType, declaringType, memberName, convertFunc, defaultTypes, true);
         }
 
         private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
@@ -173,10 +173,15 @@ namespace RockLib.Configuration.ObjectFactory
             return dictionary;
         }
 
-        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
+        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes, bool skipDefaultTypes = false)
         {
-            if (defaultTypes.TryGet(declaringType, memberName, out Type defaultType))
-                targetType = defaultType;
+            if (!skipDefaultTypes)
+            {
+                if (defaultTypes.TryGet(declaringType, memberName, out Type defaultType))
+                    targetType = defaultType;
+                else if (defaultTypes.TryGet(targetType, out defaultType))
+                    targetType = defaultType;
+            }
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
                 builder.AddMember(childSection.Key, childSection);

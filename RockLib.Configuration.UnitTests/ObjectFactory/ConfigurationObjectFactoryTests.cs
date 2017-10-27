@@ -11,7 +11,7 @@ namespace Tests
     public class ConfigurationObjectFactoryTests
     {
         [Fact]
-        public void PassingDefaultTypesOverridesMemberType()
+        public void PassingDefaultTypesOverridesNonTypeSpecifiedMember()
         {
             var guid = Guid.NewGuid();
             var config = new ConfigurationBuilder()
@@ -33,6 +33,80 @@ namespace Tests
             Assert.IsType<InheritedBarWithReadWriteProperties>(foo.Bar);
             var inheritedBar = (InheritedBarWithReadWriteProperties)foo.Bar;
             Assert.Equal("But I don't LIKE Spam!", inheritedBar.Spam);
+            Assert.Equal(guid, foo.Baz.Grault);
+        }
+
+        [Fact]
+        public void PassingDefaultTypesOverridesNonTypeSpecifiedMembersOfTheTargetType()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:qux", "true" },
+                    { "foo:bar:garply", "123.45" },
+                    { "foo:bar:spam", "But I don't LIKE Spam!" },
+                    { "foo:baz:grault", guid.ToString() },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var defaultTypes = DefaultTypes.New(typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties));
+            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+
+            Assert.Equal(true, foo.Bar.Qux);
+            Assert.Equal(123.45, foo.Bar.Garply);
+            Assert.IsType<InheritedBarWithReadWriteProperties>(foo.Bar);
+            var inheritedBar = (InheritedBarWithReadWriteProperties)foo.Bar;
+            Assert.Equal("But I don't LIKE Spam!", inheritedBar.Spam);
+            Assert.Equal(guid, foo.Baz.Grault);
+        }
+
+        [Fact]
+        public void PassingDefaultTypesDoesNotOverrideTypeSpecifiedMember()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:type", typeof(BarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:value:qux", "true" },
+                    { "foo:bar:value:garply", "123.45" },
+                    { "foo:baz:grault", guid.ToString() },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var defaultTypes = DefaultTypes.New(typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties));
+            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+
+            Assert.Equal(true, foo.Bar.Qux);
+            Assert.Equal(123.45, foo.Bar.Garply);
+            Assert.IsType<BarWithReadWriteProperties>(foo.Bar);
+            Assert.Equal(guid, foo.Baz.Grault);
+        }
+
+        [Fact]
+        public void PassingDefaultTypesDoesNotOverrideTypeSpecifiedMembersOfTheTargetType()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:type", typeof(BarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:value:qux", "true" },
+                    { "foo:bar:value:garply", "123.45" },
+                    { "foo:baz:grault", guid.ToString() },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var defaultTypes = DefaultTypes.New(typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties));
+            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+
+            Assert.Equal(true, foo.Bar.Qux);
+            Assert.Equal(123.45, foo.Bar.Garply);
+            Assert.IsType<BarWithReadWriteProperties>(foo.Bar);
             Assert.Equal(guid, foo.Baz.Grault);
         }
 
