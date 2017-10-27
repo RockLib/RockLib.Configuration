@@ -53,7 +53,7 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
-            if (IsConfigurationValue(configuration, out IConfigurationSection section)) return ConvertToType(section, targetType, declaringType, memberName, convertFunc);
+            if (IsConfigurationValue(configuration, out IConfigurationSection section)) return ConvertToType(section, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
@@ -69,7 +69,7 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         private static object ConvertToType(
-            IConfigurationSection section, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+            IConfigurationSection section, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             if (convertFunc != null)
             {
@@ -86,7 +86,7 @@ namespace RockLib.Configuration.ObjectFactory
             var typeConverter = TypeDescriptor.GetConverter(targetType);
             if (typeConverter.CanConvertFrom(typeof(string)))
                 return typeConverter.ConvertFromInvariantString(section.Value);
-            if (section.Value == "") return new ObjectBuilder(targetType).Build();
+            if (section.Value == "") return new ObjectBuilder(targetType).Build(convertFunc, defaultTypes);
             throw new InvalidOperationException($"Unable to convert section '{section.Key}' to type '{targetType}'.");
         }
 
@@ -175,14 +175,12 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
+            if (defaultTypes.TryGet(declaringType, memberName, out Type defaultType))
+                targetType = defaultType;
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
-            {
-                var childType = builder.GetChildType(childSection.Key);
-                if (childType != null)
-                    builder.AddMember(childSection.Key, childSection.Create(childType, targetType, childSection.Key, convertFunc, defaultTypes));
-            }
-            return builder.Build();
+                builder.AddMember(childSection.Key, childSection);
+            return builder.Build(convertFunc, defaultTypes);
         }
 
         private static MethodInfo GetListAddMethod(Type listType, Type tType) =>
@@ -219,7 +217,7 @@ namespace RockLib.Configuration.ObjectFactory
 
         private class ObjectBuilder
         {
-            private readonly Dictionary<string, object> _members = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(StringComparer.OrdinalIgnoreCase);
 
             public ObjectBuilder(Type type)
             {
@@ -228,55 +226,40 @@ namespace RockLib.Configuration.ObjectFactory
 
             public Type Type { get; }
 
-            public Type GetChildType(string key)
-            {
-                foreach (var property in GetReadWriteProperties().Concat(GetReadonlyListProperties()).Concat(GetReadonlyDictionaryProperties()))
-                {
-                    if (StringComparer.OrdinalIgnoreCase.Equals(property.Name, key))
-                        return property.PropertyType;
-                }
+            public void AddMember(string memberName, IConfigurationSection section) => _members.Add(memberName, section);
 
-                foreach (var constructor in GetConstructors())
-                {
-                    foreach (var parameter in constructor.GetParameters())
-                    {
-                        if (StringComparer.OrdinalIgnoreCase.Equals(parameter.Name, key))
-                            return parameter.ParameterType;
-                    }
-                }
-
-                return null;
-            }
-
-            public void AddMember(string memberName, object value) => _members.Add(memberName, value);
-
-            public object Build()
+            public object Build(ConvertFunc convertFunc, IDefaultTypes defaultTypes)
             {
                 var constructor = GetConstructor();
-                var args = GetArgs(constructor);
+                var args = GetArgs(constructor, convertFunc, defaultTypes);
                 var obj = constructor.Invoke(args);
                 foreach (var property in GetReadWriteProperties())
-                    if (_members.TryGetValue(property.Name, out object propertyValue))
+                    if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                    {
+                        var propertyValue = section.Create(property.PropertyType, Type, property.Name, convertFunc, defaultTypes);
                         property.SetValue(obj, propertyValue);
+                    }
                 foreach (var property in GetReadonlyListProperties())
                 {
-                    if (_members.TryGetValue(property.Name, value: out object propertyValue))
+                    if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
                         var tType = property.PropertyType.GetTypeInfo().GetGenericArguments()[0];
                         var addMethod = GetListAddMethod(property.PropertyType, tType);
                         var list = property.GetValue(obj);
+                        var propertyValue = section.Create(property.PropertyType, Type, property.Name, convertFunc, defaultTypes);
                         foreach (var item in (IEnumerable)propertyValue)
                             addMethod.Invoke(list, new[] { item });
                     }
                 }
                 foreach (var property in GetReadonlyDictionaryProperties())
                 {
-                    if (_members.TryGetValue(property.Name, value: out object propertyValue))
+                    if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
                         var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
                         var addMethod = typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType)).GetTypeInfo().GetMethod("Add");
                         var dictionary = property.GetValue(obj);
                         var keysProperty = property.PropertyType.GetTypeInfo().GetProperty("Keys");
+                        var propertyValue = section.Create(property.PropertyType, Type, property.Name, convertFunc, defaultTypes);
                         var enumerator = ((IEnumerable)propertyValue).GetEnumerator();
                         while (enumerator.MoveNext())
                             addMethod.Invoke(dictionary, new object[] { enumerator.Current });
@@ -303,7 +286,7 @@ namespace RockLib.Configuration.ObjectFactory
 
             private class ConstructorOrderInfo
             {
-                public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, object> members)
+                public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> members)
                 {
                     Constructor = constructor;
                     var parameters = constructor.GetParameters();
@@ -323,18 +306,22 @@ namespace RockLib.Configuration.ObjectFactory
                         && TotalParameters == other.TotalParameters;
             }
 
-            private object[] GetArgs(ConstructorInfo constructor)
+            private object[] GetArgs(ConstructorInfo constructor, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
             {
                 var parameters = constructor.GetParameters();
                 var args = new object[parameters.Length];
                 for (int i = 0; i < args.Length; i++)
                 {
-                    if (_members.TryGetValue(parameters[i].Name, out object arg)
-                        && parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
+                    if (_members.TryGetValue(parameters[i].Name, out IConfigurationSection section))
                     {
-                        args[i] = arg;
-                        _members.Remove(parameters[i].Name);
+                        var arg = section.Create(parameters[i].ParameterType, Type, parameters[i].Name, convertFunc, defaultTypes);
+                        if (parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
+                        {
+                            args[i] = arg;
+                            _members.Remove(parameters[i].Name);
+                        }
                     }
+                    
                     else if (parameters[i].HasDefaultValue) args[i] = parameters[i].DefaultValue;
                 }
                 return args;

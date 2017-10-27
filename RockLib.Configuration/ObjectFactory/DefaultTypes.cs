@@ -10,7 +10,7 @@ namespace RockLib.Configuration.ObjectFactory
 
     public sealed class DefaultTypes : IDefaultTypes
     {
-        private readonly Dictionary<string, Type> _dictionary = new Dictionary<string, Type>();
+        private readonly Dictionary<string, Type> _dictionary = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
         private DefaultTypes() {}
 
@@ -23,6 +23,9 @@ namespace RockLib.Configuration.ObjectFactory
 
         public DefaultTypes Add(Type declaringType, string memberName, Type defaultType)
         {
+            if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
+            if (memberName == null) throw new ArgumentNullException(nameof(memberName));
+            if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
             _dictionary.Add(GetKey(declaringType, memberName), defaultType);
             return this;
         }
@@ -30,6 +33,7 @@ namespace RockLib.Configuration.ObjectFactory
         bool IDefaultTypes.TryGet(Type declaringType, string memberName, out Type defaultType) =>
             _dictionary.TryGetValue(GetKey(declaringType, memberName), out defaultType);
 
-        private static string GetKey(Type declaringType, string memberName) => declaringType.FullName + ":" + memberName;
+        private static string GetKey(Type declaringType, string memberName) => 
+            (declaringType != null && memberName != null) ? declaringType.FullName + ":" + memberName : "";
     }
 }
