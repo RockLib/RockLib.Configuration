@@ -40,13 +40,13 @@ namespace RockLib.Configuration.ObjectFactory
                 return ConvertToType(section, type);
             else
             {
-                if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, type);
-                if (type.IsArray) return BuildArray(configuration, type);
-                if (IsList(type)) return BuildList(configuration, type);
-                if (IsDictionary(type)) return BuildDictionary(configuration, type);
-                if (type.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, type);
-                return BuildObject(configuration, type);
-            }
+            if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, type);
+            if (type.IsArray) return BuildArray(configuration, type);
+            if (IsList(type)) return BuildList(configuration, type);
+            if (IsDictionary(type)) return BuildDictionary(configuration, type);
+            if (type.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, type);
+            return BuildObject(configuration, type);
+        }
         }
 
         private static bool IsConfigurationSection(IConfiguration configuration, out IConfigurationSection section)
@@ -58,18 +58,28 @@ namespace RockLib.Configuration.ObjectFactory
         private static object ConvertToType(IConfigurationSection section, Type type)
         {
             if (type == typeof(Encoding)) return Encoding.GetEncoding(section.Value);
-            return TypeDescriptor.GetConverter(type).ConvertFromInvariantString(section.Value);
+            TypeConverter typeConverter = TypeDescriptor.GetConverter(type);
+            if (typeConverter.CanConvertFrom(typeof(string)))
+                return typeConverter.ConvertFromInvariantString(section.Value);
+            if (section.Value == "") return new ObjectBuilder(type).Build();
+            throw new InvalidOperationException($"Unable to convert section '{section.Key}' to type '{type}'.");
         }
 
         private static bool IsTypeSpecifiedObject(IConfiguration configuration)
         {
-            int i = 0;
+            var typeFound = false;
+            var i = 0;
             foreach (var child in configuration.GetChildren())
             {
-                if ((child.Key != _typeKey && child.Key != _valueKey)
-                    || (child.Key == _typeKey && child.Value == null)) return false;
+                if (child.Key == _typeKey)
+                {
+                    if (string.IsNullOrEmpty(child.Value)) return false;
+                    typeFound = true;
+                }
+                else if (child.Key != _valueKey) return false;
                 i++;
             }
+            if (i == 1) return typeFound;
             return i == 2;
         }
 
