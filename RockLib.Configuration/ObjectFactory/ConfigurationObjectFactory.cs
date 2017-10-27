@@ -29,9 +29,9 @@ namespace RockLib.Configuration.ObjectFactory
         /// convert the value.
         /// </param>
         /// <returns>An object of type <typeparamref name="T"/> with values set from the configuration.</returns>
-        public static T Create<T>(this IConfiguration configuration, ConvertFunc convertFunc = null)
+        public static T Create<T>(this IConfiguration configuration, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
         {
-            return (T)configuration.Create(typeof(T), convertFunc);
+            return (T)configuration.Create(typeof(T), convertFunc, defaultTypes);
         }
 
         /// <summary>
@@ -46,20 +46,20 @@ namespace RockLib.Configuration.ObjectFactory
         /// convert the value.
         /// </param>
         /// <returns>An object with values set from the configuration.</returns>
-        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null)
+        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
         {
-            return configuration.Create(type, null, null, convertFunc);
+            return configuration.Create(type, null, null, convertFunc, defaultTypes ?? DefaultTypes.Empty);
         }
 
-        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             if (IsConfigurationValue(configuration, out IConfigurationSection section)) return ConvertToType(section, targetType, declaringType, memberName, convertFunc);
-            if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, convertFunc);
-            if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, convertFunc);
-            if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, convertFunc);
-            if (IsDictionary(targetType)) return BuildDictionary(configuration, targetType, declaringType, memberName, convertFunc);
+            if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
+            if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
+            if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
+            if (IsDictionary(targetType)) return BuildDictionary(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (targetType.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, targetType);
-            return BuildObject(configuration, targetType, declaringType, memberName, convertFunc);
+            return BuildObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
         }
 
         private static bool IsConfigurationValue(IConfiguration configuration, out IConfigurationSection section)
@@ -108,20 +108,20 @@ namespace RockLib.Configuration.ObjectFactory
             return i == 2;
         }
 
-        private static object BuildTypeSpecifiedObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+        private static object BuildTypeSpecifiedObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             var typeSection = configuration.GetSection(_typeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);
             if (!targetType.GetTypeInfo().IsAssignableFrom(specifiedType)) throw GetNotAssignableException(targetType, specifiedType);
-            return configuration.GetSection(_valueKey).Create(specifiedType, declaringType, memberName, convertFunc);
+            return configuration.GetSection(_valueKey).Create(specifiedType, declaringType, memberName, convertFunc, defaultTypes);
         }
 
-        private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+        private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             if (!IsList(configuration)) throw GetConfigurationIsNotAListException(configuration, targetType);
             if (targetType.GetArrayRank() > 1) throw GetArrayRankGreaterThanOneIsNotSupportedException(targetType);
             var elementType = targetType.GetElementType();
-            var items = configuration.GetChildren().Select(child => child.Create(elementType, declaringType, memberName, convertFunc)).ToList();
+            var items = configuration.GetChildren().Select(child => child.Create(elementType, declaringType, memberName, convertFunc, defaultTypes)).ToList();
             var array = Array.CreateInstance(elementType, items.Count);
             for (int i = 0; i < array.Length; i++)
                 array.SetValue(items[i], i);
@@ -137,14 +137,14 @@ namespace RockLib.Configuration.ObjectFactory
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
 
-        private static object BuildList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+        private static object BuildList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             if (!IsList(configuration)) throw GetConfigurationIsNotAListException(configuration, targetType);
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
             var addMethod = GetListAddMethod(listType, tType);
             var list = Activator.CreateInstance(listType);
-            foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, convertFunc)))
+            foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, convertFunc, defaultTypes)))
                 addMethod.Invoke(list, new object[] { item });
             return list;
         }
@@ -162,25 +162,25 @@ namespace RockLib.Configuration.ObjectFactory
                 && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                 && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string);
 
-        private static object BuildDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+        private static object BuildDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             var tValueType = targetType.GetTypeInfo().GetGenericArguments()[1];
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), tValueType);
             var addMethod = dictionaryType.GetTypeInfo().GetMethod("Add", new[] { typeof(string), tValueType });
             var dictionary = Activator.CreateInstance(dictionaryType);
-            foreach (var x in configuration.GetChildren().Select(c => new { c.Key, Value = c.Create(tValueType, declaringType, memberName, convertFunc) }))
+            foreach (var x in configuration.GetChildren().Select(c => new { c.Key, Value = c.Create(tValueType, declaringType, memberName, convertFunc, defaultTypes) }))
                 addMethod.Invoke(dictionary, new object[] { x.Key, x.Value });
             return dictionary;
         }
 
-        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc)
+        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
             {
                 var childType = builder.GetChildType(childSection.Key);
                 if (childType != null)
-                    builder.AddMember(childSection.Key, childSection.Create(childType, targetType, childSection.Key, convertFunc));
+                    builder.AddMember(childSection.Key, childSection.Create(childType, targetType, childSection.Key, convertFunc, defaultTypes));
             }
             return builder.Build();
         }
