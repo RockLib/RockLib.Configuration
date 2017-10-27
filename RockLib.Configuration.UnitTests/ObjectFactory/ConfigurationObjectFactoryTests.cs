@@ -11,6 +11,56 @@ namespace Tests
     public class ConfigurationObjectFactoryTests
     {
         [Fact]
+        public void PassingConvertFuncOverridesDefaultConversion()
+        {
+            var config = new ConfigurationBuilder()
+               .AddInMemoryCollection(new Dictionary<string, string>
+               {
+                    { "foo:bar", "(123.45, -456.78)" },
+               })
+               .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<FooWithCoordinate>((value, targetType, declaringType, memberName) =>
+            {
+                // Make sure we're getting all the right stuff.
+                Assert.Equal("(123.45, -456.78)", value);
+                Assert.Equal(typeof(Coordinate), targetType);
+                Assert.Equal(typeof(FooWithCoordinate), declaringType);
+                Assert.Equal("bar", memberName);
+                return new Coordinate { Latitude = 111.11, Longitude = -222.22 };
+            });
+
+            Assert.Equal(111.11, foo.Bar.Latitude);
+            Assert.Equal(-222.22, foo.Bar.Longitude);
+        }
+
+        [Fact]
+        public void PassingConvertFuncDoesNotOverrideDefaultConversionWhenItReturnsNull()
+        {
+            var config = new ConfigurationBuilder()
+               .AddInMemoryCollection(new Dictionary<string, string>
+               {
+                    { "foo:bar", "123.45" },
+               })
+               .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<FooWithDouble>((value, targetType, declaringType, memberName) =>
+            {
+                // Make sure we're getting all the right stuff.
+                Assert.Equal("123.45", value);
+                Assert.Equal(typeof(double), targetType);
+                Assert.Equal(typeof(FooWithDouble), declaringType);
+                Assert.Equal("bar", memberName);
+                return null;
+            });
+
+            // The default convertion works.
+            Assert.Equal(123.45, foo.Bar);
+        }
+
+        [Fact]
         public void CanBindToReadWriteSimpleProperties()
         {
             var now = DateTime.Now;
@@ -95,7 +145,7 @@ namespace Tests
         }
 
         [Fact]
-        public void CanBindToInheritorOfTypeWithConcreteReadWriteProperties_()
+        public void CanBindToInheritorOfTypeWithConcreteReadWriteProperties()
         {
             var guid = Guid.NewGuid();
             var config = new ConfigurationBuilder()
@@ -1456,5 +1506,21 @@ namespace Tests
             Grault = grault;
         }
         public Guid Grault { get; }
+    }
+
+    public class Coordinate
+    {
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+
+    public class FooWithCoordinate
+    {
+        public Coordinate Bar { get; set; }
+    }
+
+    public class FooWithDouble
+    {
+        public double Bar { get; set; }
     }
 }
