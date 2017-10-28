@@ -11,6 +11,58 @@ namespace Tests
     public class ConfigurationObjectFactoryTests
     {
         [Fact]
+        public void CanSpecifyDefaultTypesWithDefaultTypeAttribute()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:fred", "123.45" },
+                    { "foo:baz:waldo", "-456.78" },
+                    { "foo:qux:thud", "987.65" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<FooWithMembersDecoratedWithDefaultTypeAttribute>();
+
+            Assert.IsType<DefultBarWithDefaultType>(foo.Bar);
+            Assert.Equal(123.45, ((DefultBarWithDefaultType)foo.Bar).Fred);
+
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.Baz);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.Baz).Waldo);
+
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.Qux);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.Qux).Thud);
+        }
+
+        [Fact]
+        public void CanSpecifyDefaultTypesWithLocallyDefinedDefaultTypeAttribute()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:fred", "123.45" },
+                    { "foo:baz:waldo", "-456.78" },
+                    { "foo:qux:thud", "987.65" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute>();
+
+            Assert.IsType<DefultBarWithLocallyDefinedDefaultType>(foo.Bar);
+            Assert.Equal(123.45, ((DefultBarWithLocallyDefinedDefaultType)foo.Bar).Fred);
+
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.Baz);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.Baz).Waldo);
+
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.Qux);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.Qux).Thud);
+        }
+
+        [Fact]
         public void PassingDefaultTypesOverridesNonTypeSpecifiedMember()
         {
             var guid = Guid.NewGuid();
@@ -1622,5 +1674,84 @@ namespace Tests
     public class FooWithDouble
     {
         public double Bar { get; set; }
+    }
+
+    public class FooWithMembersDecoratedWithDefaultTypeAttribute
+    {
+        public FooWithMembersDecoratedWithDefaultTypeAttribute(
+            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux)
+        {
+            Qux = qux;
+        }
+
+        public IBarWithDefaultType Bar { get; set; }
+
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))]
+        public IBazWithoutDefaultType Baz { get; set; }
+
+        public IQuxWithoutDefaultType Qux { get; }
+    }
+
+    [DefaultType(typeof(DefultBarWithDefaultType))]
+    public interface IBarWithDefaultType
+    {
+    }
+
+    public class DefultBarWithDefaultType : IBarWithDefaultType
+    {
+        public double Fred { get; set; }
+    }
+
+    public interface IBazWithoutDefaultType
+    {
+    }
+
+    public class DefaultBazWithoutDefaultType : IBazWithoutDefaultType
+    {
+        public double Waldo { get; set; }
+    }
+
+    public interface IQuxWithoutDefaultType
+    {
+    }
+
+    public class DefaultQuxWithoutDefaultType : IQuxWithoutDefaultType
+    {
+        public double Thud { get; set; }
+    }
+
+    public class FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute
+    {
+        public FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute(
+            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux)
+        {
+            Qux = qux;
+        }
+
+        public IBarWithLocallyDefinedDefaultType Bar { get; set; }
+
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))]
+        public IBazWithoutDefaultType Baz { get; set; }
+
+        public IQuxWithoutDefaultType Qux { get; }
+    }
+
+    [LocallyDefined.DefaultType(typeof(DefultBarWithLocallyDefinedDefaultType))]
+    public interface IBarWithLocallyDefinedDefaultType
+    {
+    }
+
+    public class DefultBarWithLocallyDefinedDefaultType : IBarWithLocallyDefinedDefaultType
+    {
+        public double Fred { get; set; }
+    }
+}
+
+namespace LocallyDefined
+{
+    internal class DefaultTypeAttribute : Attribute
+    {
+        public DefaultTypeAttribute(Type value) => Value = value;
+        public Type Value { get; }
     }
 }

@@ -62,7 +62,6 @@ namespace RockLib.Configuration.ObjectFactory
             if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsDictionary(targetType)) return BuildDictionary(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
-            if (targetType.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, targetType);
             return BuildObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
         }
 
@@ -179,18 +178,77 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes, bool skipDefaultTypes = false)
         {
-            if (!skipDefaultTypes)
-            {
-                if (defaultTypes.TryGet(declaringType, memberName, out Type defaultType))
-                    targetType = defaultType;
-                else if (defaultTypes.TryGet(targetType, out defaultType))
-                    targetType = defaultType;
-            }
+            if (!skipDefaultTypes && TryGetDefaultType(defaultTypes, targetType, declaringType, memberName, out Type defaultType))
+                targetType = defaultType;
+            if (targetType.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, targetType);
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
                 builder.AddMember(childSection.Key, childSection);
             return builder.Build(convertFunc, defaultTypes);
         }
+
+        private static bool TryGetDefaultType(IDefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
+        {
+            defaultType = null;
+            if (declaringType == null || memberName == null) return false;
+
+            if (defaultTypes.TryGet(declaringType, memberName, out defaultType)) return true;
+            if (defaultTypes.TryGet(targetType, out defaultType)) return true;
+
+            defaultType =
+                GetDefaultTypeFromMemberCustomAttributes(declaringType, memberName)
+                ?? GetDefaultTypeFromCustomAttributes(targetType.GetTypeInfo().CustomAttributes);
+
+            if (defaultType != null)
+            {
+                if (targetType.GetTypeInfo().IsAssignableFrom(defaultType)) return true;
+                throw new InvalidOperationException($"The specified default type, {defaultType}, is not assignable to the target type, {targetType}.");
+            }
+
+            return false;
+        }
+        
+        /// <summary>Gets the default type, or null if not found.</summary>
+        private static Type GetDefaultTypeFromMemberCustomAttributes(Type declaringType, string memberName)
+        {
+            var set = new HashSet<Type>();
+
+            foreach (var member in Members.Find(declaringType, memberName))
+            {
+                if (member.MemberType == MemberType.Property)
+                {
+                    var property = declaringType.GetTypeInfo().GetProperty(member.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+                    var defaultType = GetDefaultTypeFromCustomAttributes(property.CustomAttributes);
+                    if (defaultType != null) set.Add(defaultType);
+                }
+                else
+                {
+                    foreach (var parameter in declaringType.GetTypeInfo().GetConstructors()
+                        .SelectMany(c => c.GetParameters())
+                        .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, member.Name)))
+                    {
+                        var defaultType = GetDefaultTypeFromCustomAttributes(parameter.CustomAttributes);
+                        if (defaultType != null) set.Add(defaultType);
+                    }
+                }
+            }
+
+            switch (set.Count)
+            {
+                case 0: return null;
+                case 1: return set.First();
+                default: throw new InvalidOperationException($"More than one member (property or constructor parameter) matching the name '{memberName}' is decorated with a {nameof(DefaultTypeAttribute)} attribute. All decorated members matching the same name must have the same type.");
+            }
+        }
+
+        /// <summary>Gets the default type, or null if not found.</summary>
+        private static Type GetDefaultTypeFromCustomAttributes(IEnumerable<CustomAttributeData> customAttributes) =>
+            customAttributes.Where(attribute =>
+                attribute.AttributeType.Name == nameof(DefaultTypeAttribute)
+                    && attribute.ConstructorArguments.Count == 1
+                    && attribute.ConstructorArguments[0].ArgumentType == typeof(Type))
+                .Select(attribute => (Type)attribute.ConstructorArguments[0].Value)
+                .FirstOrDefault();
 
         private static MethodInfo GetListAddMethod(Type listType, Type tType) =>
             typeof(ICollection<>).MakeGenericType(listType.GetTypeInfo().GetGenericArguments()[0])
@@ -337,27 +395,16 @@ namespace RockLib.Configuration.ObjectFactory
             }
 
             private IEnumerable<PropertyInfo> GetReadWriteProperties() =>
-                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanRead && p.CanWrite);
+                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadWrite());
 
             private ConstructorInfo[] GetConstructors() =>
                 Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
             private IEnumerable<PropertyInfo> GetReadonlyListProperties() =>
-                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p =>
-                    p.CanRead
-                    && !p.CanWrite
-                    && p.PropertyType.GetTypeInfo().IsGenericType
-                    && (p.PropertyType.GetGenericTypeDefinition() == typeof(List<>)
-                        || p.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)
-                        || p.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)));
+                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyList());
 
             private IEnumerable<PropertyInfo> GetReadonlyDictionaryProperties() =>
-                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p =>
-                    p.CanRead
-                    && !p.CanWrite
-                    && p.PropertyType.GetTypeInfo().IsGenericType
-                    && (p.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>)
-                        || p.PropertyType.GetGenericTypeDefinition() == typeof(IDictionary<,>)));
+                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyDictionary());
         }
     }
 }

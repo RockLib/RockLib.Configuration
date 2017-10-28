@@ -71,22 +71,16 @@ namespace RockLib.Configuration.ObjectFactory
             if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
             if (memberName == null) throw new ArgumentNullException(nameof(memberName));
             if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
+            if (defaultType.GetTypeInfo().IsAbstract) throw new ArgumentException("Cannot define an abstract default type.", nameof(defaultType));
 
-            var matchingMembers = declaringType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName))
-                .Select(p => new { p.Name, Type = p.PropertyType, MemberType = "[property]" })
-                .Concat(declaringType.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance)
-                    .SelectMany(c => c.GetParameters())
-                    .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName))
-                    .Select(p => new { p.Name, Type = p.ParameterType, MemberType = "[constructor parameter]" }))
-                .ToList();
+            var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
             if (matchingMembers.Count == 0) throw new ArgumentException(
                 $"There are no properties or constructor parameters in the {declaringType} type that match member name '{memberName}'.");
             var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(defaultType)).ToList();
             if (notAssignableMembers.Count > 0) throw new ArgumentException(
                 $"The specified default type {defaultType} is not assignable to the following member(s) in the {declaringType} type that match the name '{memberName}':"
-                    + string.Join("", notAssignableMembers.Select(m => $"{Environment.NewLine}- {m.MemberType} {m.Type} {m.Name}")));
+                    + string.Join("", notAssignableMembers.Select(m => $"{Environment.NewLine}- {m}")));
 
             _dictionary.Add(GetKey(declaringType, memberName), defaultType);
             return this;
