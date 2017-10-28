@@ -28,11 +28,13 @@ namespace RockLib.Configuration.ObjectFactory
         /// value to the target type, it should return null so the default conversion mechanism can attempt to
         /// convert the value.
         /// </param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
         /// <returns>An object of type <typeparamref name="T"/> with values set from the configuration.</returns>
-        public static T Create<T>(this IConfiguration configuration, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
-        {
-            return (T)configuration.Create(typeof(T), convertFunc, defaultTypes);
-        }
+        public static T Create<T>(this IConfiguration configuration, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null) =>
+            (T)configuration.Create(typeof(T), convertFunc, defaultTypes);
 
         /// <summary>
         /// Create an object of the specified type based on the specified configuration.
@@ -45,11 +47,13 @@ namespace RockLib.Configuration.ObjectFactory
         /// value to the target type, it should return null so the default conversion mechanism can attempt to
         /// convert the value.
         /// </param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
         /// <returns>An object with values set from the configuration.</returns>
-        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
-        {
-            return configuration.Create(type, null, null, convertFunc, defaultTypes ?? DefaultTypes.Empty);
-        }
+        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null) =>
+            configuration.Create(type, null, null, convertFunc, defaultTypes ?? DefaultTypes.Empty);
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
