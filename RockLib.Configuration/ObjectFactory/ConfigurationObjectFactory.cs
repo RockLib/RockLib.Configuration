@@ -61,7 +61,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
-            if (IsDictionary(targetType)) return BuildDictionary(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
+            if (IsStringDictionary(targetType)) return BuildStringDictionary(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             return BuildObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
         }
 
@@ -160,12 +160,12 @@ namespace RockLib.Configuration.ObjectFactory
             return true;
         }
 
-        private static bool IsDictionary(Type type) =>
+        private static bool IsStringDictionary(Type type) =>
             type.GetTypeInfo().IsGenericType
                 && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                 && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string);
 
-        private static object BuildDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
+        private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             var tValueType = targetType.GetTypeInfo().GetGenericArguments()[1];
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), tValueType);
@@ -181,6 +181,8 @@ namespace RockLib.Configuration.ObjectFactory
             if (!skipDefaultTypes && TryGetDefaultType(defaultTypes, targetType, declaringType, memberName, out Type defaultType))
                 targetType = defaultType;
             if (targetType.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, targetType);
+            if (targetType == typeof(object)) throw new InvalidOperationException("A type must be specified for type object.");
+            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw new InvalidOperationException($"The collection type {targetType} is not supported. The following collection types are supported: List<T>, IList<T>, ICollection<T>, IEnumerable<T>, Dictionary<string, T>, and IDictionary<string, T>.");
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
                 builder.AddMember(childSection.Key, childSection);
