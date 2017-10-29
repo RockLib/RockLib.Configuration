@@ -17,23 +17,93 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:fred", "123.45" },
+                    { "foo:garplyBar:fred", "123.45" },
+                    { "foo:garplyBarArray:0:fred", "123.45" },
+                    { "foo:garplyBarList:0:fred", "123.45" },
+                    { "foo:garplyBarDictionary:spam:fred", "123.45" },
+                    { "foo:graultBar:fred", "123.45" },
+                    { "foo:graultBarArray:0:fred", "123.45" },
+                    { "foo:graultBarList:0:fred", "123.45" },
+                    { "foo:graultBarDictionary:spam:fred", "123.45" },
+                    { "foo:barReadonlyList:0:fred", "123.45" },
+                    { "foo:barReadonlyDictionary:spam:fred", "123.45" },
                     { "foo:baz:waldo", "-456.78" },
+                    { "foo:bazArray:0:waldo", "-456.78" },
+                    { "foo:bazList:0:waldo", "-456.78" },
+                    { "foo:bazDictionary:spam:waldo", "-456.78" },
+                    { "foo:bazReadonlyList:0:waldo", "-456.78" },
+                    { "foo:bazReadonlyDictionary:spam:waldo", "-456.78" },
                     { "foo:qux:thud", "987.65" },
+                    { "foo:quxArray:0:thud", "987.65" },
+                    { "foo:quxList:0:thud", "987.65" },
+                    { "foo:quxDictionary:spam:thud", "987.65" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
             var foo = fooSection.Create<FooWithMembersDecoratedWithDefaultTypeAttribute>();
 
-            Assert.IsType<DefultBarWithDefaultType>(foo.Bar);
-            Assert.Equal(123.45, ((DefultBarWithDefaultType)foo.Bar).Fred);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBar);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBar).Fred);
+            Assert.Equal(1, foo.GarplyBarArray.Length);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBarArray[0]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBarArray[0]).Fred);
+            Assert.Equal(1, foo.GarplyBarList.Count);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBarList[0]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBarList[0]).Fred);
+            Assert.Equal(1, foo.GarplyBarDictionary.Count);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBarDictionary["spam"]).Fred);
+
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBar);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBar).Fred);
+            Assert.Equal(1, foo.GraultBarArray.Length);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBarArray[0]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBarArray[0]).Fred);
+            Assert.Equal(1, foo.GraultBarList.Count);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBarList[0]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBarList[0]).Fred);
+            Assert.Equal(1, foo.GraultBarDictionary.Count);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBarDictionary["spam"]).Fred);
+
+            Assert.Equal(1, foo.BarReadonlyList.Count);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.BarReadonlyList[0]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.BarReadonlyList[0]).Fred);
+            Assert.Equal(1, foo.BarReadonlyDictionary.Count);
+            Assert.IsType<DefaultBarWithDefaultType>(foo.BarReadonlyDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.BarReadonlyDictionary["spam"]).Fred);
 
             Assert.IsType<DefaultBazWithoutDefaultType>(foo.Baz);
             Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.Baz).Waldo);
+            Assert.Equal(1, foo.BazArray.Length);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazArray[0]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazArray[0]).Waldo);
+            Assert.Equal(1, foo.BazList.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazList[0]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazList[0]).Waldo);
+            Assert.Equal(1, foo.BazDictionary.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazDictionary["spam"]).Waldo);
+
+            Assert.Equal(1, foo.BazReadonlyList.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyList[0]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyList[0]).Waldo);
+            Assert.Equal(1, foo.BazReadonlyDictionary.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyDictionary["spam"]).Waldo);
 
             Assert.IsType<DefaultQuxWithoutDefaultType>(foo.Qux);
             Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.Qux).Thud);
+            Assert.Equal(1, foo.QuxArray.Length);
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxArray[0]);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxArray[0]).Thud);
+            Assert.Equal(1, foo.QuxList.Count);
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxList[0]);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxList[0]).Thud);
+            Assert.Equal(1, foo.QuxDictionary.Count);
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxDictionary["spam"]);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxDictionary["spam"]).Thud);
         }
 
         [Fact]
@@ -43,23 +113,93 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:fred", "123.45" },
+                    { "foo:garplyBar:fred", "123.45" },
+                    { "foo:garplyBarArray:0:fred", "123.45" },
+                    { "foo:garplyBarList:0:fred", "123.45" },
+                    { "foo:garplyBarDictionary:spam:fred", "123.45" },
+                    { "foo:graultBar:fred", "123.45" },
+                    { "foo:graultBarArray:0:fred", "123.45" },
+                    { "foo:graultBarList:0:fred", "123.45" },
+                    { "foo:graultBarDictionary:spam:fred", "123.45" },
+                    { "foo:barReadonlyList:0:fred", "123.45" },
+                    { "foo:barReadonlyDictionary:spam:fred", "123.45" },
                     { "foo:baz:waldo", "-456.78" },
+                    { "foo:bazArray:0:waldo", "-456.78" },
+                    { "foo:bazList:0:waldo", "-456.78" },
+                    { "foo:bazDictionary:spam:waldo", "-456.78" },
+                    { "foo:bazReadonlyList:0:waldo", "-456.78" },
+                    { "foo:bazReadonlyDictionary:spam:waldo", "-456.78" },
                     { "foo:qux:thud", "987.65" },
+                    { "foo:quxArray:0:thud", "987.65" },
+                    { "foo:quxList:0:thud", "987.65" },
+                    { "foo:quxDictionary:spam:thud", "987.65" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
             var foo = fooSection.Create<FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute>();
 
-            Assert.IsType<DefultBarWithLocallyDefinedDefaultType>(foo.Bar);
-            Assert.Equal(123.45, ((DefultBarWithLocallyDefinedDefaultType)foo.Bar).Fred);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBar);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBar).Fred);
+            Assert.Equal(1, foo.GarplyBarArray.Length);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBarArray[0]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBarArray[0]).Fred);
+            Assert.Equal(1, foo.GarplyBarList.Count);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBarList[0]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBarList[0]).Fred);
+            Assert.Equal(1, foo.GarplyBarDictionary.Count);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBarDictionary["spam"]).Fred);
+
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBar);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBar).Fred);
+            Assert.Equal(1, foo.GraultBarArray.Length);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBarArray[0]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBarArray[0]).Fred);
+            Assert.Equal(1, foo.GraultBarList.Count);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBarList[0]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBarList[0]).Fred);
+            Assert.Equal(1, foo.GraultBarDictionary.Count);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBarDictionary["spam"]).Fred);
+
+            Assert.Equal(1, foo.BarReadonlyList.Count);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.BarReadonlyList[0]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.BarReadonlyList[0]).Fred);
+            Assert.Equal(1, foo.BarReadonlyDictionary.Count);
+            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.BarReadonlyDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.BarReadonlyDictionary["spam"]).Fred);
 
             Assert.IsType<DefaultBazWithoutDefaultType>(foo.Baz);
             Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.Baz).Waldo);
+            Assert.Equal(1, foo.BazArray.Length);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazArray[0]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazArray[0]).Waldo);
+            Assert.Equal(1, foo.BazList.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazList[0]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazList[0]).Waldo);
+            Assert.Equal(1, foo.BazDictionary.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazDictionary["spam"]).Waldo);
+
+            Assert.Equal(1, foo.BazReadonlyList.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyList[0]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyList[0]).Waldo);
+            Assert.Equal(1, foo.BazReadonlyDictionary.Count);
+            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyDictionary["spam"]).Waldo);
 
             Assert.IsType<DefaultQuxWithoutDefaultType>(foo.Qux);
             Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.Qux).Thud);
+            Assert.Equal(1, foo.QuxArray.Length);
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxArray[0]);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxArray[0]).Thud);
+            Assert.Equal(1, foo.QuxList.Count);
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxList[0]);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxList[0]).Thud);
+            Assert.Equal(1, foo.QuxDictionary.Count);
+            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxDictionary["spam"]);
+            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxDictionary["spam"]).Thud);
         }
 
         [Fact]
@@ -1679,25 +1819,60 @@ namespace Tests
     public class FooWithMembersDecoratedWithDefaultTypeAttribute
     {
         public FooWithMembersDecoratedWithDefaultTypeAttribute(
-            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux)
+            [DefaultType(typeof(DefaultBarWithDefaultType))] IBarWithDefaultType graultBar,
+            [DefaultType(typeof(DefaultBarWithDefaultType))] IBarWithDefaultType[] graultBarArray,
+            [DefaultType(typeof(DefaultBarWithDefaultType))] List<IBarWithDefaultType> graultBarList,
+            [DefaultType(typeof(DefaultBarWithDefaultType))] Dictionary<string, IBarWithDefaultType> graultBarDictionary,
+
+            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux,
+            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType[] quxArray,
+            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] List<IQuxWithoutDefaultType> quxList,
+            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] Dictionary<string, IQuxWithoutDefaultType> quxDictionary)
         {
+            GraultBar = graultBar;
+            GraultBarArray = graultBarArray;
+            GraultBarList = graultBarList;
+            GraultBarDictionary = graultBarDictionary;
+
             Qux = qux;
+            QuxArray = quxArray;
+            QuxList = quxList;
+            QuxDictionary = quxDictionary;
         }
 
-        public IBarWithDefaultType Bar { get; set; }
+        public IBarWithDefaultType GarplyBar { get; set; }
+        public IBarWithDefaultType[] GarplyBarArray { get; set; }
+        public List<IBarWithDefaultType> GarplyBarList { get; set; }
+        public Dictionary<string, IBarWithDefaultType> GarplyBarDictionary { get; set; }
 
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))]
-        public IBazWithoutDefaultType Baz { get; set; }
+        public IBarWithDefaultType GraultBar { get; }
+        public IBarWithDefaultType[] GraultBarArray { get; }
+        public List<IBarWithDefaultType> GraultBarList { get; }
+        public Dictionary<string, IBarWithDefaultType> GraultBarDictionary { get; }
+
+        public List<IBarWithDefaultType> BarReadonlyList { get; } = new List<IBarWithDefaultType>();
+        public Dictionary<string, IBarWithDefaultType> BarReadonlyDictionary { get; } = new Dictionary<string, IBarWithDefaultType>();
+
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType Baz { get; set; }
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType[] BazArray { get; set; }
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazList { get; set; }
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazDictionary { get; set; }
+
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazReadonlyList { get; } = new List<IBazWithoutDefaultType>();
+        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazReadonlyDictionary { get; } = new Dictionary<string, IBazWithoutDefaultType>();
 
         public IQuxWithoutDefaultType Qux { get; }
+        public IQuxWithoutDefaultType[] QuxArray { get; }
+        public List<IQuxWithoutDefaultType> QuxList { get; }
+        public Dictionary<string, IQuxWithoutDefaultType> QuxDictionary { get; }
     }
 
-    [DefaultType(typeof(DefultBarWithDefaultType))]
+    [DefaultType(typeof(DefaultBarWithDefaultType))]
     public interface IBarWithDefaultType
     {
     }
 
-    public class DefultBarWithDefaultType : IBarWithDefaultType
+    public class DefaultBarWithDefaultType : IBarWithDefaultType
     {
         public double Fred { get; set; }
     }
@@ -1723,25 +1898,60 @@ namespace Tests
     public class FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute
     {
         public FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute(
-            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux)
+            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] IBarWithLocallyDefinedDefaultType graultBar,
+            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] IBarWithLocallyDefinedDefaultType[] graultBarArray,
+            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] List<IBarWithLocallyDefinedDefaultType> graultBarList,
+            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] Dictionary<string, IBarWithLocallyDefinedDefaultType> graultBarDictionary,
+
+            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux,
+            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType[] quxArray,
+            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] List<IQuxWithoutDefaultType> quxList,
+            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] Dictionary<string, IQuxWithoutDefaultType> quxDictionary)
         {
+            GraultBar = graultBar;
+            GraultBarArray = graultBarArray;
+            GraultBarList = graultBarList;
+            GraultBarDictionary = graultBarDictionary;
+
             Qux = qux;
+            QuxArray = quxArray;
+            QuxList = quxList;
+            QuxDictionary = quxDictionary;
         }
 
-        public IBarWithLocallyDefinedDefaultType Bar { get; set; }
+        public IBarWithLocallyDefinedDefaultType GarplyBar { get; set; }
+        public IBarWithLocallyDefinedDefaultType[] GarplyBarArray { get; set; }
+        public List<IBarWithLocallyDefinedDefaultType> GarplyBarList { get; set; }
+        public Dictionary<string, IBarWithLocallyDefinedDefaultType> GarplyBarDictionary { get; set; }
 
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))]
-        public IBazWithoutDefaultType Baz { get; set; }
+        public IBarWithLocallyDefinedDefaultType GraultBar { get; }
+        public IBarWithLocallyDefinedDefaultType[] GraultBarArray { get; }
+        public List<IBarWithLocallyDefinedDefaultType> GraultBarList { get; }
+        public Dictionary<string, IBarWithLocallyDefinedDefaultType> GraultBarDictionary { get; }
+
+        public List<IBarWithLocallyDefinedDefaultType> BarReadonlyList { get; } = new List<IBarWithLocallyDefinedDefaultType>();
+        public Dictionary<string, IBarWithLocallyDefinedDefaultType> BarReadonlyDictionary { get; } = new Dictionary<string, IBarWithLocallyDefinedDefaultType>();
+
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType Baz { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType[] BazArray { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazList { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazDictionary { get; set; }
+
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazReadonlyList { get; } = new List<IBazWithoutDefaultType>();
+        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazReadonlyDictionary { get; } = new Dictionary<string, IBazWithoutDefaultType>();
 
         public IQuxWithoutDefaultType Qux { get; }
+        public IQuxWithoutDefaultType[] QuxArray { get; }
+        public List<IQuxWithoutDefaultType> QuxList { get; }
+        public Dictionary<string, IQuxWithoutDefaultType> QuxDictionary { get; }
     }
 
-    [LocallyDefined.DefaultType(typeof(DefultBarWithLocallyDefinedDefaultType))]
+    [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))]
     public interface IBarWithLocallyDefinedDefaultType
     {
     }
 
-    public class DefultBarWithLocallyDefinedDefaultType : IBarWithLocallyDefinedDefaultType
+    public class DefaultBarWithLocallyDefinedDefaultType : IBarWithLocallyDefinedDefaultType
     {
         public double Fred { get; set; }
     }
