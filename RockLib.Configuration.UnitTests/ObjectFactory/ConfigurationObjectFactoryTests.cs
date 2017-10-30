@@ -40,69 +40,69 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithMembersDecoratedWithDefaultTypeAttribute>();
+            var foo = fooSection.Create<HasMembersDecoratedWithDefaultTypeAttribute>();
 
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBar);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBar).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GarplyBar);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GarplyBar).Fred);
             Assert.Equal(1, foo.GarplyBarArray.Length);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBarArray[0]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBarArray[0]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GarplyBarArray[0]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GarplyBarArray[0]).Fred);
             Assert.Equal(1, foo.GarplyBarList.Count);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBarList[0]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBarList[0]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GarplyBarList[0]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GarplyBarList[0]).Fred);
             Assert.Equal(1, foo.GarplyBarDictionary.Count);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GarplyBarDictionary["spam"]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GarplyBarDictionary["spam"]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GarplyBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GarplyBarDictionary["spam"]).Fred);
 
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBar);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBar).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GraultBar);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GraultBar).Fred);
             Assert.Equal(1, foo.GraultBarArray.Length);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBarArray[0]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBarArray[0]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GraultBarArray[0]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GraultBarArray[0]).Fred);
             Assert.Equal(1, foo.GraultBarList.Count);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBarList[0]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBarList[0]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GraultBarList[0]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GraultBarList[0]).Fred);
             Assert.Equal(1, foo.GraultBarDictionary.Count);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.GraultBarDictionary["spam"]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.GraultBarDictionary["spam"]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.GraultBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.GraultBarDictionary["spam"]).Fred);
 
             Assert.Equal(1, foo.BarReadonlyList.Count);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.BarReadonlyList[0]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.BarReadonlyList[0]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.BarReadonlyList[0]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.BarReadonlyList[0]).Fred);
             Assert.Equal(1, foo.BarReadonlyDictionary.Count);
-            Assert.IsType<DefaultBarWithDefaultType>(foo.BarReadonlyDictionary["spam"]);
-            Assert.Equal(123.45, ((DefaultBarWithDefaultType)foo.BarReadonlyDictionary["spam"]).Fred);
+            Assert.IsType<DefaultHasDefaultType>(foo.BarReadonlyDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)foo.BarReadonlyDictionary["spam"]).Fred);
 
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.Baz);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.Baz).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.Baz);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.Baz).Waldo);
             Assert.Equal(1, foo.BazArray.Length);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazArray[0]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazArray[0]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazArray[0]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazArray[0]).Waldo);
             Assert.Equal(1, foo.BazList.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazList[0]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazList[0]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazList[0]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazList[0]).Waldo);
             Assert.Equal(1, foo.BazDictionary.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazDictionary["spam"]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazDictionary["spam"]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazDictionary["spam"]).Waldo);
 
             Assert.Equal(1, foo.BazReadonlyList.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyList[0]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyList[0]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazReadonlyList[0]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazReadonlyList[0]).Waldo);
             Assert.Equal(1, foo.BazReadonlyDictionary.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyDictionary["spam"]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyDictionary["spam"]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazReadonlyDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazReadonlyDictionary["spam"]).Waldo);
 
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.Qux);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.Qux).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.Qux);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.Qux).Thud);
             Assert.Equal(1, foo.QuxArray.Length);
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxArray[0]);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxArray[0]).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.QuxArray[0]);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.QuxArray[0]).Thud);
             Assert.Equal(1, foo.QuxList.Count);
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxList[0]);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxList[0]).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.QuxList[0]);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.QuxList[0]).Thud);
             Assert.Equal(1, foo.QuxDictionary.Count);
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxDictionary["spam"]);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxDictionary["spam"]).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.QuxDictionary["spam"]);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.QuxDictionary["spam"]).Thud);
         }
 
         [Fact]
@@ -135,69 +135,69 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute>();
+            var foo = fooSection.Create<MembersDecoratedWithLocallyDefinedDefaultTypeAttribute>();
 
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBar);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBar).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GarplyBar);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GarplyBar).Fred);
             Assert.Equal(1, foo.GarplyBarArray.Length);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBarArray[0]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBarArray[0]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GarplyBarArray[0]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GarplyBarArray[0]).Fred);
             Assert.Equal(1, foo.GarplyBarList.Count);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBarList[0]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBarList[0]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GarplyBarList[0]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GarplyBarList[0]).Fred);
             Assert.Equal(1, foo.GarplyBarDictionary.Count);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GarplyBarDictionary["spam"]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GarplyBarDictionary["spam"]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GarplyBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GarplyBarDictionary["spam"]).Fred);
 
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBar);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBar).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GraultBar);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GraultBar).Fred);
             Assert.Equal(1, foo.GraultBarArray.Length);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBarArray[0]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBarArray[0]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GraultBarArray[0]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GraultBarArray[0]).Fred);
             Assert.Equal(1, foo.GraultBarList.Count);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBarList[0]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBarList[0]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GraultBarList[0]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GraultBarList[0]).Fred);
             Assert.Equal(1, foo.GraultBarDictionary.Count);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.GraultBarDictionary["spam"]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.GraultBarDictionary["spam"]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.GraultBarDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.GraultBarDictionary["spam"]).Fred);
 
             Assert.Equal(1, foo.BarReadonlyList.Count);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.BarReadonlyList[0]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.BarReadonlyList[0]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.BarReadonlyList[0]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.BarReadonlyList[0]).Fred);
             Assert.Equal(1, foo.BarReadonlyDictionary.Count);
-            Assert.IsType<DefaultBarWithLocallyDefinedDefaultType>(foo.BarReadonlyDictionary["spam"]);
-            Assert.Equal(123.45, ((DefaultBarWithLocallyDefinedDefaultType)foo.BarReadonlyDictionary["spam"]).Fred);
+            Assert.IsType<DefaultHasLocallyDefinedDefaultType>(foo.BarReadonlyDictionary["spam"]);
+            Assert.Equal(123.45, ((DefaultHasLocallyDefinedDefaultType)foo.BarReadonlyDictionary["spam"]).Fred);
 
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.Baz);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.Baz).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.Baz);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.Baz).Waldo);
             Assert.Equal(1, foo.BazArray.Length);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazArray[0]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazArray[0]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazArray[0]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazArray[0]).Waldo);
             Assert.Equal(1, foo.BazList.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazList[0]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazList[0]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazList[0]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazList[0]).Waldo);
             Assert.Equal(1, foo.BazDictionary.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazDictionary["spam"]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazDictionary["spam"]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazDictionary["spam"]).Waldo);
 
             Assert.Equal(1, foo.BazReadonlyList.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyList[0]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyList[0]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazReadonlyList[0]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazReadonlyList[0]).Waldo);
             Assert.Equal(1, foo.BazReadonlyDictionary.Count);
-            Assert.IsType<DefaultBazWithoutDefaultType>(foo.BazReadonlyDictionary["spam"]);
-            Assert.Equal(-456.78, ((DefaultBazWithoutDefaultType)foo.BazReadonlyDictionary["spam"]).Waldo);
+            Assert.IsType<DefaultHasNoDefaultType>(foo.BazReadonlyDictionary["spam"]);
+            Assert.Equal(-456.78, ((DefaultHasNoDefaultType)foo.BazReadonlyDictionary["spam"]).Waldo);
 
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.Qux);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.Qux).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.Qux);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.Qux).Thud);
             Assert.Equal(1, foo.QuxArray.Length);
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxArray[0]);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxArray[0]).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.QuxArray[0]);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.QuxArray[0]).Thud);
             Assert.Equal(1, foo.QuxList.Count);
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxList[0]);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxList[0]).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.QuxList[0]);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.QuxList[0]).Thud);
             Assert.Equal(1, foo.QuxDictionary.Count);
-            Assert.IsType<DefaultQuxWithoutDefaultType>(foo.QuxDictionary["spam"]);
-            Assert.Equal(987.65, ((DefaultQuxWithoutDefaultType)foo.QuxDictionary["spam"]).Thud);
+            Assert.IsType<DefaultIAlsoHasNoDefaultType>(foo.QuxDictionary["spam"]);
+            Assert.Equal(987.65, ((DefaultIAlsoHasNoDefaultType)foo.QuxDictionary["spam"]).Thud);
         }
 
         [Fact]
@@ -215,13 +215,13 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = new DefaultTypes { { typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties) } };
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+            var defaultTypes = new DefaultTypes { { typeof(HasReadWriteConcreteProperties), "bar", typeof(InheritedHasReadWriteProperties) } };
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<InheritedBarWithReadWriteProperties>(foo.Bar);
-            var inheritedBar = (InheritedBarWithReadWriteProperties)foo.Bar;
+            Assert.IsType<InheritedHasReadWriteProperties>(foo.Bar);
+            var inheritedBar = (InheritedHasReadWriteProperties)foo.Bar;
             Assert.Equal("But I don't LIKE Spam!", inheritedBar.Spam);
             Assert.Equal(guid, foo.Baz.Grault);
         }
@@ -241,13 +241,13 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = new DefaultTypes { { typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties) } };
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+            var defaultTypes = new DefaultTypes { { typeof(HasReadWriteProperties), typeof(InheritedHasReadWriteProperties) } };
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<InheritedBarWithReadWriteProperties>(foo.Bar);
-            var inheritedBar = (InheritedBarWithReadWriteProperties)foo.Bar;
+            Assert.IsType<InheritedHasReadWriteProperties>(foo.Bar);
+            var inheritedBar = (InheritedHasReadWriteProperties)foo.Bar;
             Assert.Equal("But I don't LIKE Spam!", inheritedBar.Spam);
             Assert.Equal(guid, foo.Baz.Grault);
         }
@@ -259,7 +259,7 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(BarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(HasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:bar:value:qux", "true" },
                     { "foo:bar:value:garply", "123.45" },
                     { "foo:baz:grault", guid.ToString() },
@@ -267,12 +267,12 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = new DefaultTypes { { typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties) } };
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+            var defaultTypes = new DefaultTypes { { typeof(HasReadWriteConcreteProperties), "bar", typeof(InheritedHasReadWriteProperties) } };
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<BarWithReadWriteProperties>(foo.Bar);
+            Assert.IsType<HasReadWriteProperties>(foo.Bar);
             Assert.Equal(guid, foo.Baz.Grault);
         }
 
@@ -283,7 +283,7 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(BarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(HasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:bar:value:qux", "true" },
                     { "foo:bar:value:garply", "123.45" },
                     { "foo:baz:grault", guid.ToString() },
@@ -291,12 +291,12 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = new DefaultTypes { { typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties) } };
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
+            var defaultTypes = new DefaultTypes { { typeof(HasReadWriteProperties), typeof(InheritedHasReadWriteProperties) } };
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<BarWithReadWriteProperties>(foo.Bar);
+            Assert.IsType<HasReadWriteProperties>(foo.Bar);
             Assert.Equal(guid, foo.Baz.Grault);
         }
 
@@ -311,12 +311,12 @@ namespace Tests
                .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithCoordinate>((value, targetType, declaringType, memberName) =>
+            var foo = fooSection.Create<CoordinateContainer>((value, targetType, declaringType, memberName) =>
             {
                 // Make sure we're getting all the right stuff.
                 Assert.Equal("(123.45, -456.78)", value);
                 Assert.Equal(typeof(Coordinate), targetType);
-                Assert.Equal(typeof(FooWithCoordinate), declaringType);
+                Assert.Equal(typeof(CoordinateContainer), declaringType);
                 Assert.Equal("Bar", memberName);
                 return new Coordinate { Latitude = 111.11, Longitude = -222.22 };
             });
@@ -336,12 +336,12 @@ namespace Tests
                .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithDouble>((value, targetType, declaringType, memberName) =>
+            var foo = fooSection.Create<DoubleContainer>((value, targetType, declaringType, memberName) =>
             {
                 // Make sure we're getting all the right stuff.
                 Assert.Equal("123.45", value);
                 Assert.Equal(typeof(double), targetType);
-                Assert.Equal(typeof(FooWithDouble), declaringType);
+                Assert.Equal(typeof(DoubleContainer), declaringType);
                 Assert.Equal("Bar", memberName);
                 return null;
             });
@@ -364,7 +364,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteSimpleProperties>();
+            var foo = fooSection.Create<HasReadWriteSimpleProperties>();
 
             Assert.Equal(123, foo.Bar);
             Assert.Equal(now, foo.Baz);
@@ -385,7 +385,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleConstructorParameters>();
+            var foo = fooSection.Create<HasSimpleConstructorParameters>();
 
             Assert.Equal(123, foo.Bar);
             Assert.Equal(now, foo.Baz);
@@ -406,7 +406,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>();
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
@@ -427,7 +427,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteConstructorParameters>();
+            var foo = fooSection.Create<HasConcreteConstructorParameters>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
@@ -441,7 +441,7 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:bar:value:qux", "true" },
                     { "foo:bar:value:garply", "123.45" },
                     { "foo:bar:value:spam", "But I don't LIKE Spam!" },
@@ -450,12 +450,12 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>();
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<InheritedBarWithReadWriteProperties>(foo.Bar);
-            var inheritedBar = (InheritedBarWithReadWriteProperties)foo.Bar;
+            Assert.IsType<InheritedHasReadWriteProperties>(foo.Bar);
+            var inheritedBar = (InheritedHasReadWriteProperties)foo.Bar;
             Assert.Equal("But I don't LIKE Spam!", inheritedBar.Spam);
             Assert.Equal(guid, foo.Baz.Grault);
         }
@@ -467,7 +467,7 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithConstructorParameters).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasConstructorParameters).AssemblyQualifiedName },
                     { "foo:bar:value:qux", "true" },
                     { "foo:bar:value:garply", "123.45" },
                     { "foo:bar:value:spam", "But I don't LIKE Spam!" },
@@ -476,12 +476,12 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteConstructorParameters>();
+            var foo = fooSection.Create<HasConcreteConstructorParameters>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<InheritedBarWithConstructorParameters>(foo.Bar);
-            var inheritedBar = (InheritedBarWithConstructorParameters)foo.Bar;
+            Assert.IsType<InheritedHasConstructorParameters>(foo.Bar);
+            var inheritedBar = (InheritedHasConstructorParameters)foo.Bar;
             Assert.Equal("But I don't LIKE Spam!", inheritedBar.Spam);
             Assert.Equal(guid, foo.Baz.Grault);
         }
@@ -493,21 +493,21 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(BarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(HasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:bar:value:qux", "true" },
                     { "foo:bar:value:garply", "123.45" },
-                    { "foo:baz:type", typeof(BazWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:baz:type", typeof(AlsoHasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:baz:value:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteInterfaceProperties>();
+            var foo = fooSection.Create<HasReadWriteInterfaceProperties>();
 
-            Assert.IsType<BarWithReadWriteProperties>(foo.Bar);
+            Assert.IsType<HasReadWriteProperties>(foo.Bar);
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<BazWithReadWriteProperties>(foo.Baz);
+            Assert.IsType<AlsoHasReadWriteProperties>(foo.Baz);
             Assert.Equal(guid, foo.Baz.Grault);
         }
 
@@ -518,21 +518,21 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(BarWithConstructorParameters).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(HasConstructorParameters).AssemblyQualifiedName },
                     { "foo:bar:value:qux", "true" },
                     { "foo:bar:value:garply", "123.45" },
-                    { "foo:baz:type", typeof(BazWithConstructorParameters).AssemblyQualifiedName },
+                    { "foo:baz:type", typeof(AlsoHasConstructorParameters).AssemblyQualifiedName },
                     { "foo:baz:value:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceConstructorParameters>();
+            var foo = fooSection.Create<HasInterfaceConstructorParameters>();
 
-            Assert.IsType<BarWithConstructorParameters>(foo.Bar);
+            Assert.IsType<HasConstructorParameters>(foo.Bar);
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(123.45, foo.Bar.Garply);
-            Assert.IsType<BazWithConstructorParameters>(foo.Baz);
+            Assert.IsType<AlsoHasConstructorParameters>(foo.Baz);
             Assert.Equal(guid, foo.Baz.Grault);
         }
 
@@ -543,13 +543,13 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:baz:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>();
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>();
 
             Assert.Equal(false, foo.Bar.Qux);
             Assert.Equal(0D, foo.Bar.Garply);
@@ -563,13 +563,13 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithDefaultConstructor).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasDefaultConstructor).AssemblyQualifiedName },
                     { "foo:baz:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteConstructorParameters>();
+            var foo = fooSection.Create<HasConcreteConstructorParameters>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(543.21, foo.Bar.Garply);
@@ -583,14 +583,14 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:bar:value", null },
                     { "foo:baz:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>();
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>();
 
             Assert.Equal(false, foo.Bar.Qux);
             Assert.Equal(0D, foo.Bar.Garply);
@@ -604,14 +604,14 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithDefaultConstructor).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasDefaultConstructor).AssemblyQualifiedName },
                     { "foo:bar:value", null },
                     { "foo:baz:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteConstructorParameters>();
+            var foo = fooSection.Create<HasConcreteConstructorParameters>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(543.21, foo.Bar.Garply);
@@ -625,14 +625,14 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasReadWriteProperties).AssemblyQualifiedName },
                     { "foo:bar:value", "" },
                     { "foo:baz:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithReadWriteConcreteProperties>();
+            var foo = fooSection.Create<HasReadWriteConcreteProperties>();
 
             Assert.Equal(false, foo.Bar.Qux);
             Assert.Equal(0D, foo.Bar.Garply);
@@ -646,14 +646,14 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:type", typeof(InheritedBarWithDefaultConstructor).AssemblyQualifiedName },
+                    { "foo:bar:type", typeof(InheritedHasDefaultConstructor).AssemblyQualifiedName },
                     { "foo:bar:value", "" },
                     { "foo:baz:grault", guid.ToString() },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteConstructorParameters>();
+            var foo = fooSection.Create<HasConcreteConstructorParameters>();
 
             Assert.Equal(true, foo.Bar.Qux);
             Assert.Equal(543.21, foo.Bar.Garply);
@@ -684,7 +684,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleReadWriteCollectionProperties>();
+            var foo = fooSection.Create<HasSimpleReadWriteCollectionProperties>();
 
             Assert.Equal(2, foo.Bar.Length);
             Assert.Equal(123, foo.Bar[0]);
@@ -725,7 +725,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleReadonlyCollectionProperties>();
+            var foo = fooSection.Create<HasSimpleReadonlyCollectionProperties>();
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(123, foo.Baz[0]);
@@ -762,7 +762,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleCollectionConstructorParameters>();
+            var foo = fooSection.Create<HasSimpleCollectionConstructorParameters>();
 
             Assert.Equal(2, foo.Bar.Length);
             Assert.Equal(123, foo.Bar[0]);
@@ -811,7 +811,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteReadWriteCollectionProperties>();
+            var foo = fooSection.Create<HasConcreteReadWriteCollectionProperties>();
 
             Assert.Equal(2, foo.Bar.Length);
             Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
@@ -852,7 +852,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteReadonlyCollectionProperties>();
+            var foo = fooSection.Create<HasConcreteReadonlyCollectionProperties>();
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
@@ -889,7 +889,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteCollectionConstructorParameters>();
+            var foo = fooSection.Create<HasConcreteCollectionConstructorParameters>();
 
             Assert.Equal(2, foo.Bar.Length);
             Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
@@ -922,101 +922,101 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:bar:0:value:baz", "utf-8" },
                     { "foo:bar:0:value:qux", quxValue.ToString() },
-                    { "foo:bar:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:bar:1:value:baz", "ascii" },
 
-                    { "foo:baz:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:baz:0:value:baz", "utf-8" },
                     { "foo:baz:0:value:qux", quxValue.ToString() },
-                    { "foo:baz:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:1:value:baz", "ascii" },
 
-                    { "foo:qux:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:qux:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:qux:0:value:baz", "utf-8" },
                     { "foo:qux:0:value:qux", quxValue.ToString() },
-                    { "foo:qux:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:qux:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:qux:1:value:baz", "ascii" },
 
-                    { "foo:garply:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:garply:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:garply:0:value:baz", "utf-8" },
                     { "foo:garply:0:value:qux", quxValue.ToString() },
-                    { "foo:garply:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:garply:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:garply:1:value:baz", "ascii" },
 
-                    { "foo:grault:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:grault:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:grault:0:value:baz", "utf-8" },
                     { "foo:grault:0:value:qux", quxValue.ToString() },
-                    { "foo:grault:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:grault:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:grault:1:value:baz", "ascii" },
 
-                    { "foo:fred:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:fred:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:fred:0:value:baz", "utf-8" },
                     { "foo:fred:0:value:qux", quxValue.ToString() },
-                    { "foo:fred:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:fred:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:fred:1:value:baz", "ascii" },
 
-                    { "foo:waldo:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:waldo:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:waldo:0:value:baz", "utf-8" },
                     { "foo:waldo:0:value:qux", quxValue.ToString() },
-                    { "foo:waldo:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:waldo:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:waldo:1:value:baz", "ascii" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceReadWriteCollectionProperties>();
+            var foo = fooSection.Create<HasInterfaceReadWriteCollectionProperties>();
 
             Assert.Equal(2, foo.Bar.Length);
             Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Bar[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Bar[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Bar[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Bar[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Bar[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Bar[1]);
+            Assert.IsType<HasSomething>(foo.Bar[1]);
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Baz[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Baz[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Baz[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Baz[1]);
+            Assert.IsType<HasSomething>(foo.Baz[1]);
 
             Assert.Equal(2, foo.Qux.Count);
             Assert.Equal(Encoding.UTF8, foo.Qux[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Qux[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Qux[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Qux[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Qux[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Qux[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Qux[1]);
+            Assert.IsType<HasSomething>(foo.Qux[1]);
 
             Assert.Equal(2, foo.Garply.Count);
             Assert.Equal(Encoding.UTF8, foo.Garply.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Garply.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Garply.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Garply.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Garply.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Garply.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Garply.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Garply.Skip(1).First());
 
             Assert.Equal(2, foo.Grault.Count());
             Assert.Equal(Encoding.UTF8, foo.Grault.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Grault.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Grault.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Grault.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Grault.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Grault.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Grault.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Grault.Skip(1).First());
 
             Assert.Equal(2, foo.Fred.Count);
             Assert.Equal(Encoding.UTF8, foo.Fred.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Fred.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Fred.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Fred.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Fred.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Fred.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Fred.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Fred.Skip(1).First());
 
             Assert.Equal(2, foo.Waldo.Count);
             Assert.Equal(Encoding.UTF8, foo.Waldo[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Waldo[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Waldo[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Waldo[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Waldo[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Waldo[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Waldo[1]);
+            Assert.IsType<HasSomething>(foo.Waldo[1]);
         }
 
         [Fact]
@@ -1027,49 +1027,49 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:baz:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:baz:0:value:baz", "utf-8" },
                     { "foo:baz:0:value:qux", quxValue.ToString() },
-                    { "foo:baz:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:1:value:baz", "ascii" },
 
-                    { "foo:qux:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:qux:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:qux:0:value:baz", "utf-8" },
                     { "foo:qux:0:value:qux", quxValue.ToString() },
-                    { "foo:qux:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:qux:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:qux:1:value:baz", "ascii" },
 
-                    { "foo:garply:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:garply:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:garply:0:value:baz", "utf-8" },
                     { "foo:garply:0:value:qux", quxValue.ToString() },
-                    { "foo:garply:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:garply:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:garply:1:value:baz", "ascii" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceReadonlyCollectionProperties>();
+            var foo = fooSection.Create<HasInterfaceReadonlyCollectionProperties>();
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Baz[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Baz[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Baz[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Baz[1]);
+            Assert.IsType<HasSomething>(foo.Baz[1]);
 
             Assert.Equal(2, foo.Qux.Count);
             Assert.Equal(Encoding.UTF8, foo.Qux[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Qux[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Qux[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Qux[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Qux[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Qux[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Qux[1]);
+            Assert.IsType<HasSomething>(foo.Qux[1]);
 
             Assert.Equal(2, foo.Garply.Count);
             Assert.Equal(Encoding.UTF8, foo.Garply.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Garply.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Garply.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Garply.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Garply.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Garply.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Garply.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Garply.Skip(1).First());
         }
 
         [Fact]
@@ -1080,101 +1080,101 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:bar:0:value:baz", "utf-8" },
                     { "foo:bar:0:value:qux", quxValue.ToString() },
-                    { "foo:bar:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:bar:1:value:baz", "ascii" },
 
-                    { "foo:baz:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:baz:0:value:baz", "utf-8" },
                     { "foo:baz:0:value:qux", quxValue.ToString() },
-                    { "foo:baz:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:1:value:baz", "ascii" },
 
-                    { "foo:qux:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:qux:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:qux:0:value:baz", "utf-8" },
                     { "foo:qux:0:value:qux", quxValue.ToString() },
-                    { "foo:qux:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:qux:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:qux:1:value:baz", "ascii" },
 
-                    { "foo:garply:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:garply:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:garply:0:value:baz", "utf-8" },
                     { "foo:garply:0:value:qux", quxValue.ToString() },
-                    { "foo:garply:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:garply:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:garply:1:value:baz", "ascii" },
 
-                    { "foo:grault:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:grault:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:grault:0:value:baz", "utf-8" },
                     { "foo:grault:0:value:qux", quxValue.ToString() },
-                    { "foo:grault:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:grault:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:grault:1:value:baz", "ascii" },
 
-                    { "foo:fred:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:fred:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:fred:0:value:baz", "utf-8" },
                     { "foo:fred:0:value:qux", quxValue.ToString() },
-                    { "foo:fred:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:fred:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:fred:1:value:baz", "ascii" },
 
-                    { "foo:waldo:0:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:waldo:0:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:waldo:0:value:baz", "utf-8" },
                     { "foo:waldo:0:value:qux", quxValue.ToString() },
-                    { "foo:waldo:1:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:waldo:1:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:waldo:1:value:baz", "ascii" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceCollectionConstructorParameters>();
+            var foo = fooSection.Create<HasInterfaceCollectionConstructorParameters>();
 
             Assert.Equal(2, foo.Bar.Length);
             Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Bar[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Bar[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Bar[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Bar[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Bar[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Bar[1]);
+            Assert.IsType<HasSomething>(foo.Bar[1]);
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Baz[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Baz[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Baz[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Baz[1]);
+            Assert.IsType<HasSomething>(foo.Baz[1]);
 
             Assert.Equal(2, foo.Qux.Count);
             Assert.Equal(Encoding.UTF8, foo.Qux[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Qux[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Qux[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Qux[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Qux[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Qux[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Qux[1]);
+            Assert.IsType<HasSomething>(foo.Qux[1]);
 
             Assert.Equal(2, foo.Garply.Count);
             Assert.Equal(Encoding.UTF8, foo.Garply.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Garply.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Garply.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Garply.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Garply.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Garply.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Garply.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Garply.Skip(1).First());
 
             Assert.Equal(2, foo.Grault.Count());
             Assert.Equal(Encoding.UTF8, foo.Grault.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Grault.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Grault.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Grault.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Grault.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Grault.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Grault.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Grault.Skip(1).First());
 
             Assert.Equal(2, foo.Fred.Count);
             Assert.Equal(Encoding.UTF8, foo.Fred.First().Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Fred.First());
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Fred.First()).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Fred.First());
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Fred.First()).Qux);
             Assert.Equal(Encoding.ASCII, foo.Fred.Skip(1).First().Baz);
-            Assert.IsType<BarWithSomething>(foo.Fred.Skip(1).First());
+            Assert.IsType<HasSomething>(foo.Fred.Skip(1).First());
 
             Assert.Equal(2, foo.Waldo.Count);
             Assert.Equal(Encoding.UTF8, foo.Waldo[0].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Waldo[0]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Waldo[0]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Waldo[0]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Waldo[0]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Waldo[1].Baz);
-            Assert.IsType<BarWithSomething>(foo.Waldo[1]);
+            Assert.IsType<HasSomething>(foo.Waldo[1]);
         }
 
         [Fact]
@@ -1191,7 +1191,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleReadWriteDictionaryProperties>();
+            var foo = fooSection.Create<HasSimpleReadWriteDictionaryProperties>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(123, foo.Bar["fred"]);
@@ -1215,7 +1215,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleReadonlyDictionaryProperties>();
+            var foo = fooSection.Create<HasSimpleReadonlyDictionaryProperties>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(123, foo.Bar["fred"]);
@@ -1239,7 +1239,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithSimpleDictionaryConstructorParameters>();
+            var foo = fooSection.Create<HasSimpleDictionaryConstructorParameters>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(123, foo.Bar["fred"]);
@@ -1263,7 +1263,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteReadWriteDictionaryProperties>();
+            var foo = fooSection.Create<HasConcreteReadWriteDictionaryProperties>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(Encoding.UTF8, foo.Bar["fred"].Baz);
@@ -1287,7 +1287,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteReadonlyDictionaryProperties>();
+            var foo = fooSection.Create<HasConcreteReadonlyDictionaryProperties>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(Encoding.UTF8, foo.Bar["fred"].Baz);
@@ -1311,7 +1311,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithConcreteDictionaryParameters>();
+            var foo = fooSection.Create<HasConcreteDictionaryParameters>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(Encoding.UTF8, foo.Bar["fred"].Baz);
@@ -1329,36 +1329,36 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:fred:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:bar:fred:value:baz", "utf-8" },
                     { "foo:bar:fred:value:qux", quxValue.ToString() },
-                    { "foo:bar:waldo:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:bar:waldo:value:baz", "ascii" },
 
-                    { "foo:baz:fred:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:baz:fred:value:baz", "utf-8" },
                     { "foo:baz:fred:value:qux", quxValue.ToString() },
-                    { "foo:baz:waldo:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:waldo:value:baz", "ascii" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceReadWriteDictionaryProperties>();
+            var foo = fooSection.Create<HasInterfaceReadWriteDictionaryProperties>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(Encoding.UTF8, foo.Bar["fred"].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Bar["fred"]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Bar["fred"]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Bar["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Bar["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Bar["waldo"].Baz);
-            Assert.IsType<BarWithSomething>(foo.Bar["waldo"]);
+            Assert.IsType<HasSomething>(foo.Bar["waldo"]);
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz["fred"].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Baz["fred"]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Baz["fred"]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Baz["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
-            Assert.IsType<BarWithSomething>(foo.Baz["waldo"]);
+            Assert.IsType<HasSomething>(foo.Baz["waldo"]);
         }
 
         [Fact]
@@ -1369,36 +1369,36 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:fred:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:bar:fred:value:baz", "utf-8" },
                     { "foo:bar:fred:value:qux", quxValue.ToString() },
-                    { "foo:bar:waldo:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:bar:waldo:value:baz", "ascii" },
 
-                    { "foo:baz:fred:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:baz:fred:value:baz", "utf-8" },
                     { "foo:baz:fred:value:qux", quxValue.ToString() },
-                    { "foo:baz:waldo:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:waldo:value:baz", "ascii" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceReadonlyDictionaryProperties>();
+            var foo = fooSection.Create<HasInterfaceReadonlyDictionaryProperties>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(Encoding.UTF8, foo.Bar["fred"].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Bar["fred"]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Bar["fred"]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Bar["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Bar["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Bar["waldo"].Baz);
-            Assert.IsType<BarWithSomething>(foo.Bar["waldo"]);
+            Assert.IsType<HasSomething>(foo.Bar["waldo"]);
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz["fred"].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Baz["fred"]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Baz["fred"]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Baz["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
-            Assert.IsType<BarWithSomething>(foo.Baz["waldo"]);
+            Assert.IsType<HasSomething>(foo.Baz["waldo"]);
         }
 
         [Fact]
@@ -1409,54 +1409,54 @@ namespace Tests
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "foo:bar:fred:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:bar:fred:value:baz", "utf-8" },
                     { "foo:bar:fred:value:qux", quxValue.ToString() },
-                    { "foo:bar:waldo:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:bar:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:bar:waldo:value:baz", "ascii" },
 
-                    { "foo:baz:fred:type", typeof(DerivedBarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
                     { "foo:baz:fred:value:baz", "utf-8" },
                     { "foo:baz:fred:value:qux", quxValue.ToString() },
-                    { "foo:baz:waldo:type", typeof(BarWithSomething).AssemblyQualifiedName },
+                    { "foo:baz:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:waldo:value:baz", "ascii" },
                 })
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<FooWithInterfaceDictionaryParameters>();
+            var foo = fooSection.Create<HasInterfaceDictionaryParameters>();
 
             Assert.Equal(2, foo.Bar.Count);
             Assert.Equal(Encoding.UTF8, foo.Bar["fred"].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Bar["fred"]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Bar["fred"]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Bar["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Bar["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Bar["waldo"].Baz);
-            Assert.IsType<BarWithSomething>(foo.Bar["waldo"]);
+            Assert.IsType<HasSomething>(foo.Bar["waldo"]);
 
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz["fred"].Baz);
-            Assert.IsType<DerivedBarWithSomething>(foo.Baz["fred"]);
-            Assert.Equal(quxValue, ((DerivedBarWithSomething)foo.Baz["fred"]).Qux);
+            Assert.IsType<DerivedHasSomething>(foo.Baz["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
-            Assert.IsType<BarWithSomething>(foo.Baz["waldo"]);
+            Assert.IsType<HasSomething>(foo.Baz["waldo"]);
         }
     }
 
-    public class FooWithSimpleReadWriteDictionaryProperties
+    public class HasSimpleReadWriteDictionaryProperties
     {
         public Dictionary<string, int> Bar { get; set; }
         public IDictionary<string, int> Baz { get; set; }
     }
 
-    public class FooWithSimpleReadonlyDictionaryProperties
+    public class HasSimpleReadonlyDictionaryProperties
     {
         public Dictionary<string, int> Bar { get; } = new Dictionary<string, int>();
         public IDictionary<string, int> Baz { get; } = new Dictionary<string, int>();
     }
 
-    public class FooWithSimpleDictionaryConstructorParameters
+    public class HasSimpleDictionaryConstructorParameters
     {
-        public FooWithSimpleDictionaryConstructorParameters(Dictionary<string, int> bar, IDictionary<string, int> baz)
+        public HasSimpleDictionaryConstructorParameters(Dictionary<string, int> bar, IDictionary<string, int> baz)
         {
             Bar = bar;
             Baz = baz;
@@ -1466,55 +1466,55 @@ namespace Tests
         public IDictionary<string, int> Baz { get; }
     }
 
-    public class FooWithConcreteReadWriteDictionaryProperties
+    public class HasConcreteReadWriteDictionaryProperties
     {
-        public Dictionary<string, BarWithSomething> Bar { get; set; }
-        public IDictionary<string, BarWithSomething> Baz { get; set; }
+        public Dictionary<string, HasSomething> Bar { get; set; }
+        public IDictionary<string, HasSomething> Baz { get; set; }
     }
 
-    public class FooWithConcreteReadonlyDictionaryProperties
+    public class HasConcreteReadonlyDictionaryProperties
     {
-        public Dictionary<string, BarWithSomething> Bar { get; } = new Dictionary<string, BarWithSomething>();
-        public IDictionary<string, BarWithSomething> Baz { get; } = new Dictionary<string, BarWithSomething>();
+        public Dictionary<string, HasSomething> Bar { get; } = new Dictionary<string, HasSomething>();
+        public IDictionary<string, HasSomething> Baz { get; } = new Dictionary<string, HasSomething>();
     }
 
-    public class FooWithConcreteDictionaryParameters
+    public class HasConcreteDictionaryParameters
     {
-        public FooWithConcreteDictionaryParameters(Dictionary<string, BarWithSomething> bar, IDictionary<string, BarWithSomething> baz)
+        public HasConcreteDictionaryParameters(Dictionary<string, HasSomething> bar, IDictionary<string, HasSomething> baz)
         {
             Bar = bar;
             Baz = baz;
         }
 
-        public Dictionary<string, BarWithSomething> Bar { get; }
-        public IDictionary<string, BarWithSomething> Baz { get; }
+        public Dictionary<string, HasSomething> Bar { get; }
+        public IDictionary<string, HasSomething> Baz { get; }
     }
 
-    public class FooWithInterfaceReadWriteDictionaryProperties
+    public class HasInterfaceReadWriteDictionaryProperties
     {
-        public Dictionary<string, IBarWithSomething> Bar { get; set; }
-        public IDictionary<string, IBarWithSomething> Baz { get; set; }
+        public Dictionary<string, IHasSomething> Bar { get; set; }
+        public IDictionary<string, IHasSomething> Baz { get; set; }
     }
 
-    public class FooWithInterfaceReadonlyDictionaryProperties
+    public class HasInterfaceReadonlyDictionaryProperties
     {
-        public Dictionary<string, IBarWithSomething> Bar { get; } = new Dictionary<string, IBarWithSomething>();
-        public IDictionary<string, IBarWithSomething> Baz { get; } = new Dictionary<string, IBarWithSomething>();
+        public Dictionary<string, IHasSomething> Bar { get; } = new Dictionary<string, IHasSomething>();
+        public IDictionary<string, IHasSomething> Baz { get; } = new Dictionary<string, IHasSomething>();
     }
 
-    public class FooWithInterfaceDictionaryParameters
+    public class HasInterfaceDictionaryParameters
     {
-        public FooWithInterfaceDictionaryParameters(Dictionary<string, IBarWithSomething> bar, IDictionary<string, IBarWithSomething> baz)
+        public HasInterfaceDictionaryParameters(Dictionary<string, IHasSomething> bar, IDictionary<string, IHasSomething> baz)
         {
             Bar = bar;
             Baz = baz;
         }
 
-        public Dictionary<string, IBarWithSomething> Bar { get; }
-        public IDictionary<string, IBarWithSomething> Baz { get; }
+        public Dictionary<string, IHasSomething> Bar { get; }
+        public IDictionary<string, IHasSomething> Baz { get; }
     }
 
-    public class FooWithSimpleReadWriteCollectionProperties
+    public class HasSimpleReadWriteCollectionProperties
     {
         public int[] Bar { get; set; }
         public List<int> Baz { get; set; }
@@ -1525,16 +1525,16 @@ namespace Tests
         public IReadOnlyList<int> Waldo { get; set; }
     }
 
-    public class FooWithSimpleReadonlyCollectionProperties
+    public class HasSimpleReadonlyCollectionProperties
     {
         public List<int> Baz { get; } = new List<int>();
         public IList<int> Qux { get; } = new List<int>();
         public ICollection<int> Garply { get; } = new List<int>();
     }
 
-    public class FooWithSimpleCollectionConstructorParameters
+    public class HasSimpleCollectionConstructorParameters
     {
-        public FooWithSimpleCollectionConstructorParameters(
+        public HasSimpleCollectionConstructorParameters(
             int[] bar,
             List<int> baz,
             IList<int> qux,
@@ -1560,34 +1560,34 @@ namespace Tests
         public IReadOnlyList<int> Waldo { get; }
     }
 
-    public class FooWithConcreteReadWriteCollectionProperties
+    public class HasConcreteReadWriteCollectionProperties
     {
-        public BarWithSomething[] Bar { get; set; }
-        public List<BarWithSomething> Baz { get; set; }
-        public IList<BarWithSomething> Qux { get; set; }
-        public ICollection<BarWithSomething> Garply { get; set; }
-        public IEnumerable<BarWithSomething> Grault { get; set; }
-        public IReadOnlyCollection<BarWithSomething> Fred { get; set; }
-        public IReadOnlyList<BarWithSomething> Waldo { get; set; }
+        public HasSomething[] Bar { get; set; }
+        public List<HasSomething> Baz { get; set; }
+        public IList<HasSomething> Qux { get; set; }
+        public ICollection<HasSomething> Garply { get; set; }
+        public IEnumerable<HasSomething> Grault { get; set; }
+        public IReadOnlyCollection<HasSomething> Fred { get; set; }
+        public IReadOnlyList<HasSomething> Waldo { get; set; }
     }
 
-    public class FooWithConcreteReadonlyCollectionProperties
+    public class HasConcreteReadonlyCollectionProperties
     {
-        public List<BarWithSomething> Baz { get; } = new List<BarWithSomething>();
-        public IList<BarWithSomething> Qux { get; } = new List<BarWithSomething>();
-        public ICollection<BarWithSomething> Garply { get; } = new List<BarWithSomething>();
+        public List<HasSomething> Baz { get; } = new List<HasSomething>();
+        public IList<HasSomething> Qux { get; } = new List<HasSomething>();
+        public ICollection<HasSomething> Garply { get; } = new List<HasSomething>();
     }
 
-    public class FooWithConcreteCollectionConstructorParameters
+    public class HasConcreteCollectionConstructorParameters
     {
-        public FooWithConcreteCollectionConstructorParameters(
-            BarWithSomething[] bar,
-            List<BarWithSomething> baz,
-            IList<BarWithSomething> qux,
-            ICollection<BarWithSomething> garply,
-            IEnumerable<BarWithSomething> grault,
-            IReadOnlyCollection<BarWithSomething> fred,
-            IReadOnlyList<BarWithSomething> waldo)
+        public HasConcreteCollectionConstructorParameters(
+            HasSomething[] bar,
+            List<HasSomething> baz,
+            IList<HasSomething> qux,
+            ICollection<HasSomething> garply,
+            IEnumerable<HasSomething> grault,
+            IReadOnlyCollection<HasSomething> fred,
+            IReadOnlyList<HasSomething> waldo)
         {
             Bar = bar;
             Baz = baz;
@@ -1597,43 +1597,43 @@ namespace Tests
             Fred = fred;
             Waldo = waldo;
         }
-        public BarWithSomething[] Bar { get; }
-        public List<BarWithSomething> Baz { get; }
-        public IList<BarWithSomething> Qux { get; }
-        public ICollection<BarWithSomething> Garply { get; }
-        public IEnumerable<BarWithSomething> Grault { get; }
-        public IReadOnlyCollection<BarWithSomething> Fred { get; }
-        public IReadOnlyList<BarWithSomething> Waldo { get; }
+        public HasSomething[] Bar { get; }
+        public List<HasSomething> Baz { get; }
+        public IList<HasSomething> Qux { get; }
+        public ICollection<HasSomething> Garply { get; }
+        public IEnumerable<HasSomething> Grault { get; }
+        public IReadOnlyCollection<HasSomething> Fred { get; }
+        public IReadOnlyList<HasSomething> Waldo { get; }
     }
 
-    public class FooWithInterfaceReadWriteCollectionProperties
+    public class HasInterfaceReadWriteCollectionProperties
     {
-        public IBarWithSomething[] Bar { get; set; }
-        public List<IBarWithSomething> Baz { get; set; }
-        public IList<IBarWithSomething> Qux { get; set; }
-        public ICollection<IBarWithSomething> Garply { get; set; }
-        public IEnumerable<IBarWithSomething> Grault { get; set; }
-        public IReadOnlyCollection<IBarWithSomething> Fred { get; set; }
-        public IReadOnlyList<IBarWithSomething> Waldo { get; set; }
+        public IHasSomething[] Bar { get; set; }
+        public List<IHasSomething> Baz { get; set; }
+        public IList<IHasSomething> Qux { get; set; }
+        public ICollection<IHasSomething> Garply { get; set; }
+        public IEnumerable<IHasSomething> Grault { get; set; }
+        public IReadOnlyCollection<IHasSomething> Fred { get; set; }
+        public IReadOnlyList<IHasSomething> Waldo { get; set; }
     }
 
-    public class FooWithInterfaceReadonlyCollectionProperties
+    public class HasInterfaceReadonlyCollectionProperties
     {
-        public List<IBarWithSomething> Baz { get; } = new List<IBarWithSomething>();
-        public IList<IBarWithSomething> Qux { get; } = new List<IBarWithSomething>();
-        public ICollection<IBarWithSomething> Garply { get; } = new List<IBarWithSomething>();
+        public List<IHasSomething> Baz { get; } = new List<IHasSomething>();
+        public IList<IHasSomething> Qux { get; } = new List<IHasSomething>();
+        public ICollection<IHasSomething> Garply { get; } = new List<IHasSomething>();
     }
 
-    public class FooWithInterfaceCollectionConstructorParameters
+    public class HasInterfaceCollectionConstructorParameters
     {
-        public FooWithInterfaceCollectionConstructorParameters(
-            IBarWithSomething[] bar,
-            List<IBarWithSomething> baz,
-            IList<IBarWithSomething> qux,
-            ICollection<IBarWithSomething> garply,
-            IEnumerable<IBarWithSomething> grault,
-            IReadOnlyCollection<IBarWithSomething> fred,
-            IReadOnlyList<IBarWithSomething> waldo)
+        public HasInterfaceCollectionConstructorParameters(
+            IHasSomething[] bar,
+            List<IHasSomething> baz,
+            IList<IHasSomething> qux,
+            ICollection<IHasSomething> garply,
+            IEnumerable<IHasSomething> grault,
+            IReadOnlyCollection<IHasSomething> fred,
+            IReadOnlyList<IHasSomething> waldo)
         {
             Bar = bar;
             Baz = baz;
@@ -1643,40 +1643,40 @@ namespace Tests
             Fred = fred;
             Waldo = waldo;
         }
-        public IBarWithSomething[] Bar { get; }
-        public List<IBarWithSomething> Baz { get; }
-        public IList<IBarWithSomething> Qux { get; }
-        public ICollection<IBarWithSomething> Garply { get; }
-        public IEnumerable<IBarWithSomething> Grault { get; }
-        public IReadOnlyCollection<IBarWithSomething> Fred { get; }
-        public IReadOnlyList<IBarWithSomething> Waldo { get; }
+        public IHasSomething[] Bar { get; }
+        public List<IHasSomething> Baz { get; }
+        public IList<IHasSomething> Qux { get; }
+        public ICollection<IHasSomething> Garply { get; }
+        public IEnumerable<IHasSomething> Grault { get; }
+        public IReadOnlyCollection<IHasSomething> Fred { get; }
+        public IReadOnlyList<IHasSomething> Waldo { get; }
     }
 
-    public interface IBarWithSomething
+    public interface IHasSomething
     {
         Encoding Baz { get; }
     }
 
-    public class BarWithSomething : IBarWithSomething
+    public class HasSomething : IHasSomething
     {
         public Encoding Baz { get; set; }
     }
 
-    public class DerivedBarWithSomething : BarWithSomething
+    public class DerivedHasSomething : HasSomething
     {
         public TimeSpan Qux { get; set; }
     }
 
-    public class FooWithReadWriteSimpleProperties
+    public class HasReadWriteSimpleProperties
     {
         public int Bar { get; set; }
         public DateTime Baz { get; set; }
         public bool Qux { get; set; }
     }
 
-    public class FooWithSimpleConstructorParameters
+    public class HasSimpleConstructorParameters
     {
-        public FooWithSimpleConstructorParameters(int bar, DateTime baz, bool qux)
+        public HasSimpleConstructorParameters(int bar, DateTime baz, bool qux)
         {
             Bar = bar;
             Baz = baz;
@@ -1688,81 +1688,70 @@ namespace Tests
         public bool Qux { get; }
     }
 
-    public class FooWithReadWriteConcreteProperties
+    public class HasReadWriteConcreteProperties
     {
-        public BarWithReadWriteProperties Bar { get; set; }
-        public BazWithReadWriteProperties Baz { get; set; }
+        public HasReadWriteProperties Bar { get; set; }
+        public AlsoHasReadWriteProperties Baz { get; set; }
     }
 
-    public class FooWithReadWriteInterfaceProperties
+    public class HasReadWriteInterfaceProperties
     {
-        public IBarWithReadWriteProperties Bar { get; set; }
-        public IBazWithReadWriteProperties Baz { get; set; }
+        public IHasSimpleProperties Bar { get; set; }
+        public IAlsoHasSimpleProperties Baz { get; set; }
     }
 
-    public interface IBarWithReadWriteProperties
-    {
-        bool Qux { get; set; }
-        double Garply { get; set; }
-    }
-
-    public interface IBazWithReadWriteProperties
-    {
-        Guid Grault { get; set; }
-    }
-
-    public class BarWithReadWriteProperties : IBarWithReadWriteProperties
-    {
-        public bool Qux { get; set; }
-        public double Garply { get; set; }
-    }
-
-    public class InheritedBarWithReadWriteProperties : BarWithReadWriteProperties
-    {
-        public string Spam { get; set; }
-    }
-
-    public class BazWithReadWriteProperties : IBazWithReadWriteProperties
-    {
-        public Guid Grault { get; set; }
-    }
-
-    public class FooWithConcreteConstructorParameters
-    {
-        public FooWithConcreteConstructorParameters(BarWithConstructorParameters bar, BazWithConstructorParameters baz)
-        {
-            Bar = bar;
-            Baz = baz;
-        }
-        public BarWithConstructorParameters Bar { get; }
-        public BazWithConstructorParameters Baz { get; }
-    }
-
-    public class FooWithInterfaceConstructorParameters
-    {
-        public FooWithInterfaceConstructorParameters(IBarWithConstructorParameters bar, IBazWithConstructorParameters baz)
-        {
-            Bar = bar;
-            Baz = baz;
-        }
-        public IBarWithConstructorParameters Bar { get; }
-        public IBazWithConstructorParameters Baz { get; }
-    }
-
-    public interface IBarWithConstructorParameters
+    public interface IHasSimpleProperties
     {
         bool Qux { get; }
         double Garply { get; }
     }
 
-    public interface IBazWithConstructorParameters
+    public interface IAlsoHasSimpleProperties
     {
         Guid Grault { get; }
     }
 
-    public class BarWithConstructorParameters : IBarWithConstructorParameters
+    public class HasReadWriteProperties : IHasSimpleProperties
     {
-        public BarWithConstructorParameters(bool qux, double garply)
+        public bool Qux { get; set; }
+        public double Garply { get; set; }
+    }
+
+    public class InheritedHasReadWriteProperties : HasReadWriteProperties
+    {
+        public string Spam { get; set; }
+    }
+
+    public class AlsoHasReadWriteProperties : IAlsoHasSimpleProperties
+    {
+        public Guid Grault { get; set; }
+    }
+
+    public class HasConcreteConstructorParameters
+    {
+        public HasConcreteConstructorParameters(HasConstructorParameters bar, AlsoHasConstructorParameters baz)
+        {
+            Bar = bar;
+            Baz = baz;
+        }
+        public HasConstructorParameters Bar { get; }
+        public AlsoHasConstructorParameters Baz { get; }
+    }
+
+    public class HasInterfaceConstructorParameters
+    {
+        public HasInterfaceConstructorParameters(IHasSimpleProperties bar, IAlsoHasSimpleProperties baz)
+        {
+            Bar = bar;
+            Baz = baz;
+        }
+        public IHasSimpleProperties Bar { get; }
+        public IAlsoHasSimpleProperties Baz { get; }
+    }
+
+    public class HasConstructorParameters : IHasSimpleProperties
+    {
+        public HasConstructorParameters(bool qux, double garply)
         {
             Qux = qux;
             Garply = garply;
@@ -1771,9 +1760,9 @@ namespace Tests
         public double Garply { get; }
     }
 
-    public class InheritedBarWithConstructorParameters : BarWithConstructorParameters
+    public class InheritedHasConstructorParameters : HasConstructorParameters
     {
-        public InheritedBarWithConstructorParameters(bool qux, double garply, string spam)
+        public InheritedHasConstructorParameters(bool qux, double garply, string spam)
             : base(qux, garply)
         {
             Spam = spam;
@@ -1781,17 +1770,17 @@ namespace Tests
         public string Spam { get; }
     }
 
-    public class InheritedBarWithDefaultConstructor : BarWithConstructorParameters
+    public class InheritedHasDefaultConstructor : HasConstructorParameters
     {
-        public InheritedBarWithDefaultConstructor()
+        public InheritedHasDefaultConstructor()
             : base(true, 543.21)
         {
         }
     }
 
-    public class BazWithConstructorParameters : IBazWithConstructorParameters
+    public class AlsoHasConstructorParameters : IAlsoHasSimpleProperties
     {
-        public BazWithConstructorParameters(Guid grault)
+        public AlsoHasConstructorParameters(Guid grault)
         {
             Grault = grault;
         }
@@ -1804,28 +1793,28 @@ namespace Tests
         public double Longitude { get; set; }
     }
 
-    public class FooWithCoordinate
+    public class CoordinateContainer
     {
         public Coordinate Bar { get; set; }
     }
 
-    public class FooWithDouble
+    public class DoubleContainer
     {
         public double Bar { get; set; }
     }
 
-    public class FooWithMembersDecoratedWithDefaultTypeAttribute
+    public class HasMembersDecoratedWithDefaultTypeAttribute
     {
-        public FooWithMembersDecoratedWithDefaultTypeAttribute(
-            [DefaultType(typeof(DefaultBarWithDefaultType))] IBarWithDefaultType graultBar,
-            [DefaultType(typeof(DefaultBarWithDefaultType))] IBarWithDefaultType[] graultBarArray,
-            [DefaultType(typeof(DefaultBarWithDefaultType))] List<IBarWithDefaultType> graultBarList,
-            [DefaultType(typeof(DefaultBarWithDefaultType))] Dictionary<string, IBarWithDefaultType> graultBarDictionary,
+        public HasMembersDecoratedWithDefaultTypeAttribute(
+            [DefaultType(typeof(DefaultHasDefaultType))] IHasDefaultType graultBar,
+            [DefaultType(typeof(DefaultHasDefaultType))] IHasDefaultType[] graultBarArray,
+            [DefaultType(typeof(DefaultHasDefaultType))] List<IHasDefaultType> graultBarList,
+            [DefaultType(typeof(DefaultHasDefaultType))] Dictionary<string, IHasDefaultType> graultBarDictionary,
 
-            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux,
-            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType[] quxArray,
-            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] List<IQuxWithoutDefaultType> quxList,
-            [DefaultType(typeof(DefaultQuxWithoutDefaultType))] Dictionary<string, IQuxWithoutDefaultType> quxDictionary)
+            [DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] IAlsoHasNoDefaultType qux,
+            [DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] IAlsoHasNoDefaultType[] quxArray,
+            [DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] List<IAlsoHasNoDefaultType> quxList,
+            [DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] Dictionary<string, IAlsoHasNoDefaultType> quxDictionary)
         {
             GraultBar = graultBar;
             GraultBarArray = graultBarArray;
@@ -1838,73 +1827,73 @@ namespace Tests
             QuxDictionary = quxDictionary;
         }
 
-        public IBarWithDefaultType GarplyBar { get; set; }
-        public IBarWithDefaultType[] GarplyBarArray { get; set; }
-        public List<IBarWithDefaultType> GarplyBarList { get; set; }
-        public Dictionary<string, IBarWithDefaultType> GarplyBarDictionary { get; set; }
+        public IHasDefaultType GarplyBar { get; set; }
+        public IHasDefaultType[] GarplyBarArray { get; set; }
+        public List<IHasDefaultType> GarplyBarList { get; set; }
+        public Dictionary<string, IHasDefaultType> GarplyBarDictionary { get; set; }
 
-        public IBarWithDefaultType GraultBar { get; }
-        public IBarWithDefaultType[] GraultBarArray { get; }
-        public List<IBarWithDefaultType> GraultBarList { get; }
-        public Dictionary<string, IBarWithDefaultType> GraultBarDictionary { get; }
+        public IHasDefaultType GraultBar { get; }
+        public IHasDefaultType[] GraultBarArray { get; }
+        public List<IHasDefaultType> GraultBarList { get; }
+        public Dictionary<string, IHasDefaultType> GraultBarDictionary { get; }
 
-        public List<IBarWithDefaultType> BarReadonlyList { get; } = new List<IBarWithDefaultType>();
-        public Dictionary<string, IBarWithDefaultType> BarReadonlyDictionary { get; } = new Dictionary<string, IBarWithDefaultType>();
+        public List<IHasDefaultType> BarReadonlyList { get; } = new List<IHasDefaultType>();
+        public Dictionary<string, IHasDefaultType> BarReadonlyDictionary { get; } = new Dictionary<string, IHasDefaultType>();
 
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType Baz { get; set; }
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType[] BazArray { get; set; }
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazList { get; set; }
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazDictionary { get; set; }
+        [DefaultType(typeof(DefaultHasNoDefaultType))] public IHasNoDefaultType Baz { get; set; }
+        [DefaultType(typeof(DefaultHasNoDefaultType))] public IHasNoDefaultType[] BazArray { get; set; }
+        [DefaultType(typeof(DefaultHasNoDefaultType))] public List<IHasNoDefaultType> BazList { get; set; }
+        [DefaultType(typeof(DefaultHasNoDefaultType))] public Dictionary<string, IHasNoDefaultType> BazDictionary { get; set; }
 
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazReadonlyList { get; } = new List<IBazWithoutDefaultType>();
-        [DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazReadonlyDictionary { get; } = new Dictionary<string, IBazWithoutDefaultType>();
+        [DefaultType(typeof(DefaultHasNoDefaultType))] public List<IHasNoDefaultType> BazReadonlyList { get; } = new List<IHasNoDefaultType>();
+        [DefaultType(typeof(DefaultHasNoDefaultType))] public Dictionary<string, IHasNoDefaultType> BazReadonlyDictionary { get; } = new Dictionary<string, IHasNoDefaultType>();
 
-        public IQuxWithoutDefaultType Qux { get; }
-        public IQuxWithoutDefaultType[] QuxArray { get; }
-        public List<IQuxWithoutDefaultType> QuxList { get; }
-        public Dictionary<string, IQuxWithoutDefaultType> QuxDictionary { get; }
+        public IAlsoHasNoDefaultType Qux { get; }
+        public IAlsoHasNoDefaultType[] QuxArray { get; }
+        public List<IAlsoHasNoDefaultType> QuxList { get; }
+        public Dictionary<string, IAlsoHasNoDefaultType> QuxDictionary { get; }
     }
 
-    [DefaultType(typeof(DefaultBarWithDefaultType))]
-    public interface IBarWithDefaultType
+    [DefaultType(typeof(DefaultHasDefaultType))]
+    public interface IHasDefaultType
     {
     }
 
-    public class DefaultBarWithDefaultType : IBarWithDefaultType
+    public class DefaultHasDefaultType : IHasDefaultType
     {
         public double Fred { get; set; }
     }
 
-    public interface IBazWithoutDefaultType
+    public interface IHasNoDefaultType
     {
     }
 
-    public class DefaultBazWithoutDefaultType : IBazWithoutDefaultType
+    public class DefaultHasNoDefaultType : IHasNoDefaultType
     {
         public double Waldo { get; set; }
     }
 
-    public interface IQuxWithoutDefaultType
+    public interface IAlsoHasNoDefaultType
     {
     }
 
-    public class DefaultQuxWithoutDefaultType : IQuxWithoutDefaultType
+    public class DefaultIAlsoHasNoDefaultType : IAlsoHasNoDefaultType
     {
         public double Thud { get; set; }
     }
 
-    public class FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute
+    public class MembersDecoratedWithLocallyDefinedDefaultTypeAttribute
     {
-        public FooWithMembersDecoratedWithLocallyDefinedDefaultTypeAttribute(
-            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] IBarWithLocallyDefinedDefaultType graultBar,
-            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] IBarWithLocallyDefinedDefaultType[] graultBarArray,
-            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] List<IBarWithLocallyDefinedDefaultType> graultBarList,
-            [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))] Dictionary<string, IBarWithLocallyDefinedDefaultType> graultBarDictionary,
+        public MembersDecoratedWithLocallyDefinedDefaultTypeAttribute(
+            [LocallyDefined.DefaultType(typeof(DefaultHasLocallyDefinedDefaultType))] IHasLocallyDefinedDefaultType graultBar,
+            [LocallyDefined.DefaultType(typeof(DefaultHasLocallyDefinedDefaultType))] IHasLocallyDefinedDefaultType[] graultBarArray,
+            [LocallyDefined.DefaultType(typeof(DefaultHasLocallyDefinedDefaultType))] List<IHasLocallyDefinedDefaultType> graultBarList,
+            [LocallyDefined.DefaultType(typeof(DefaultHasLocallyDefinedDefaultType))] Dictionary<string, IHasLocallyDefinedDefaultType> graultBarDictionary,
 
-            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType qux,
-            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] IQuxWithoutDefaultType[] quxArray,
-            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] List<IQuxWithoutDefaultType> quxList,
-            [LocallyDefined.DefaultType(typeof(DefaultQuxWithoutDefaultType))] Dictionary<string, IQuxWithoutDefaultType> quxDictionary)
+            [LocallyDefined.DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] IAlsoHasNoDefaultType qux,
+            [LocallyDefined.DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] IAlsoHasNoDefaultType[] quxArray,
+            [LocallyDefined.DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] List<IAlsoHasNoDefaultType> quxList,
+            [LocallyDefined.DefaultType(typeof(DefaultIAlsoHasNoDefaultType))] Dictionary<string, IAlsoHasNoDefaultType> quxDictionary)
         {
             GraultBar = graultBar;
             GraultBarArray = graultBarArray;
@@ -1917,39 +1906,39 @@ namespace Tests
             QuxDictionary = quxDictionary;
         }
 
-        public IBarWithLocallyDefinedDefaultType GarplyBar { get; set; }
-        public IBarWithLocallyDefinedDefaultType[] GarplyBarArray { get; set; }
-        public List<IBarWithLocallyDefinedDefaultType> GarplyBarList { get; set; }
-        public Dictionary<string, IBarWithLocallyDefinedDefaultType> GarplyBarDictionary { get; set; }
+        public IHasLocallyDefinedDefaultType GarplyBar { get; set; }
+        public IHasLocallyDefinedDefaultType[] GarplyBarArray { get; set; }
+        public List<IHasLocallyDefinedDefaultType> GarplyBarList { get; set; }
+        public Dictionary<string, IHasLocallyDefinedDefaultType> GarplyBarDictionary { get; set; }
 
-        public IBarWithLocallyDefinedDefaultType GraultBar { get; }
-        public IBarWithLocallyDefinedDefaultType[] GraultBarArray { get; }
-        public List<IBarWithLocallyDefinedDefaultType> GraultBarList { get; }
-        public Dictionary<string, IBarWithLocallyDefinedDefaultType> GraultBarDictionary { get; }
+        public IHasLocallyDefinedDefaultType GraultBar { get; }
+        public IHasLocallyDefinedDefaultType[] GraultBarArray { get; }
+        public List<IHasLocallyDefinedDefaultType> GraultBarList { get; }
+        public Dictionary<string, IHasLocallyDefinedDefaultType> GraultBarDictionary { get; }
 
-        public List<IBarWithLocallyDefinedDefaultType> BarReadonlyList { get; } = new List<IBarWithLocallyDefinedDefaultType>();
-        public Dictionary<string, IBarWithLocallyDefinedDefaultType> BarReadonlyDictionary { get; } = new Dictionary<string, IBarWithLocallyDefinedDefaultType>();
+        public List<IHasLocallyDefinedDefaultType> BarReadonlyList { get; } = new List<IHasLocallyDefinedDefaultType>();
+        public Dictionary<string, IHasLocallyDefinedDefaultType> BarReadonlyDictionary { get; } = new Dictionary<string, IHasLocallyDefinedDefaultType>();
 
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType Baz { get; set; }
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public IBazWithoutDefaultType[] BazArray { get; set; }
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazList { get; set; }
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazDictionary { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultHasNoDefaultType))] public IHasNoDefaultType Baz { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultHasNoDefaultType))] public IHasNoDefaultType[] BazArray { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultHasNoDefaultType))] public List<IHasNoDefaultType> BazList { get; set; }
+        [LocallyDefined.DefaultType(typeof(DefaultHasNoDefaultType))] public Dictionary<string, IHasNoDefaultType> BazDictionary { get; set; }
 
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public List<IBazWithoutDefaultType> BazReadonlyList { get; } = new List<IBazWithoutDefaultType>();
-        [LocallyDefined.DefaultType(typeof(DefaultBazWithoutDefaultType))] public Dictionary<string, IBazWithoutDefaultType> BazReadonlyDictionary { get; } = new Dictionary<string, IBazWithoutDefaultType>();
+        [LocallyDefined.DefaultType(typeof(DefaultHasNoDefaultType))] public List<IHasNoDefaultType> BazReadonlyList { get; } = new List<IHasNoDefaultType>();
+        [LocallyDefined.DefaultType(typeof(DefaultHasNoDefaultType))] public Dictionary<string, IHasNoDefaultType> BazReadonlyDictionary { get; } = new Dictionary<string, IHasNoDefaultType>();
 
-        public IQuxWithoutDefaultType Qux { get; }
-        public IQuxWithoutDefaultType[] QuxArray { get; }
-        public List<IQuxWithoutDefaultType> QuxList { get; }
-        public Dictionary<string, IQuxWithoutDefaultType> QuxDictionary { get; }
+        public IAlsoHasNoDefaultType Qux { get; }
+        public IAlsoHasNoDefaultType[] QuxArray { get; }
+        public List<IAlsoHasNoDefaultType> QuxList { get; }
+        public Dictionary<string, IAlsoHasNoDefaultType> QuxDictionary { get; }
     }
 
-    [LocallyDefined.DefaultType(typeof(DefaultBarWithLocallyDefinedDefaultType))]
-    public interface IBarWithLocallyDefinedDefaultType
+    [LocallyDefined.DefaultType(typeof(DefaultHasLocallyDefinedDefaultType))]
+    public interface IHasLocallyDefinedDefaultType
     {
     }
 
-    public class DefaultBarWithLocallyDefinedDefaultType : IBarWithLocallyDefinedDefaultType
+    public class DefaultHasLocallyDefinedDefaultType : IHasLocallyDefinedDefaultType
     {
         public double Fred { get; set; }
     }
