@@ -215,7 +215,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = DefaultTypes.New(typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties));
+            var defaultTypes = new DefaultTypes { { typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties) } };
             var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
@@ -241,7 +241,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = DefaultTypes.New(typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties));
+            var defaultTypes = new DefaultTypes { { typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties) } };
             var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
@@ -267,7 +267,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = DefaultTypes.New(typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties));
+            var defaultTypes = new DefaultTypes { { typeof(FooWithReadWriteConcreteProperties), "bar", typeof(InheritedBarWithReadWriteProperties) } };
             var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);
@@ -291,7 +291,7 @@ namespace Tests
                 .Build();
 
             var fooSection = config.GetSection("foo");
-            var defaultTypes = DefaultTypes.New(typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties));
+            var defaultTypes = new DefaultTypes { { typeof(BarWithReadWriteProperties), typeof(InheritedBarWithReadWriteProperties) } };
             var foo = fooSection.Create<FooWithReadWriteConcreteProperties>(defaultTypes: defaultTypes);
 
             Assert.Equal(true, foo.Bar.Qux);

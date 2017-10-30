@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,51 +10,15 @@ namespace RockLib.Configuration.ObjectFactory
     /// Defines the default types used by <see cref="ConfigurationObjectFactory"/> when a type is not explicitly specified
     /// by a configuration section.
     /// </summary>
-    public sealed class DefaultTypes : IDefaultTypes
+    public sealed class DefaultTypes : IDefaultTypes, IEnumerable<KeyValuePair<string, Type>>
     {
         private readonly Dictionary<string, Type> _dictionary = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
-        private DefaultTypes() {}
-
-        internal static IDefaultTypes Empty { get; } = new DefaultTypes();
-
-        /// <summary>
-        /// Gets a new instance of <see cref="DefaultTypes"/> that is configured with a default type for the
-        /// member (property or constructor parameter) specified by the provided declaring type and member name.
-        /// </summary>
-        /// <param name="declaringType">The declaring type of a member that needs a default type.</param>
-        /// <param name="memberName">The name of a member that needs a default type.</param>
-        /// <param name="defaultType">The default type for the specified member.</param>
-        /// <returns>An instance of <see cref="DefaultTypes"/>.</returns>
-        /// <exception cref="ArgumentNullException">
-        /// If <paramref name="declaringType"/>, <paramref name="memberName"/>, or <paramref name="defaultType"/> is null.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// If there are no members of <paramref name="declaringType"/> that match <paramref name="memberName"/>, or
-        /// if <paramref name="defaultType"/> is not assignable to any of the matching members.
-        /// </exception>
-        public static DefaultTypes New(Type declaringType, string memberName, Type defaultType)
-        {
-            return new DefaultTypes().Add(declaringType, memberName, defaultType);
-        }
-
-        /// <summary>
-        /// Gets a new instance of <see cref="DefaultTypes"/> that is configured with a default type for the
-        /// specified target type.
-        /// </summary>
-        /// <param name="targetType">A type that needs a default type.</param>
-        /// <param name="defaultType">The default type for the specified target type.</param>
-        /// <returns>An instance of <see cref="DefaultTypes"/>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="targetType"/> or <paramref name="defaultType"/> is null.</exception>
-        /// <exception cref="ArgumentException">If <paramref name="defaultType"/> is not assignable to <paramref name="targetType"/>.</exception>
-        public static DefaultTypes New(Type targetType, Type defaultType)
-        {
-            return new DefaultTypes().Add(targetType, defaultType);
-        }
-
         /// <summary>
         /// Configures a default type for the member (property or constructor parameter) specified by the
-        /// provided declaring type and member name.
+        /// provided declaring type and member name. Use this method when you need different members of
+        /// a target type to each use a different default type. If you want all members of a target type to
+        /// use the same default type, use the other <see cref="Add(Type, Type)"/> method.
         /// </summary>
         /// <param name="declaringType">The declaring type of a member that needs a default type.</param>
         /// <param name="memberName">The name of a member that needs a default type.</param>
@@ -85,7 +50,10 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         /// <summary>
-        /// Configures a default type for the specified target type.
+        /// Configures a default type for the specified target type. Use this method when you want all
+        /// members (properties or constructor parameters) of the target type to use the same default
+        /// type. If you need different members of a target type to each use a different default type,
+        /// use the other <see cref="Add(Type, string, Type)"/> method.
         /// </summary>
         /// <param name="targetType">A type that needs a default type.</param>
         /// <param name="defaultType">The default type for the specified target type.</param>
@@ -127,5 +95,8 @@ namespace RockLib.Configuration.ObjectFactory
             (declaringType != null && memberName != null) ? declaringType.FullName + "::" + memberName : "";
 
         private static string GetKey(Type targetType) => targetType != null ? targetType.FullName: "";
+
+        IEnumerator<KeyValuePair<string, Type>> IEnumerable<KeyValuePair<string, Type>>.GetEnumerator() => _dictionary.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_dictionary).GetEnumerator();
     }
 }

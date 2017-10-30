@@ -17,6 +17,8 @@ namespace RockLib.Configuration.ObjectFactory
         private const string _typeKey = "type";
         private const string _valueKey = "value";
 
+        private static readonly IDefaultTypes _empty = new DefaultTypes();
+
         /// <summary>
         /// Create an object of type <typeparamref name="T"/> based on the specified configuration.
         /// </summary>
@@ -96,7 +98,7 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return configuration.Create(type, null, null, convertFunc, defaultTypes ?? DefaultTypes.Empty);
+            return configuration.Create(type, null, null, convertFunc, defaultTypes ?? _empty);
         }
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
