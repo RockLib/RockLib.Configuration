@@ -159,12 +159,12 @@ namespace RockLib.Configuration.ObjectFactory
             return list;
         }
 
-        private static bool IsList(IConfiguration configuration)
+        private static bool IsList(IConfiguration configuration, bool includeEmptyList = true)
         {
             int i = 0;
             foreach (var child in configuration.GetChildren())
                 if (child.Key != i++.ToString()) return false;
-            return true;
+            return includeEmptyList || i > 0;
         }
 
         private static bool IsStringDictionary(Type type) =>
@@ -190,7 +190,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (targetType.GetTypeInfo().IsAbstract) throw Exceptions.CannotCreateAbstractType(configuration, targetType);
             if (targetType == typeof(object)) throw Exceptions.CannotCreateObjectType;
             if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw Exceptions.UnsupportedCollectionType(targetType);
-            if (IsList(configuration)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
+            if (IsList(configuration, includeEmptyList:false)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
                 builder.AddMember(childSection.Key, childSection);
