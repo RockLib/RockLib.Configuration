@@ -18,7 +18,7 @@ namespace RockLib.Configuration.ObjectFactory
         private const string _valueKey = "value";
 
         /// <summary>
-        /// Create an objecgt of type <typeparamref name="T"/> based on the specified configuration.
+        /// Create an object of type <typeparamref name="T"/> based on the specified configuration.
         /// </summary>
         /// <typeparam name="T">The type of object to create.</typeparam>
         /// <param name="configuration">The configuration to create the object from.</param>
@@ -61,7 +61,7 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
-            if (IsConfigurationValue(configuration, out IConfigurationSection section)) return ConvertToType(section, targetType, declaringType, memberName, convertFunc, defaultTypes);
+            if (IsValueSection(configuration, out IConfigurationSection valueSection)) return ConvertToType(valueSection, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
             if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
@@ -69,31 +69,34 @@ namespace RockLib.Configuration.ObjectFactory
             return BuildObject(configuration, targetType, declaringType, memberName, convertFunc, defaultTypes);
         }
 
-        private static bool IsConfigurationValue(IConfiguration configuration, out IConfigurationSection section)
+        private static bool IsValueSection(IConfiguration configuration, out IConfigurationSection valueSection)
         {
-            section = configuration as IConfigurationSection;
-            return section != null && section.Value != null;
+            valueSection = configuration as IConfigurationSection;
+            if (valueSection != null)
+                if (valueSection.Value == null) valueSection = null;
+                else return true;
+            return false;
         }
 
         private static object ConvertToType(
-            IConfigurationSection section, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
+            IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
             if (convertFunc != null)
             {
-                var result = convertFunc(section.Value, targetType, declaringType, memberName);
+                var result = convertFunc(valueSection.Value, targetType, declaringType, memberName);
                 if (result != null)
                 {
                     if (!targetType.GetTypeInfo().IsInstanceOfType(result))
-                        throw Exceptions.ResultNotAssignableToTargetType(section, targetType, result);
+                        throw Exceptions.ResultNotAssignableToTargetType(valueSection, targetType, result);
                     return result;
                 }
             }
-            if (targetType == typeof(Encoding)) return Encoding.GetEncoding(section.Value);
+            if (targetType == typeof(Encoding)) return Encoding.GetEncoding(valueSection.Value);
             var typeConverter = TypeDescriptor.GetConverter(targetType);
             if (typeConverter.CanConvertFrom(typeof(string)))
-                return typeConverter.ConvertFromInvariantString(section.Value);
-            if (section.Value == "") return new ObjectBuilder(targetType).Build(convertFunc, defaultTypes);
-            throw Exceptions.CannotConvertSectionValueToTargetType(section, targetType);
+                return typeConverter.ConvertFromInvariantString(valueSection.Value);
+            if (valueSection.Value == "") return new ObjectBuilder(targetType).Build(convertFunc, defaultTypes);
+            throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
         }
 
         private static bool IsTypeSpecifiedObject(IConfiguration configuration)
@@ -214,7 +217,7 @@ namespace RockLib.Configuration.ObjectFactory
 
             return false;
         }
-        
+
         /// <summary>Gets the default type, or null if not found.</summary>
         private static Type GetDefaultTypeFromMemberCustomAttributes(Type declaringType, string memberName)
         {
@@ -265,10 +268,7 @@ namespace RockLib.Configuration.ObjectFactory
         {
             private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(StringComparer.OrdinalIgnoreCase);
 
-            public ObjectBuilder(Type type)
-            {
-                Type = type;
-            }
+            public ObjectBuilder(Type type) => Type = type;
 
             public Type Type { get; }
 
@@ -279,13 +279,13 @@ namespace RockLib.Configuration.ObjectFactory
                 var constructor = GetConstructor();
                 var args = GetArgs(constructor, convertFunc, defaultTypes);
                 var obj = constructor.Invoke(args);
-                foreach (var property in GetReadWriteProperties())
+                foreach (var property in ReadWriteProperties)
                     if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
                         var propertyValue = section.Create(property.PropertyType, Type, property.Name, convertFunc, defaultTypes);
                         property.SetValue(obj, propertyValue);
                     }
-                foreach (var property in GetReadonlyListProperties())
+                foreach (var property in ReadonlyListProperties)
                 {
                     if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
@@ -297,7 +297,7 @@ namespace RockLib.Configuration.ObjectFactory
                             addMethod.Invoke(list, new[] { item });
                     }
                 }
-                foreach (var property in GetReadonlyDictionaryProperties())
+                foreach (var property in ReadonlyDictionaryProperties)
                 {
                     if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
@@ -316,7 +316,7 @@ namespace RockLib.Configuration.ObjectFactory
 
             private ConstructorInfo GetConstructor()
             {
-                var constructors = GetConstructors();
+                var constructors = Constructors;
                 if (constructors.Length == 1) return constructors[0];
                 if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
                 var orderedConstructors = constructors
@@ -373,16 +373,16 @@ namespace RockLib.Configuration.ObjectFactory
                 return args;
             }
 
-            private IEnumerable<PropertyInfo> GetReadWriteProperties() =>
+            private IEnumerable<PropertyInfo> ReadWriteProperties =>
                 Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadWrite());
 
-            private ConstructorInfo[] GetConstructors() =>
+            private ConstructorInfo[] Constructors =>
                 Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
 
-            private IEnumerable<PropertyInfo> GetReadonlyListProperties() =>
+            private IEnumerable<PropertyInfo> ReadonlyListProperties =>
                 Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyList());
 
-            private IEnumerable<PropertyInfo> GetReadonlyDictionaryProperties() =>
+            private IEnumerable<PropertyInfo> ReadonlyDictionaryProperties =>
                 Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyDictionary());
         }
     }

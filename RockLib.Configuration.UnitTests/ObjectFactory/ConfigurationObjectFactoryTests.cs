@@ -13,7 +13,6 @@ namespace Tests
         [Fact]
         public void CanSpecifyDefaultTypesWithDefaultTypeAttribute()
         {
-            var guid = Guid.NewGuid();
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
@@ -109,7 +108,6 @@ namespace Tests
         [Fact]
         public void CanSpecifyDefaultTypesWithLocallyDefinedDefaultTypeAttribute()
         {
-            var guid = Guid.NewGuid();
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {

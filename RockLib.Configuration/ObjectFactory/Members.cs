@@ -11,13 +11,7 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (declaringType == null || memberName == null) return Enumerable.Empty<Member>();
             var constructorParameters = FindConstructorParameters(declaringType, memberName).ToList();
-            return declaringType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName)
-                    && (p.IsReadWrite()
-                        || ((p.IsReadonlyList() || p.IsReadonlyDictionary())
-                            && !constructorParameters.Any(c => StringComparer.OrdinalIgnoreCase.Equals(c.Name, memberName)))))
-                .Select(p => new Member(p.Name, p.PropertyType, MemberType.Property))
-                .Concat(constructorParameters);
+            return FindProperties(declaringType, memberName, constructorParameters).Concat(constructorParameters);
         }
 
         private static IEnumerable<Member> FindConstructorParameters(Type declaringType, string memberName) =>
@@ -25,6 +19,14 @@ namespace RockLib.Configuration.ObjectFactory
                 .SelectMany(c => c.GetParameters())
                 .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName))
                 .Select(p => new Member(p.Name, p.ParameterType, MemberType.ConstructorParameter));
+
+        private static IEnumerable<Member> FindProperties(Type declaringType, string memberName, List<Member> constructorParameters) =>
+            declaringType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName)
+                    && (p.IsReadWrite()
+                        || ((p.IsReadonlyList() || p.IsReadonlyDictionary())
+                            && !constructorParameters.Any(c => StringComparer.OrdinalIgnoreCase.Equals(c.Name, memberName)))))
+                .Select(p => new Member(p.Name, p.PropertyType, MemberType.Property));
 
         public static bool IsReadWrite(this PropertyInfo p) => p.CanRead && p.CanWrite;
 
