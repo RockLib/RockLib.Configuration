@@ -71,16 +71,14 @@ namespace RockLib.Configuration.ObjectFactory
             if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
             if (memberName == null) throw new ArgumentNullException(nameof(memberName));
             if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
-            if (defaultType.GetTypeInfo().IsAbstract) throw new ArgumentException("Cannot define an abstract default type.", nameof(defaultType));
+
+            if (defaultType.GetTypeInfo().IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
-            if (matchingMembers.Count == 0) throw new ArgumentException(
-                $"There are no properties or constructor parameters in the {declaringType} type that match member name '{memberName}'.");
+            if (matchingMembers.Count == 0) throw Exceptions.DefaultTypeHasNoMatchingMembers(declaringType, memberName);
             var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(defaultType)).ToList();
-            if (notAssignableMembers.Count > 0) throw new ArgumentException(
-                $"The specified default type {defaultType} is not assignable to the following member(s) in the {declaringType} type that match the name '{memberName}':"
-                    + string.Join("", notAssignableMembers.Select(m => $"{Environment.NewLine}- {m}")));
+            if (notAssignableMembers.Count > 0) throw Exceptions.DefaultTypeNotAssignableToMembers(declaringType, memberName, defaultType, notAssignableMembers);
 
             _dictionary.Add(GetKey(declaringType, memberName), defaultType);
             return this;
@@ -100,7 +98,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
 
             if (!targetType.GetTypeInfo().IsAssignableFrom(defaultType))
-                throw new ArgumentException($"The specified default type {defaultType} is not assignable to the target type {targetType}.");
+                throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
 
             _dictionary.Add(GetKey(targetType), defaultType);
             return this;

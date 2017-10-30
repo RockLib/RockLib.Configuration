@@ -52,8 +52,12 @@ namespace RockLib.Configuration.ObjectFactory
         /// configuration section.
         /// </param>
         /// <returns>An object with values set from the configuration.</returns>
-        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null) =>
-            configuration.Create(type, null, null, convertFunc, defaultTypes ?? DefaultTypes.Empty);
+        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
+        {
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            return configuration.Create(type, null, null, convertFunc, defaultTypes ?? DefaultTypes.Empty);
+        }
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
@@ -80,8 +84,7 @@ namespace RockLib.Configuration.ObjectFactory
                 if (result != null)
                 {
                     if (!targetType.GetTypeInfo().IsInstanceOfType(result))
-                        throw new InvalidOperationException($"The {result.GetType()} object that was returned by the ConvertFunc "
-                            + $"callback was not assignable to the target type {targetType} from value '{section.Value}'.");
+                        throw Exceptions.ResultNotAssignableToTargetType(section, targetType, result);
                     return result;
                 }
             }
@@ -90,7 +93,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (typeConverter.CanConvertFrom(typeof(string)))
                 return typeConverter.ConvertFromInvariantString(section.Value);
             if (section.Value == "") return new ObjectBuilder(targetType).Build(convertFunc, defaultTypes);
-            throw new InvalidOperationException($"Unable to convert section '{section.Key}' to type '{targetType}'.");
+            throw Exceptions.CannotConvertSectionValueToTargetType(section, targetType);
         }
 
         private static bool IsTypeSpecifiedObject(IConfiguration configuration)
@@ -115,14 +118,15 @@ namespace RockLib.Configuration.ObjectFactory
         {
             var typeSection = configuration.GetSection(_typeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);
-            if (!targetType.GetTypeInfo().IsAssignableFrom(specifiedType)) throw GetNotAssignableException(targetType, specifiedType);
+            if (!targetType.GetTypeInfo().IsAssignableFrom(specifiedType))
+                throw Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(targetType, specifiedType);
             return BuildObject(configuration.GetSection(_valueKey), specifiedType, declaringType, memberName, convertFunc, defaultTypes, true);
         }
 
         private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
-            if (!IsList(configuration)) throw GetConfigurationIsNotAListException(configuration, targetType);
-            if (targetType.GetArrayRank() > 1) throw GetArrayRankGreaterThanOneIsNotSupportedException(targetType);
+            if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
+            if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
             var elementType = targetType.GetElementType();
             var items = configuration.GetChildren().Select(child => child.Create(elementType, declaringType, memberName, convertFunc, defaultTypes)).ToList();
             var array = Array.CreateInstance(elementType, items.Count);
@@ -142,7 +146,7 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ConvertFunc convertFunc, IDefaultTypes defaultTypes)
         {
-            if (!IsList(configuration)) throw GetConfigurationIsNotAListException(configuration, targetType);
+            if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
             var addMethod = GetListAddMethod(listType, tType);
@@ -180,9 +184,10 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (!skipDefaultTypes && TryGetDefaultType(defaultTypes, targetType, declaringType, memberName, out Type defaultType))
                 targetType = defaultType;
-            if (targetType.GetTypeInfo().IsAbstract) throw GetCannotCreateAbstractTypeException(configuration, targetType);
-            if (targetType == typeof(object)) throw new InvalidOperationException("A type must be specified for type object.");
-            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw new InvalidOperationException($"The collection type {targetType} is not supported. The following collection types are supported: List<T>, IList<T>, ICollection<T>, IEnumerable<T>, Dictionary<string, T>, and IDictionary<string, T>.");
+            if (targetType.GetTypeInfo().IsAbstract) throw Exceptions.CannotCreateAbstractType(configuration, targetType);
+            if (targetType == typeof(object)) throw Exceptions.CannotCreateObjectType;
+            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw Exceptions.UnsupportedCollectionType(targetType);
+            if (IsList(configuration)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
                 builder.AddMember(childSection.Key, childSection);
@@ -204,7 +209,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (defaultType != null)
             {
                 if (targetType.GetTypeInfo().IsAssignableFrom(defaultType)) return true;
-                throw new InvalidOperationException($"The specified default type, {defaultType}, is not assignable to the target type, {targetType}.");
+                throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
             }
 
             return false;
@@ -239,7 +244,7 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 case 0: return null;
                 case 1: return set.First();
-                default: throw new InvalidOperationException($"More than one member (property or constructor parameter) matching the name '{memberName}' is decorated with a {nameof(DefaultTypeAttribute)} attribute. All decorated members matching the same name must have the same type.");
+                default: throw Exceptions.InconsistentDefaultTypeAttributesForMultipleMembers(memberName);
             }
         }
 
@@ -255,34 +260,6 @@ namespace RockLib.Configuration.ObjectFactory
         private static MethodInfo GetListAddMethod(Type listType, Type tType) =>
             typeof(ICollection<>).MakeGenericType(listType.GetTypeInfo().GetGenericArguments()[0])
                 .GetTypeInfo().GetMethod("Add", new[] { tType });
-
-        private static Exception GetNotAssignableException(Type type, Type specifiedType) =>
-            new InvalidOperationException($"The configuration-specified type, '{specifiedType}' is not assignable to the target type, {type}.");
-
-        private static Exception GetCannotCreateAbstractTypeException(IConfiguration configuration, Type type)
-        {
-            if (configuration is IConfigurationSection section)
-                return new InvalidOperationException($"Cannot create instance of abstract target type, '{type}', from section '{section.Key}' at path '{section.Path}'.");
-            return new InvalidOperationException($"Cannot create instance of abstract target type, '{type}' from configuration.");
-        }
-
-        private static Exception GetNoConstructorsException() =>
-            new InvalidOperationException("No public constructors found.");
-
-        private static Exception GetAmbiguousConstructorsException(Type type) =>
-            new InvalidOperationException($"Ambiguous best-match constructors in '{type}' type. Constructors are ordered as following: 1) from "
-                + "highest-to-lowest ratio of matched parameters to total parameters, 2) then from highest-to-lowest ratio of matched parameters "
-                + "or parameters with a default value to total parameters, 3) then from the highest-to-lowest number of total parameters.");
-
-        private static Exception GetConfigurationIsNotAListException(IConfiguration configuration, Type type)
-        {
-            if (configuration is IConfigurationSection section)
-                return new InvalidOperationException($"Configuration from section '{section.Key}' at path '{section.Path}' does not represent a list but should be convertible to type '{type}'.");
-            return new InvalidOperationException($"Configuration does not represent a list but should be convertible to type '{type}'.");
-        }
-
-        private static Exception GetArrayRankGreaterThanOneIsNotSupportedException(Type type) =>
-            new InvalidOperationException($"Arrays with rank greater than zero are not supported. The type specified was '{type}'.");
 
         private class ObjectBuilder
         {
@@ -341,7 +318,7 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 var constructors = GetConstructors();
                 if (constructors.Length == 1) return constructors[0];
-                if (constructors.Length == 0) throw GetNoConstructorsException();
+                if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
                 var orderedConstructors = constructors
                     .Select(ctor => new ConstructorOrderInfo(ctor, _members))
                     .OrderByDescending(x => x.MatchedParametersRatio)
@@ -349,7 +326,7 @@ namespace RockLib.Configuration.ObjectFactory
                     .ThenByDescending(x => x.TotalParameters)
                     .ToList();
                 if (orderedConstructors[0].HasSameSortOrderAs(orderedConstructors[1]))
-                    throw GetAmbiguousConstructorsException(Type);
+                    throw Exceptions.AmbiguousConstructors(Type);
                 return orderedConstructors[0].Constructor;
             }
 
