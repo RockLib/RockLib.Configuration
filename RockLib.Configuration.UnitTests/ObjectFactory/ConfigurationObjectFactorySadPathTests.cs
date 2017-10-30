@@ -1,5 +1,4 @@
-﻿#if DEBUG
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections;
@@ -50,8 +49,10 @@ namespace Tests
             var actual = Assert.Throws<InvalidOperationException>(() =>
                 fooSection.Create<SimplePropertyClass>((value, targetType, declaringType, memberName) => "This is not a double."));
 
+#if DEBUG
             var expected = Exceptions.ResultNotAssignableToTargetType(fooSection.GetSection("bar"), typeof(double), "This is not a double.");
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -67,8 +68,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<EmptyClassPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.CannotConvertSectionValueToTargetType(fooSection.GetSection("bar"), typeof(EmptyClass));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -86,8 +89,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<EmptyClassPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(typeof(EmptyClass), typeof(SimplePropertyClass));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -104,8 +109,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<ArrayPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.ConfigurationIsNotAList(fooSection.GetSection("bar"), typeof(double[]));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -122,8 +129,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<MultiDimensionalArrayPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.ArrayRankGreaterThanOneIsNotSupported(typeof(double[,]));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -140,8 +149,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<ListPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.ConfigurationIsNotAList(fooSection.GetSection("bar"), typeof(List<double>));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -157,8 +168,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<InterfacePropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.CannotCreateAbstractType(fooSection.GetSection("bar"), typeof(IBar));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -174,8 +187,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<ObjectPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.CannotCreateObjectType;
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -191,8 +206,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<ArrayListPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.UnsupportedCollectionType(typeof(ArrayList));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -209,8 +226,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<NestedSimplePropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.ConfigurationIsAList(fooSection.GetSection("bar"), typeof(SimplePropertyClass));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -226,8 +245,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<ArgumentException>(() => fooSection.Create<InvalidDefaultTypeForPropertyClass>());
 
+#if DEBUG
             var expected = Exceptions.DefaultTypeIsNotAssignableToTargetType(typeof(SimplePropertyClass), typeof(EmptyClass));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -243,8 +264,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<ArgumentException>(() => fooSection.Create<InvalidDefaultTypeForPropertyTypeClass>());
 
+#if DEBUG
             var expected = Exceptions.DefaultTypeIsNotAssignableToTargetType(typeof(InvalidDefaultType), typeof(EmptyClass));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -260,8 +283,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<InconsistentDefaultTypesClass>());
 
+#if DEBUG
             var expected = Exceptions.InconsistentDefaultTypeAttributesForMultipleMembers("bar");
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -277,8 +302,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<NoPublicConstructorsClass>());
 
+#if DEBUG
             var expected = Exceptions.NoPublicConstructorsFound;
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -295,8 +322,10 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<AmbiguousConstructorsClass>());
 
+#if DEBUG
             var expected = Exceptions.AmbiguousConstructors(typeof(AmbiguousConstructorsClass));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         private class EmptyClass { }
@@ -401,4 +430,3 @@ namespace Tests
         }
     }
 }
-#endif

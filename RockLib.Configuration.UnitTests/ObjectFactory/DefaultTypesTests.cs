@@ -1,7 +1,6 @@
 ﻿using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace Tests
@@ -155,8 +154,10 @@ namespace Tests
 
             var actual = Assert.Throws<ArgumentException>(() => defaultTypes.Add(typeof(Foo), "qux", typeof(Qux)));
 
+#if DEBUG
             var expected = Exceptions.DefaultTypeHasNoMatchingMembers(typeof(Foo), "qux");
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -166,8 +167,10 @@ namespace Tests
 
             var actual = Assert.Throws<ArgumentException>(() => defaultTypes.Add(typeof(Foo), "bar", typeof(Qux)));
 
+#if DEBUG
             var expected = Exceptions.DefaultTypeNotAssignableToMembers(typeof(Foo), "bar", typeof(Qux), new List<Member> { new Member("Bar", typeof(IBar), MemberType.Property) });
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         [Fact]
@@ -177,8 +180,10 @@ namespace Tests
 
             var actual = Assert.Throws<ArgumentException>(() => defaultTypes.Add(typeof(IBar), typeof(Qux)));
 
+#if DEBUG
             var expected = Exceptions.DefaultTypeIsNotAssignableToTargetType(typeof(IBar), typeof(Qux));
             Assert.Equal(expected.Message, actual.Message);
+#endif
         }
 
         private class Foo
