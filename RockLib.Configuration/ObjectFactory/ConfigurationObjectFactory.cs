@@ -33,6 +33,26 @@ namespace RockLib.Configuration.ObjectFactory
         /// configuration section.
         /// </param>
         /// <returns>An object of type <typeparamref name="T"/> with values set from the configuration.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// - If the specified convert func returns an object that is not assignable to the target type.
+        /// - If a configuration value is not assignable to the target type.
+        /// - If the type specified by configuration is not assignable to its target type.
+        /// - If the target type is an array but the type specified by configuration does not represent a list.
+        /// - If the target type is an array with a rank greater than one.
+        /// - If the target type is a list type but the type specified by configuration does not represent a list.
+        /// - If the target type is abstract.
+        /// - If the target type is System.Object.
+        /// - If the target type is an unsupported collection type.
+        /// - If the target type is not a supported collection type but the configuration represents a list.
+        /// - If multiple properties or constructor parameters that match a member are decorated with a [DefaultType] attribute and the attribute values don't all match.
+        /// - If the target type has no public constructors.
+        /// - If the target has ambiguous constructors.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
+        /// that has a value that is not assignable to the property or constructor parameter.
+        /// </exception>
         public static T Create<T>(this IConfiguration configuration, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null) =>
             (T)configuration.Create(typeof(T), convertFunc, defaultTypes);
 
@@ -52,6 +72,26 @@ namespace RockLib.Configuration.ObjectFactory
         /// configuration section.
         /// </param>
         /// <returns>An object with values set from the configuration.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> or <paramref name="type"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// - If the specified convert func returns an object that is not assignable to the target type.
+        /// - If a configuration value is not assignable to the target type.
+        /// - If the type specified by configuration is not assignable to its target type.
+        /// - If the target type is an array but the type specified by configuration does not represent a list.
+        /// - If the target type is an array with a rank greater than one.
+        /// - If the target type is a list type but the type specified by configuration does not represent a list.
+        /// - If the target type is abstract.
+        /// - If the target type is System.Object.
+        /// - If the target type is an unsupported collection type.
+        /// - If the target type is not a supported collection type but the configuration represents a list.
+        /// - If multiple properties or constructor parameters that match a member are decorated with a [DefaultType] attribute and the attribute values don't all match.
+        /// - If the target type has no public constructors.
+        /// - If the target has ambiguous constructors.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
+        /// that has a value that is not assignable to the property or constructor parameter.
+        /// </exception>
         public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
