@@ -24,15 +24,15 @@ namespace RockLib.Configuration.ObjectFactory
         /// </summary>
         /// <typeparam name="T">The type of object to create.</typeparam>
         /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
         /// <param name="convertFunc">
         /// A function that overrides the default conversion mechanism by taking a configuration string value
         /// and converting it to a new instance of target type. If the function cannot or should not convert a
         /// value to the target type, it should return null so the default conversion mechanism can attempt to
         /// convert the value.
-        /// </param>
-        /// <param name="defaultTypes">
-        /// An object that defines the default types to be used when a type is not explicitly specified by a
-        /// configuration section.
         /// </param>
         /// <returns>An object of type <typeparamref name="T"/> with values set from the configuration.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is null.</exception>
@@ -55,23 +55,23 @@ namespace RockLib.Configuration.ObjectFactory
         /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
         /// that has a value that is not assignable to the property or constructor parameter.
         /// </exception>
-        public static T Create<T>(this IConfiguration configuration, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null) =>
-            (T)configuration.Create(typeof(T), convertFunc, defaultTypes);
+        public static T Create<T>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ConvertFunc convertFunc = null) =>
+            (T)configuration.Create(typeof(T), defaultTypes, convertFunc);
 
         /// <summary>
         /// Create an object of the specified type based on the specified configuration.
         /// </summary>
         /// <param name="configuration">The configuration to create the object from.</param>
         /// <param name="type">The type of object to create.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
         /// <param name="convertFunc">
         /// A function that overrides the default conversion mechanism by taking a configuration string value
         /// and converting it to a new instance of target type. If the function cannot or should not convert a
         /// value to the target type, it should return null so the default conversion mechanism can attempt to
         /// convert the value.
-        /// </param>
-        /// <param name="defaultTypes">
-        /// An object that defines the default types to be used when a type is not explicitly specified by a
-        /// configuration section.
         /// </param>
         /// <returns>An object with values set from the configuration.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> or <paramref name="type"/> is null.</exception>
@@ -94,7 +94,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
         /// that has a value that is not assignable to the property or constructor parameter.
         /// </exception>
-        public static object Create(this IConfiguration configuration, Type type, ConvertFunc convertFunc = null, DefaultTypes defaultTypes = null)
+        public static object Create(this IConfiguration configuration, Type type, DefaultTypes defaultTypes = null, ConvertFunc convertFunc = null)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
             if (type == null) throw new ArgumentNullException(nameof(type));

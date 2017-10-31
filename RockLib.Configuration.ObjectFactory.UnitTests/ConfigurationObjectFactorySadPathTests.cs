@@ -47,7 +47,7 @@ namespace Tests
 
             var fooSection = config.GetSection("foo");
             var actual = Assert.Throws<InvalidOperationException>(() =>
-                fooSection.Create<SimplePropertyClass>((value, targetType, declaringType, memberName) => "This is not a double."));
+                fooSection.Create<SimplePropertyClass>(convertFunc: (value, targetType, declaringType, memberName) => "This is not a double."));
 
 #if DEBUG
             var expected = Exceptions.ResultNotAssignableToTargetType(fooSection.GetSection("bar"), typeof(double), "This is not a double.");

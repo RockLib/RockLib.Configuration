@@ -311,7 +311,7 @@ namespace Tests
                .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<CoordinateContainer>((value, targetType, declaringType, memberName) =>
+            var foo = fooSection.Create<CoordinateContainer>(convertFunc: (value, targetType, declaringType, memberName) =>
             {
                 // Make sure we're getting all the right stuff.
                 Assert.Equal("(123.45, -456.78)", value);
@@ -336,7 +336,7 @@ namespace Tests
                .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<DoubleContainer>((value, targetType, declaringType, memberName) =>
+            var foo = fooSection.Create<DoubleContainer>(convertFunc: (value, targetType, declaringType, memberName) =>
             {
                 // Make sure we're getting all the right stuff.
                 Assert.Equal("123.45", value);
