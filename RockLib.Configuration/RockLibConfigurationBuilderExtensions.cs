@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace RockLib.Configuration
@@ -50,7 +48,7 @@ namespace RockLib.Configuration
             {
                 builder = builder.AddJsonFile(supplementalJsonConfigPath, optional: true);
             }
-           
+
             return builder;
         }
 
@@ -62,18 +60,15 @@ namespace RockLib.Configuration
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
         public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder)
         {
-
-
             var appSettings = System.Configuration.ConfigurationManager.AppSettings;
             var inMemoryKeys = appSettings
                 .AllKeys
                 .ToDictionary(k => $"AppSettings:{k}", k => appSettings[k]);
-          
+
             builder.AddInMemoryCollection(inMemoryKeys);
 
             return builder;
         }
-
 #endif
     }
 }
