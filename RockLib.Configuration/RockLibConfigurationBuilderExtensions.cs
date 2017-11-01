@@ -23,11 +23,11 @@ namespace RockLib.Configuration
             if (!string.IsNullOrEmpty(environment))
                 supplementalJsonConfigPath = $"{environment.ToLower()}.rocklib.config.json";
 
-            return builder.AddRockLib("rocklib.config.json", supplementalJsonConfigPath);
+            return builder.AddJson("rocklib.config.json", supplementalJsonConfigPath);
         }
 
         /// <summary>
-        /// Adds the RockLib configuration provider to the builder using the specified configuration file,
+        /// Adds a configuration provider to the builder using the specified configuration file,
         /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
@@ -36,7 +36,7 @@ namespace RockLib.Configuration
         /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
         /// <exception cref="ArgumentException">If <paramref name="jsonConfigPath"/> is null or empty.</exception>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder, string jsonConfigPath, string supplementalJsonConfigPath = null)
+        public static IConfigurationBuilder AddJson(this IConfigurationBuilder builder, string jsonConfigPath, string supplementalJsonConfigPath = null)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (string.IsNullOrEmpty(jsonConfigPath)) throw new ArgumentException($"'{nameof(jsonConfigPath)}' must be a non-empty string.", nameof(jsonConfigPath));
