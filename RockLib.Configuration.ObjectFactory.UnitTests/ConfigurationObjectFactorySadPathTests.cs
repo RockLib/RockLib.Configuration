@@ -36,22 +36,25 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenConvertFuncThatReturnsAnObjectNotAssignableToTargetType_ThrowsInvalidOperationException()
+        public void GivenValueConverterThatReturnsNull_ThrowsInvalidOperationException()
         {
             var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
-                {
-                    { "foo:bar", "123.45" },
-                })
-                .Build();
+               .AddInMemoryCollection(new Dictionary<string, string>
+               {
+                    { "foo:bar", "abcdefg" },
+               })
+               .Build();
 
             var fooSection = config.GetSection("foo");
-            var actual = Assert.Throws<InvalidOperationException>(() =>
-                fooSection.Create<SimplePropertyClass>(convertFunc: (value, targetType, declaringType, memberName) => "This is not a double."));
+
+            var valueConverters = new ValueConverters()
+                .Add(typeof(StringContainer), "bar", value => (string)null);
+
+            var ex = Assert.Throws<InvalidOperationException>(() => fooSection.Create<StringContainer>(valueConverters: valueConverters));
 
 #if DEBUG
-            var expected = Exceptions.ResultNotAssignableToTargetType(fooSection.GetSection("bar"), typeof(double), "This is not a double.");
-            Assert.Equal(expected.Message, actual.Message);
+            var expected = Exceptions.ResultCannotBeNull(typeof(string), typeof(StringContainer), "Bar");
+            Assert.Equal(expected.Message, ex.Message);
 #endif
         }
 

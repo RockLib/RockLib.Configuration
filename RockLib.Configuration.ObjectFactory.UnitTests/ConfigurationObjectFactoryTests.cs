@@ -301,32 +301,7 @@ namespace Tests
         }
 
         [Fact]
-        public void PassingConvertFuncOverridesDefaultConversion()
-        {
-            var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
-               {
-                    { "foo:bar", "(123.45, -456.78)" },
-               })
-               .Build();
-
-            var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<CoordinateContainer>(convertFunc: (value, targetType, declaringType, memberName) =>
-            {
-                // Make sure we're getting all the right stuff.
-                Assert.Equal("(123.45, -456.78)", value);
-                Assert.Equal(typeof(Coordinate), targetType);
-                Assert.Equal(typeof(CoordinateContainer), declaringType);
-                Assert.Equal("Bar", memberName);
-                return new Coordinate { Latitude = 111.11, Longitude = -222.22 };
-            });
-
-            Assert.Equal(111.11, foo.Bar.Latitude);
-            Assert.Equal(-222.22, foo.Bar.Longitude);
-        }
-
-        [Fact]
-        public void PassingConvertFuncDoesNotOverrideDefaultConversionWhenItReturnsNull()
+        public void PassingValueConvertersOverridesDefaultConversionWhenThereIsAMatch()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -336,17 +311,60 @@ namespace Tests
                .Build();
 
             var fooSection = config.GetSection("foo");
-            var foo = fooSection.Create<DoubleContainer>(convertFunc: (value, targetType, declaringType, memberName) =>
-            {
-                // Make sure we're getting all the right stuff.
-                Assert.Equal("123.45", value);
-                Assert.Equal(typeof(double), targetType);
-                Assert.Equal(typeof(DoubleContainer), declaringType);
-                Assert.Equal("Bar", memberName);
-                return null;
-            });
 
-            // The default convertion works.
+            var valueConverters = new ValueConverters()
+                .Add(typeof(double), value => double.Parse(value) * 2);
+
+            var foo = fooSection.Create<DoubleContainer>(valueConverters: valueConverters);
+
+            Assert.Equal(123.45 * 2, foo.Bar); // Doubled by the custom converter
+        }
+
+        [Fact]
+        public void TheValueConverterRegisteredByDeclaringTypeAndMemberNameHasPriorityOverTheValueConverterRegisteredByTargetType()
+        {
+            var config = new ConfigurationBuilder()
+               .AddInMemoryCollection(new Dictionary<string, string>
+               {
+                    { "foo:bar", "123.45" },
+               })
+               .Build();
+
+            var fooSection = config.GetSection("foo");
+
+            var valueConverters = new ValueConverters()
+                .Add(typeof(double), value => double.Parse(value) * 2)
+                .Add(typeof(DoubleContainer), "bar", value => double.Parse(value) * 3);
+
+            var foo = fooSection.Create<DoubleContainer>(valueConverters: valueConverters);
+
+            // Tripled by the custom converter registered to the declaring type and member name
+            Assert.Equal(123.45 * 3, foo.Bar);
+
+            var anotherFoo = fooSection.Create<AnotherDoubleContainer>(valueConverters: valueConverters);
+
+            // Still matches by target type for other doubles
+            Assert.Equal(123.45 * 2, anotherFoo.Bar);
+        }
+
+        [Fact]
+        public void PassingValueConvertersDoesNotOverrideDefaultConversionWhenThereIsNotAMatch()
+        {
+            var config = new ConfigurationBuilder()
+               .AddInMemoryCollection(new Dictionary<string, string>
+               {
+                    { "foo:bar", "123.45" },
+               })
+               .Build();
+
+            var fooSection = config.GetSection("foo");
+
+            var valueConverters = new ValueConverters()
+                .Add(typeof(AnotherDoubleContainer), "bar", value => double.Parse(value) * 2);
+
+            var foo = fooSection.Create<DoubleContainer>(valueConverters: valueConverters);
+
+            // Not doubled by the custom converter because the declaring types were different.
             Assert.Equal(123.45, foo.Bar);
         }
 
@@ -1801,6 +1819,16 @@ namespace Tests
     public class DoubleContainer
     {
         public double Bar { get; set; }
+    }
+
+    public class AnotherDoubleContainer
+    {
+        public double Bar { get; set; }
+    }
+
+    public class StringContainer
+    {
+        public string Bar { get; set; }
     }
 
     public class HasMembersDecoratedWithDefaultTypeAttribute

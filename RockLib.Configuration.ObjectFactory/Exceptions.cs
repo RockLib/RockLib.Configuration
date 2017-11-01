@@ -9,9 +9,8 @@ namespace RockLib.Configuration.ObjectFactory
     {
         private const string SpecifyType = "A type must be specified in configuration or by specifying a default type.";
 
-        public static InvalidOperationException ResultNotAssignableToTargetType(IConfigurationSection section, Type targetType, object result) =>
-            new InvalidOperationException($"The {result.GetType()} object that was returned by the ConvertFunc "
-                + $"callback was not assignable to the target type {targetType} from value '{section.Value}'.");
+        public static InvalidOperationException ResultCannotBeNull(Type targetType, Type declaringType, string memberName) =>
+            new InvalidOperationException($"A null {targetType} value was returned by the custom convert func for {(declaringType == null ? "the value" : $"the {declaringType}.{memberName} member")}");
 
         public static InvalidOperationException CannotConvertSectionValueToTargetType(IConfigurationSection section, Type targetType) =>
             new InvalidOperationException($"Unable to convert value '{section.Value}' in {section.Description()} to target type '{targetType}'.");
