@@ -12,9 +12,6 @@ namespace Tests
             // Register a converter by declaring type and member name when you need
             // different properties of the same type to use different converters.
 
-            // Use this Add method when you want to register a function that returns
-            // the converted value.
-
             // Call the Add method for each converter that needs to be registered.
             var valueConverters = new ValueConverters();
             valueConverters.Add(typeof(Foo), "bar", value => new Bar(int.Parse(value)));
@@ -34,40 +31,10 @@ namespace Tests
         }
 
         [Fact]
-        public void CanAddConverterTypeByDeclaringTypeAndMemberName()
-        {
-            // Register a converter by declaring type and member name when you need
-            // different properties of the same type to use different converters.
-
-            // Use this Add method when you want to register a type that declares
-            // a 'static T Convert(string)' method.
-
-            // Call the Add method for each converter that needs to be registered.
-            var valueConverters = new ValueConverters();
-            valueConverters.Add(typeof(Foo), "bar", typeof(BarConverter));
-            valueConverters.Add(typeof(Foo), "baz", typeof(BazConverter));
-
-            // The Add method returns 'this', so you can chain them together:
-            valueConverters = new ValueConverters()
-                .Add(typeof(Foo), "bar", typeof(BarConverter))
-                .Add(typeof(Foo), "baz", typeof(BazConverter));
-
-            // List initialization syntax works also.
-            valueConverters = new ValueConverters
-            {
-                { typeof(Foo), "bar", typeof(BarConverter) },
-                { typeof(Foo), "baz", typeof(BazConverter) }
-            };
-        }
-
-        [Fact]
         public void CanAddConvertFuncByTargetType()
         {
             // Register a converter by target type when you want all properties of the
             // target type to use the same converter.
-
-            // Use this Add method when you want to register a function that returns
-            // the converted value.
 
             // Call the Add method for each converter that needs to be registered.
             var valueConverters = new ValueConverters();
@@ -88,37 +55,10 @@ namespace Tests
         }
 
         [Fact]
-        public void CanAddConverterTypeByTargetType()
-        {
-            // Register a converter by target type when you want all properties of the
-            // target type to use the same converter.
-
-            // Use this Add method when you want to register a type that declares
-            // a 'static T Convert(string)' method.
-
-            // Call the Add method for each converter that needs to be registered.
-            var valueConverters = new ValueConverters();
-            valueConverters.Add(typeof(Bar), typeof(BarConverter));
-            valueConverters.Add(typeof(Baz), typeof(BazConverter));
-
-            // The Add method returns 'this', so you can chain them together:
-            valueConverters = new ValueConverters()
-                .Add(typeof(Bar), typeof(BarConverter))
-                .Add(typeof(Baz), typeof(BazConverter));
-
-            // List initialization syntax works also.
-            valueConverters = new ValueConverters
-            {
-                { typeof(Bar), typeof(BarConverter) },
-                { typeof(Baz), typeof(BazConverter) }
-            };
-        }
-
-        [Fact]
         public void TryGetByDeclaringTypeAndMemberNameReturnsTrueWhenThereIsAMatch()
         {
             var valueConverters = new ValueConverters()
-                .Add(typeof(Foo), "bar", typeof(BarConverter))
+                .Add(typeof(Foo), "bar", value => new Bar(int.Parse(value)))
                 .Add(typeof(Foo), "baz", ParseBaz);
 
             Assert.True(valueConverters.TryGet(typeof(Foo), "bar", out var convertBar));
@@ -201,63 +141,6 @@ namespace Tests
             Assert.IsType<Baz>(converted);
             Assert.Equal(123.45, ((Baz)converted).Latitude);
             Assert.Equal(-76.543, ((Baz)converted).Longitude);
-        }
-
-        [Fact]
-        public void TheConvertFuncReturnedByTryGetCallsTheConvertMethodFromTheConvertTypePassedToTheAddByDeclaringTypeAndMemberNameMethod()
-        {
-            var valueConverters = new ValueConverters()
-                .Add(typeof(Foo), "bar", typeof(CountingBarConverter));
-
-            Assert.True(valueConverters.TryGet(typeof(Foo), "bar", out var retrievedConvertBar));
-
-            Assert.Equal(0, CountingBarConverter.InvocationCount);
-
-            var converted = retrievedConvertBar("123");
-
-            Assert.Equal(1, CountingBarConverter.InvocationCount);
-            Assert.IsType<Bar>(converted);
-            Assert.Equal(123, ((Bar)converted).Baz);
-        }
-
-        private static class CountingBarConverter
-        {
-            public static int InvocationCount { get; private set; }
-
-            private static Bar Convert(string value)
-            {
-                InvocationCount++;
-                return new Bar(int.Parse(value));
-            }
-        }
-
-        [Fact]
-        public void TheConvertFuncReturnedByTryGetCallsTheConvertMethodFromTheConvertTypePassedToTheAddByTargetTypeMethod()
-        {
-            var valueConverters = new ValueConverters()
-                .Add(typeof(Baz), typeof(CountingBazConverter));
-
-            Assert.True(valueConverters.TryGet(typeof(Baz), out var retrievedConvertBaz));
-
-            Assert.Equal(0, CountingBazConverter.InvocationCount);
-
-            var converted = retrievedConvertBaz("123.45,-76.543");
-
-            Assert.Equal(1, CountingBazConverter.InvocationCount);
-            Assert.IsType<Baz>(converted);
-            Assert.Equal(123.45, ((Baz)converted).Latitude);
-            Assert.Equal(-76.543, ((Baz)converted).Longitude);
-        }
-
-        private static class CountingBazConverter
-        {
-            public static int InvocationCount { get; private set; }
-
-            private static Baz Convert(string value)
-            {
-                InvocationCount++;
-                return ParseBaz(value);
-            }
         }
 
         private static Baz ParseBaz(string value)

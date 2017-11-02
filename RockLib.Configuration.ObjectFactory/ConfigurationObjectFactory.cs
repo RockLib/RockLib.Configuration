@@ -120,13 +120,33 @@ namespace RockLib.Configuration.ObjectFactory
         private static object ConvertToType(
             IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (valueConverters.TryGet(declaringType, memberName, out Func<string, object> convert)
-                || valueConverters.TryGet(targetType, out convert))
+            if (!valueConverters.TryGet(declaringType, memberName, out Func<string, object> convert)
+                && !valueConverters.TryGet(targetType, out convert))
             {
-                var result = convert(valueSection.Value);
-                if (result == null) throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
-                return result;
+                Type returnType;
+                var convertMethodName = GetConverterMethodNameFromMemberCustomAttributes(declaringType, memberName, out Type declaringTypeOfDecoratedMember);
+                if (convertMethodName != null)
+                    GetConvertFunc(declaringTypeOfDecoratedMember ?? declaringType, convertMethodName, out returnType, out convert);
+                else
+                {
+                    convertMethodName = GetConverterMethodNameFromCustomAttributes(targetType.GetTypeInfo().CustomAttributes);
+                    if (convertMethodName != null)
+                        GetConvertFunc(targetType, convertMethodName, out returnType, out convert);
+                    else
+                    {
+                        convert = null;
+                        returnType = null;
+                    }
+                }
+                if (returnType != null)
+                {
+                    if (!targetType.GetTypeInfo().IsAssignableFrom(returnType))
+                        throw new ArgumentException("must be able to assign returnType to targetType");
+                }
             }
+
+            if (convert != null)
+                return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
 
             if (targetType == typeof(Encoding)) return Encoding.GetEncoding(valueSection.Value);
             var typeConverter = TypeDescriptor.GetConverter(targetType);
@@ -134,6 +154,18 @@ namespace RockLib.Configuration.ObjectFactory
                 return typeConverter.ConvertFromInvariantString(valueSection.Value);
             if (valueSection.Value == "") return new ObjectBuilder(targetType).Build(valueConverters, defaultTypes);
             throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
+        }
+
+        private static void GetConvertFunc(Type declaringType, string methodName, out Type returnType, out Func<string, object> convertFunc)
+        {
+            var convertMethod = declaringType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                .SingleOrDefault(m =>
+                    m.Name == methodName
+                    && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string)
+                    && m.ReturnType != typeof(void) && m.ReturnType != typeof(object));
+            if (convertMethod == null) throw new ArgumentException($"No static method named '{methodName}' could be found in the {declaringType} type that has a single string parameter and returns a type other than System.Object.");
+            returnType = convertMethod.ReturnType;
+            convertFunc = value => convertMethod.Invoke(null, new object[] { value });
         }
 
         private static bool IsTypeSpecifiedObject(IConfiguration configuration)
@@ -226,6 +258,9 @@ namespace RockLib.Configuration.ObjectFactory
                 targetType = defaultType;
             if (targetType.GetTypeInfo().IsAbstract) throw Exceptions.CannotCreateAbstractType(configuration, targetType);
             if (targetType == typeof(object)) throw Exceptions.CannotCreateObjectType;
+            // TODO: Check targetType to see if it is "simple". Throw if it is.
+            // TODO: Define with "simple" means.
+            // TODO: Be sure that "simple" can be extended.
             if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw Exceptions.UnsupportedCollectionType(targetType);
             if (IsList(configuration, includeEmptyList:false)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
             var builder = new ObjectBuilder(targetType);
@@ -256,17 +291,32 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         /// <summary>Gets the default type, or null if not found.</summary>
-        private static Type GetDefaultTypeFromMemberCustomAttributes(Type declaringType, string memberName)
+        private static Type GetDefaultTypeFromMemberCustomAttributes(Type declaringType, string memberName) =>
+            GetFirstParameterValueFromMemberCustomAttributes<Type>(declaringType, memberName, nameof(DefaultTypeAttribute), out var dummy);
+
+        /// <summary>Gets the converter, or null if not found.</summary>
+        private static string GetConverterMethodNameFromMemberCustomAttributes(Type declaringType, string memberName, out Type declaringTypeOfDecoratedMember) =>
+            GetFirstParameterValueFromMemberCustomAttributes<string>(declaringType, memberName, nameof(ConvertMethodAttribute), out declaringTypeOfDecoratedMember);
+
+        /// <summary>Gets the value of the first parameter, or null if not found.</summary>
+        private static T GetFirstParameterValueFromMemberCustomAttributes<T>(
+            Type declaringType, string memberName, string attributeTypeName, out Type declaringTypeOfDecoratedMember)
+            where T : class
         {
-            var set = new HashSet<Type>();
+            var parameterValueSet = new HashSet<T>();
+            var declaringTypeSet = new HashSet<Type>();
 
             foreach (var member in Members.Find(declaringType, memberName))
             {
                 if (member.MemberType == MemberType.Property)
                 {
                     var property = declaringType.GetTypeInfo().GetProperty(member.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-                    var defaultType = GetDefaultTypeFromCustomAttributes(property.CustomAttributes);
-                    if (defaultType != null) set.Add(defaultType);
+                    var value = GetFirstParameterValueFromCustomAttributes<T>(property.CustomAttributes, attributeTypeName);
+                    if (value != null)
+                    {
+                        parameterValueSet.Add(value);
+                        declaringTypeSet.Add(property.DeclaringType);
+                    }
                 }
                 else
                 {
@@ -274,27 +324,51 @@ namespace RockLib.Configuration.ObjectFactory
                         .SelectMany(c => c.GetParameters())
                         .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, member.Name)))
                     {
-                        var defaultType = GetDefaultTypeFromCustomAttributes(parameter.CustomAttributes);
-                        if (defaultType != null) set.Add(defaultType);
+                        var value = GetFirstParameterValueFromCustomAttributes<T>(parameter.CustomAttributes, attributeTypeName);
+                        if (value != null)
+                        {
+                            parameterValueSet.Add(value);
+                            declaringTypeSet.Add(parameter.Member.DeclaringType);
+                        }
                     }
                 }
             }
 
-            switch (set.Count)
+            switch (declaringTypeSet.Count)
+            {
+                case 1:
+                    declaringTypeOfDecoratedMember = declaringTypeSet.First();
+                    break;
+                default:
+                    declaringTypeOfDecoratedMember = null;
+                    break;
+            }
+
+            switch (parameterValueSet.Count)
             {
                 case 0: return null;
-                case 1: return set.First();
+                case 1: return parameterValueSet.First();
                 default: throw Exceptions.InconsistentDefaultTypeAttributesForMultipleMembers(memberName);
             }
         }
 
         /// <summary>Gets the default type, or null if not found.</summary>
         private static Type GetDefaultTypeFromCustomAttributes(IEnumerable<CustomAttributeData> customAttributes) =>
+            GetFirstParameterValueFromCustomAttributes<Type>(customAttributes, nameof(DefaultTypeAttribute));
+
+        /// <summary>Gets the converter, or null if not found.</summary>
+        private static string GetConverterMethodNameFromCustomAttributes(IEnumerable<CustomAttributeData> customAttributes) =>
+            GetFirstParameterValueFromCustomAttributes<string>(customAttributes, nameof(ConvertMethodAttribute));
+
+        /// <summary>Gets the value of the first parameter, or null if not found.</summary>
+        private static T GetFirstParameterValueFromCustomAttributes<T>(
+            IEnumerable<CustomAttributeData> customAttributes, string attributeTypeName) =>
             customAttributes.Where(attribute =>
-                attribute.AttributeType.Name == nameof(DefaultTypeAttribute)
+                attribute.AttributeType.Name == attributeTypeName
                     && attribute.ConstructorArguments.Count == 1
-                    && attribute.ConstructorArguments[0].ArgumentType == typeof(Type))
-                .Select(attribute => (Type)attribute.ConstructorArguments[0].Value)
+                    && attribute.ConstructorArguments[0].ArgumentType == typeof(T)
+                    && attribute.ConstructorArguments[0].Value != null)
+                .Select(attribute => (T)attribute.ConstructorArguments[0].Value)
                 .FirstOrDefault();
 
         private static MethodInfo GetListAddMethod(Type listType, Type tType) =>
@@ -326,9 +400,10 @@ namespace RockLib.Configuration.ObjectFactory
                 {
                     if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
+                        var list = property.GetValue(obj);
+                        if (list == null) continue; // TODO: Or throw an exception?
                         var tType = property.PropertyType.GetTypeInfo().GetGenericArguments()[0];
                         var addMethod = GetListAddMethod(property.PropertyType, tType);
-                        var list = property.GetValue(obj);
                         var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
                         foreach (var item in (IEnumerable)propertyValue)
                             addMethod.Invoke(list, new[] { item });
@@ -338,9 +413,10 @@ namespace RockLib.Configuration.ObjectFactory
                 {
                     if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                     {
+                        var dictionary = property.GetValue(obj);
+                        if (dictionary == null) continue; // TODO: Or throw an exception?
                         var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
                         var addMethod = typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType)).GetTypeInfo().GetMethod("Add");
-                        var dictionary = property.GetValue(obj);
                         var keysProperty = property.PropertyType.GetTypeInfo().GetProperty("Keys");
                         var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
                         var enumerator = ((IEnumerable)propertyValue).GetEnumerator();

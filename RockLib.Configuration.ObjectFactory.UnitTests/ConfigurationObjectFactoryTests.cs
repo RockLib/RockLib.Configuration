@@ -11,6 +11,64 @@ namespace Tests
     public class ConfigurationObjectFactoryTests
     {
         [Fact]
+        public void CanSpecifyConvertMethodWithConvertMethodAttribute()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "123.45" },
+                    { "foo:baz:0", "234.56" },
+                    { "foo:baz:1", "345.67" },
+                    { "foo:qux:fred", "456.78" },
+                    { "foo:qux:waldo", "567.89" },
+                }).Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasMembersDecoratedWithValueConverterAttribute>();
+
+            Assert.Equal(123.45 * 2, foo.Bar);
+
+            Assert.Equal(2, foo.Baz.Count());
+            Assert.Equal(234.56 * 3, foo.Baz.First());
+            Assert.Equal(345.67 * 3, foo.Baz.Skip(1).First());
+
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.True(foo.Qux.ContainsKey("fred"));
+            Assert.True(foo.Qux.ContainsKey("waldo"));
+            Assert.Equal(456.78 * 5, foo.Qux["fred"].Value);
+            Assert.Equal(567.89 * 5, foo.Qux["waldo"].Value);
+        }
+
+        [Fact]
+        public void CanSpecifyConvertMethodWithLocallyDefinedConvertMethodAttribute()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "123.45" },
+                    { "foo:baz:0", "234.56" },
+                    { "foo:baz:1", "345.67" },
+                    { "foo:qux:fred", "456.78" },
+                    { "foo:qux:waldo", "567.89" },
+                }).Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasMembersDecoratedWithLocallyDefinedValueConverterAttribute>();
+
+            Assert.Equal(123.45 * 7, foo.Bar);
+
+            Assert.Equal(2, foo.Baz.Count());
+            Assert.Equal(234.56 * 11, foo.Baz.First());
+            Assert.Equal(345.67 * 11, foo.Baz.Skip(1).First());
+
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.True(foo.Qux.ContainsKey("fred"));
+            Assert.True(foo.Qux.ContainsKey("waldo"));
+            Assert.Equal(456.78 * 13, foo.Qux["fred"].Value);
+            Assert.Equal(567.89 * 13, foo.Qux["waldo"].Value);
+        }
+
+        [Fact]
         public void CanSpecifyDefaultTypesWithDefaultTypeAttribute()
         {
             var config = new ConfigurationBuilder()
@@ -1970,6 +2028,50 @@ namespace Tests
     {
         public double Fred { get; set; }
     }
+
+    [ConvertMethod(nameof(Convert))]
+    public class IsDecoratedWithValueConverterAttribute
+    {
+        private IsDecoratedWithValueConverterAttribute(double value) => Value = value;
+        public double Value { get; }
+        private static IsDecoratedWithValueConverterAttribute Convert(string value) =>
+            new IsDecoratedWithValueConverterAttribute(double.Parse(value) * 5);
+    }
+
+    public class HasMembersDecoratedWithValueConverterAttribute
+    {
+        public HasMembersDecoratedWithValueConverterAttribute(
+            [ConvertMethod(nameof(ConvertBar))] double bar) => Bar = bar;
+
+        public double Bar { get; }
+        [ConvertMethod(nameof(ConvertBaz))] public IEnumerable<double> Baz { get; set; }
+        public Dictionary<string, IsDecoratedWithValueConverterAttribute> Qux { get; } = new Dictionary<string, IsDecoratedWithValueConverterAttribute>();
+
+        private static double ConvertBar(string value) => double.Parse(value) * 2;
+        private static double ConvertBaz(string value) => double.Parse(value) * 3;
+    }
+
+    [LocallyDefined.ConvertMethod(nameof(Convert))]
+    public class IsDecoratedWithLocallyDefinedValueConverterAttribute
+    {
+        private IsDecoratedWithLocallyDefinedValueConverterAttribute(double value) => Value = value;
+        public double Value { get; }
+        private static IsDecoratedWithLocallyDefinedValueConverterAttribute Convert(string value) =>
+            new IsDecoratedWithLocallyDefinedValueConverterAttribute(double.Parse(value) * 13);
+    }
+
+    public class HasMembersDecoratedWithLocallyDefinedValueConverterAttribute
+    {
+        public HasMembersDecoratedWithLocallyDefinedValueConverterAttribute(
+            [LocallyDefined.ConvertMethod(nameof(ConvertBar))] double bar) => Bar = bar;
+
+        public double Bar { get; }
+        [LocallyDefined.ConvertMethod(nameof(ConvertBaz))] public IEnumerable<double> Baz { get; set; }
+        public Dictionary<string, IsDecoratedWithLocallyDefinedValueConverterAttribute> Qux { get; } = new Dictionary<string, IsDecoratedWithLocallyDefinedValueConverterAttribute>();
+
+        private static double ConvertBar(string value) => double.Parse(value) * 7;
+        private static double ConvertBaz(string value) => double.Parse(value) * 11;
+    }
 }
 
 namespace LocallyDefined
@@ -1978,5 +2080,11 @@ namespace LocallyDefined
     {
         public DefaultTypeAttribute(Type value) => Value = value;
         public Type Value { get; }
+    }
+
+    internal class ConvertMethodAttribute : Attribute
+    {
+        public ConvertMethodAttribute(string convertMethodName) => ConvertMethodName = convertMethodName;
+        public string ConvertMethodName { get; }
     }
 }
