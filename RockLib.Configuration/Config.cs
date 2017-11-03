@@ -104,7 +104,7 @@ namespace RockLib.Configuration
 #endif
 
             builder
-                .AddAppSettings()
+                .AddAppSettingsJson()
                 .AddEnvironmentVariables()
                 .AddInMemoryCollection(additionalValues ?? new List<KeyValuePair<string, string>>());
             

@@ -17,7 +17,7 @@ namespace RockLib.Configuration
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddAppSettings(this IConfigurationBuilder builder)
+        public static IConfigurationBuilder AddAppSettingsJson(this IConfigurationBuilder builder)
         {
             string supplementalJsonConfigPath = null;
 
