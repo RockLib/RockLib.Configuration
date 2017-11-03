@@ -8,7 +8,9 @@ namespace RockLib.Configuration.AppSettingsConfigTests
         static ConfigTests()
         {
             // Set the environment variable before reading configs.
-            Environment.SetEnvironmentVariable("AppSettings:Environment", "Prod");
+            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+            Environment.SetEnvironmentVariable("ROCKLIB_ENVIRONMENT", "Staging");
+            Environment.SetEnvironmentVariable("AppSettings:RockLib.Environment", "Prod");
         }
 
         [Fact(DisplayName = "AppSettingsConfigTests: IsDefault is true by default.")]
@@ -28,7 +30,7 @@ namespace RockLib.Configuration.AppSettingsConfigTests
         {
             // Note that the "AppSettings:Environment" environment variable was
             // set in the static constructor with a value of "Prod".
-            Assert.Equal("Prod", Config.AppSettings["Environment"]);
+            Assert.Equal("Prod", Config.AppSettings["RockLib.Environment"]);
         }
 
         [Fact(DisplayName = "AppSettingsConfigTests: IsLocked is true after the ConfigurationRoot property has been accessed.")]
@@ -48,10 +50,16 @@ namespace RockLib.Configuration.AppSettingsConfigTests
 
             // This is the same environment variable that we successfully changed in the static constructor.
             // Setting it this time, however, is too late.
-            Environment.SetEnvironmentVariable("AppSettings:Environment", "Beta");
+            Environment.SetEnvironmentVariable("AppSettings:RockLib.Environment", "Beta");
 
             // No effect.
-            Assert.Equal("Prod", Config.AppSettings["Environment"]);
+            Assert.Equal("Prod", Config.AppSettings["RockLib.Environment"]);
+        }
+
+        [Fact(DisplayName = "AppSettingsConfigTests: Changing environment variable values when IsLocked is true has no effect.")]
+        public void AppSettingsDevelopmentJsonIsLoaded()
+        {
+            Assert.Equal("appsettings.development.json", Config.AppSettings["FileName"]);
         }
     }
 }
