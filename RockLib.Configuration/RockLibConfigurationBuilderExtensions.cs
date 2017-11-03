@@ -21,9 +21,13 @@ namespace RockLib.Configuration
         {
             string supplementalJsonConfigPath = null;
 
-            var environment = Environment.GetEnvironmentVariable("AppSettings:Environment");
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            if (string.IsNullOrEmpty(environment))
+                environment = Environment.GetEnvironmentVariable("ROCKLIB_ENVIRONMENT");
+
             if (!string.IsNullOrEmpty(environment))
-                supplementalJsonConfigPath = $"apppsettings.{environment.ToLower()}.json";
+                supplementalJsonConfigPath = $"appsettings.{environment.ToLower()}.json";
 
             return builder.AddJson("appsettings.json", supplementalJsonConfigPath);
         }
