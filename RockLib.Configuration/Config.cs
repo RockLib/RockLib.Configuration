@@ -99,12 +99,12 @@ namespace RockLib.Configuration
             var builder = new ConfigurationBuilder();
 
 #if NET451
-
             builder
                 .AddConfigurationManager();
 #endif
+
             builder
-                .AddRockLib()
+                .AddAppSettingsJson()
                 .AddEnvironmentVariables()
                 .AddInMemoryCollection(additionalValues ?? new List<KeyValuePair<string, string>>());
             
