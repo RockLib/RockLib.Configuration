@@ -28,7 +28,7 @@ namespace RockLib.Configuration.AppSettingsConfigTests
         [Fact(DisplayName = "AppSettingsConfigTests: Environment variables override values from 'appsettings.json'.")]
         public void EnvironmentVariablesOverrideFileConfig()
         {
-            // Note that the "AppSettings:Environment" environment variable was
+            // Note that the "AppSettings:RockLib.Environment" environment variable was
             // set in the static constructor with a value of "Prod".
             Assert.Equal("Prod", Config.AppSettings["RockLib.Environment"]);
         }
@@ -56,7 +56,7 @@ namespace RockLib.Configuration.AppSettingsConfigTests
             Assert.Equal("Prod", Config.AppSettings["RockLib.Environment"]);
         }
 
-        [Fact(DisplayName = "AppSettingsConfigTests: Changing environment variable values when IsLocked is true has no effect.")]
+        [Fact(DisplayName = "AppSettingsConfigTests: appsettings.development.json is the loaded as FileName due to priority")]
         public void AppSettingsDevelopmentJsonIsLoaded()
         {
             Assert.Equal("appsettings.development.json", Config.AppSettings["FileName"]);
