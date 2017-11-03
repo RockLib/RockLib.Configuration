@@ -120,18 +120,31 @@ namespace RockLib.Configuration.ObjectFactory
         private static object ConvertToType(
             IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
+            var convert = GetConvertFunc(targetType, declaringType, memberName, valueConverters);
+            if (convert != null)
+                return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
+            if (targetType == typeof(Encoding)) return Encoding.GetEncoding(valueSection.Value);
+            var typeConverter = TypeDescriptor.GetConverter(targetType);
+            if (typeConverter.CanConvertFrom(typeof(string)))
+                return typeConverter.ConvertFromInvariantString(valueSection.Value);
+            if (valueSection.Value == "") return new ObjectBuilder(targetType).Build(valueConverters, defaultTypes);
+            throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
+        }
+
+        private static Func<string, object> GetConvertFunc(Type targetType, Type declaringType, string memberName, IValueConverters valueConverters)
+        {
             if (!valueConverters.TryGet(declaringType, memberName, out Func<string, object> convert)
                 && !valueConverters.TryGet(targetType, out convert))
             {
                 Type returnType;
                 var convertMethodName = GetConverterMethodNameFromMemberCustomAttributes(declaringType, memberName, out Type declaringTypeOfDecoratedMember);
                 if (convertMethodName != null)
-                    GetConvertFunc(declaringTypeOfDecoratedMember ?? declaringType, convertMethodName, out returnType, out convert);
+                    CreateConvertFunc(declaringTypeOfDecoratedMember ?? declaringType, convertMethodName, out returnType, out convert);
                 else
                 {
                     convertMethodName = GetConverterMethodNameFromCustomAttributes(targetType.GetTypeInfo().CustomAttributes);
                     if (convertMethodName != null)
-                        GetConvertFunc(targetType, convertMethodName, out returnType, out convert);
+                        CreateConvertFunc(targetType, convertMethodName, out returnType, out convert);
                     else
                     {
                         convert = null;
@@ -145,18 +158,10 @@ namespace RockLib.Configuration.ObjectFactory
                 }
             }
 
-            if (convert != null)
-                return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
-
-            if (targetType == typeof(Encoding)) return Encoding.GetEncoding(valueSection.Value);
-            var typeConverter = TypeDescriptor.GetConverter(targetType);
-            if (typeConverter.CanConvertFrom(typeof(string)))
-                return typeConverter.ConvertFromInvariantString(valueSection.Value);
-            if (valueSection.Value == "") return new ObjectBuilder(targetType).Build(valueConverters, defaultTypes);
-            throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
+            return convert;
         }
 
-        private static void GetConvertFunc(Type declaringType, string methodName, out Type returnType, out Func<string, object> convertFunc)
+        private static void CreateConvertFunc(Type declaringType, string methodName, out Type returnType, out Func<string, object> convertFunc)
         {
             var convertMethod = declaringType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
                 .SingleOrDefault(m =>
@@ -221,7 +226,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
-            var addMethod = GetListAddMethod(listType, tType);
+            var addMethod = GetListAddMethod(tType);
             var list = Activator.CreateInstance(listType);
             foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
                 addMethod.Invoke(list, new object[] { item });
@@ -371,9 +376,13 @@ namespace RockLib.Configuration.ObjectFactory
                 .Select(attribute => (T)attribute.ConstructorArguments[0].Value)
                 .FirstOrDefault();
 
-        private static MethodInfo GetListAddMethod(Type listType, Type tType) =>
-            typeof(ICollection<>).MakeGenericType(listType.GetTypeInfo().GetGenericArguments()[0])
-                .GetTypeInfo().GetMethod("Add", new[] { tType });
+        private static MethodInfo GetListAddMethod(Type tType) =>
+            typeof(ICollection<>).MakeGenericType(tType)
+                .GetTypeInfo().GetMethod("Add");
+
+        private static MethodInfo GetDictionaryAddMethod(Type tValueType) =>
+            typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType))
+                .GetTypeInfo().GetMethod("Add");
 
         private class ObjectBuilder
         {
@@ -391,40 +400,49 @@ namespace RockLib.Configuration.ObjectFactory
                 var args = GetArgs(constructor, valueConverters, defaultTypes);
                 var obj = constructor.Invoke(args);
                 foreach (var property in ReadWriteProperties)
-                    if (_members.TryGetValue(property.Name, out IConfigurationSection section))
-                    {
-                        var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
-                        property.SetValue(obj, propertyValue);
-                    }
+                    SetReadWriteProperty(obj, property, defaultTypes, valueConverters);
                 foreach (var property in ReadonlyListProperties)
-                {
-                    if (_members.TryGetValue(property.Name, out IConfigurationSection section))
-                    {
-                        var list = property.GetValue(obj);
-                        if (list == null) continue; // TODO: Or throw an exception?
-                        var tType = property.PropertyType.GetTypeInfo().GetGenericArguments()[0];
-                        var addMethod = GetListAddMethod(property.PropertyType, tType);
-                        var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
-                        foreach (var item in (IEnumerable)propertyValue)
-                            addMethod.Invoke(list, new[] { item });
-                    }
-                }
+                    SetReadonlyListProperty(obj, property, defaultTypes, valueConverters);
                 foreach (var property in ReadonlyDictionaryProperties)
-                {
-                    if (_members.TryGetValue(property.Name, out IConfigurationSection section))
-                    {
-                        var dictionary = property.GetValue(obj);
-                        if (dictionary == null) continue; // TODO: Or throw an exception?
-                        var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
-                        var addMethod = typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType)).GetTypeInfo().GetMethod("Add");
-                        var keysProperty = property.PropertyType.GetTypeInfo().GetProperty("Keys");
-                        var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
-                        var enumerator = ((IEnumerable)propertyValue).GetEnumerator();
-                        while (enumerator.MoveNext())
-                            addMethod.Invoke(dictionary, new object[] { enumerator.Current });
-                    }
-                }
+                    SetReadonlyDictionaryProperty(obj, property, defaultTypes, valueConverters);
                 return obj;
+            }
+
+            private void SetReadWriteProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            {
+                if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                {
+                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    property.SetValue(obj, propertyValue);
+                }
+            }
+
+            private void SetReadonlyListProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            {
+                if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                {
+                    var list = property.GetValue(obj);
+                    if (list == null) return;
+                    var tType = property.PropertyType.GetTypeInfo().GetGenericArguments()[0];
+                    var addMethod = GetListAddMethod(tType);
+                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    foreach (var item in (IEnumerable)propertyValue)
+                        addMethod.Invoke(list, new[] { item });
+                }
+            }
+
+            private void SetReadonlyDictionaryProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            {
+                if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                {
+                    var dictionary = property.GetValue(obj);
+                    if (dictionary == null) return;
+                    var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
+                    var addMethod = GetDictionaryAddMethod(tValueType);
+                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    foreach (var item in (IEnumerable)propertyValue)
+                        addMethod.Invoke(dictionary, new object[] { item });
+                }
             }
 
             private ConstructorInfo GetConstructor()
@@ -480,7 +498,6 @@ namespace RockLib.Configuration.ObjectFactory
                             _members.Remove(parameters[i].Name);
                         }
                     }
-                    
                     else if (parameters[i].HasDefaultValue) args[i] = parameters[i].DefaultValue;
                 }
                 return args;
