@@ -11,24 +11,6 @@ namespace RockLib.Configuration
     public static class RockLibConfigurationBuilderExtensions
     {
         /// <summary>
-        /// Adds the RockLib configuration provider to the builder using the configuration file "rocklib.config.json",
-        /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
-        /// </summary>
-        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
-        /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddRockLib(this IConfigurationBuilder builder)
-        {
-            string supplementalJsonConfigPath = null;
-
-            var environment = Environment.GetEnvironmentVariable("AppSettings:Environment");
-            if (!string.IsNullOrEmpty(environment))
-                supplementalJsonConfigPath = $"{environment.ToLower()}.rocklib.config.json";
-
-            return builder.AddJson("rocklib.config.json", supplementalJsonConfigPath);
-        }
-
-        /// <summary>
         /// Adds the ASP.NET Core appsettings.json configuration provider to the builder using the configuration file "appsettings.json",
         /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
         /// </summary>
