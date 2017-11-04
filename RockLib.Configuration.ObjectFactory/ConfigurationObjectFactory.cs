@@ -127,7 +127,7 @@ namespace RockLib.Configuration.ObjectFactory
             var typeConverter = TypeDescriptor.GetConverter(targetType);
             if (typeConverter.CanConvertFrom(typeof(string)))
                 return typeConverter.ConvertFromInvariantString(valueSection.Value);
-            if (valueSection.Value == "") return new ObjectBuilder(targetType).Build(valueConverters, defaultTypes);
+            if (valueSection.Value == "") return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
             throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
         }
 
@@ -266,11 +266,8 @@ namespace RockLib.Configuration.ObjectFactory
             if (targetType.GetTypeInfo().IsAbstract) throw Exceptions.CannotCreateAbstractType(configuration, targetType);
             if (targetType == typeof(object)) throw Exceptions.CannotCreateObjectType;
             if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw Exceptions.UnsupportedCollectionType(targetType);
-            if (IsList(configuration, includeEmptyList:false)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
-            var builder = new ObjectBuilder(targetType);
-            foreach (var childSection in configuration.GetChildren())
-                builder.AddMember(childSection.Key, childSection);
-            return builder.Build(valueConverters, defaultTypes);
+            if (IsList(configuration, includeEmptyList: false)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
+            return new ObjectBuilder(targetType, configuration).Build(valueConverters, defaultTypes);
         }
 
         private static bool IsSimpleType(Type targetType, Type declaringType, string memberName, IValueConverters valueConverters)
@@ -403,19 +400,22 @@ namespace RockLib.Configuration.ObjectFactory
         {
             private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(StringComparer.OrdinalIgnoreCase);
 
-            public ObjectBuilder(Type type) => Type = type;
+            public ObjectBuilder(Type type, IConfiguration configuration)
+            {
+                Type = type;
+                foreach (var childSection in configuration.GetChildren())
+                    _members.Add(childSection.Key, childSection);
+            }
 
             public Type Type { get; }
-
-            public void AddMember(string memberName, IConfigurationSection section) => _members.Add(memberName, section);
 
             public object Build(IValueConverters valueConverters, IDefaultTypes defaultTypes)
             {
                 var constructor = GetConstructor();
                 var args = GetArgs(constructor, valueConverters, defaultTypes);
                 var obj = constructor.Invoke(args);
-                foreach (var property in ReadWriteProperties)
-                    SetReadWriteProperty(obj, property, defaultTypes, valueConverters);
+                foreach (var property in WritableProperties)
+                    SetWritableProperty(obj, property, defaultTypes, valueConverters);
                 foreach (var property in ReadonlyListProperties)
                     SetReadonlyListProperty(obj, property, defaultTypes, valueConverters);
                 foreach (var property in ReadonlyDictionaryProperties)
@@ -423,7 +423,7 @@ namespace RockLib.Configuration.ObjectFactory
                 return obj;
             }
 
-            private void SetReadWriteProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            private void SetWritableProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
             {
                 if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                 {
@@ -462,7 +462,7 @@ namespace RockLib.Configuration.ObjectFactory
 
             private ConstructorInfo GetConstructor()
             {
-                var constructors = Constructors;
+                var constructors = Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
                 if (constructors.Length == 1) return constructors[0];
                 if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
                 var orderedConstructors = constructors
@@ -518,11 +518,8 @@ namespace RockLib.Configuration.ObjectFactory
                 return args;
             }
 
-            private IEnumerable<PropertyInfo> ReadWriteProperties =>
-                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadWrite());
-
-            private ConstructorInfo[] Constructors =>
-                Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+            private IEnumerable<PropertyInfo> WritableProperties =>
+                Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite);
 
             private IEnumerable<PropertyInfo> ReadonlyListProperties =>
                 Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyList());
