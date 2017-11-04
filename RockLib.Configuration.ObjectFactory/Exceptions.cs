@@ -62,6 +62,15 @@ namespace RockLib.Configuration.ObjectFactory
                 $"The specified default type {defaultType} is not assignable to the following member(s) in declaring type {declaringType} that match the name '{memberName}':"
                     + string.Join("", notAssignableMembers.Select(m => $"{Environment.NewLine}- {m}")));
 
+        public static InvalidOperationException TargetTypeRequiresConfigurationValue(IConfiguration configuration, Type targetType, Type declaringType, string memberName) =>
+            new InvalidOperationException($"The {targetType.Description(declaringType, memberName)} requires the {configuration.Description()} to have a value and no children but it " +
+                $"instead has no value and children: {string.Join(", ", configuration.GetChildren().Select(c => "'" + c.Key + "'"))}.");
+
+        private static string Description(this Type targetType, Type declaringType, string memberName) =>
+            declaringType == null || memberName == null
+            ? $"target type '{targetType}'"
+            : $"'{targetType} {declaringType}.{memberName}' member";
+
         private static string Description(this IConfiguration configuration) =>
             configuration is IConfigurationSection section ? section.Description() : "configuration";
 

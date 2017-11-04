@@ -3,6 +3,7 @@ using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Xunit;
 
 namespace Tests
@@ -331,12 +332,60 @@ namespace Tests
 #endif
         }
 
+        [Theory]
+        [InlineData(typeof(double))]
+        [InlineData(typeof(Corge))]
+        [InlineData(typeof(string))]
+        [InlineData(typeof(decimal))]
+        [InlineData(typeof(Guid))]
+        [InlineData(typeof(DateTime))]
+        [InlineData(typeof(DateTimeOffset))]
+        [InlineData(typeof(TimeSpan))]
+        [InlineData(typeof(Uri))]
+        [InlineData(typeof(Encoding))]
+        [InlineData(typeof(IsDecoratedWithConvertMethod))]
+        public void GivenABranchNodeWhenTheMemberTypeRequiresALeafNode_ThrowsInvalidOperationException(Type type)
+        {
+            var classType = typeof(GenericPropertyClass<>).MakeGenericType(type);
+
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:baz", "123.45" },
+                    { "foo:bar:qux", "456" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create(classType));
+
+#if DEBUG
+            var expected = Exceptions.TargetTypeRequiresConfigurationValue(fooSection.GetSection("bar"), type, classType, "Bar");
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
         private class EmptyClass { }
 
         private class SimplePropertyClass
         {
             public double Bar { get; set; }
         }
+
+        private class GenericPropertyClass<T>
+        {
+            public T Bar { get; set; }
+        }
+
+        [ConvertMethod(nameof(Convert))]
+        private class IsDecoratedWithConvertMethod
+        {
+            public IsDecoratedWithConvertMethod(double baz) => Baz = baz;
+            public double Baz { get; }
+            private static IsDecoratedWithConvertMethod Convert(string value) => new IsDecoratedWithConvertMethod(double.Parse(value));
+        }
+
+        private enum Corge { Garply, Grault }
 
         private class EmptyClassPropertyClass
         {

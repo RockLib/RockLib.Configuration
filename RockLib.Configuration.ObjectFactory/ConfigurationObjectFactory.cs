@@ -261,17 +261,32 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (!skipDefaultTypes && TryGetDefaultType(defaultTypes, targetType, declaringType, memberName, out Type defaultType))
                 targetType = defaultType;
+            if (IsSimpleType(targetType, declaringType, memberName, valueConverters))
+                throw Exceptions.TargetTypeRequiresConfigurationValue(configuration, targetType, declaringType, memberName);
             if (targetType.GetTypeInfo().IsAbstract) throw Exceptions.CannotCreateAbstractType(configuration, targetType);
             if (targetType == typeof(object)) throw Exceptions.CannotCreateObjectType;
-            // TODO: Check targetType to see if it is "simple". Throw if it is.
-            // TODO: Define with "simple" means.
-            // TODO: Be sure that "simple" can be extended.
             if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw Exceptions.UnsupportedCollectionType(targetType);
             if (IsList(configuration, includeEmptyList:false)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
             var builder = new ObjectBuilder(targetType);
             foreach (var childSection in configuration.GetChildren())
                 builder.AddMember(childSection.Key, childSection);
             return builder.Build(valueConverters, defaultTypes);
+        }
+
+        private static bool IsSimpleType(Type targetType, Type declaringType, string memberName, IValueConverters valueConverters)
+        {
+            var type = Nullable.GetUnderlyingType(targetType) ?? targetType;
+            return type.GetTypeInfo().IsPrimitive
+                || type.GetTypeInfo().IsEnum
+                || type == typeof(string)
+                || type == typeof(decimal)
+                || type == typeof(Guid)
+                || type == typeof(DateTime)
+                || type == typeof(DateTimeOffset)
+                || type == typeof(TimeSpan)
+                || type == typeof(Uri)
+                || type == typeof(Encoding)
+                || GetConvertFunc(targetType, declaringType, memberName, valueConverters) != null;
         }
 
         private static bool TryGetDefaultType(IDefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
