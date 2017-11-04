@@ -396,7 +396,7 @@ namespace RockLib.Configuration.ObjectFactory
             typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType))
                 .GetTypeInfo().GetMethod("Add");
 
-        private class ObjectBuilder
+        internal class ObjectBuilder
         {
             private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(StringComparer.OrdinalIgnoreCase);
 
@@ -476,15 +476,23 @@ namespace RockLib.Configuration.ObjectFactory
                 return orderedConstructors[0].Constructor;
             }
 
-            private class ConstructorOrderInfo
+            internal class ConstructorOrderInfo
             {
                 public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> members)
                 {
                     Constructor = constructor;
                     var parameters = constructor.GetParameters();
                     TotalParameters = parameters.Length;
-                    MatchedParametersRatio = parameters.Count(p => members.ContainsKey(p.Name)) / (double)TotalParameters;
-                    MatchedOrDefaultParametersRatio = parameters.Count(p => members.ContainsKey(p.Name) || p.HasDefaultValue) / (double)TotalParameters;
+                    if (TotalParameters == 0)
+                    {
+                        MatchedParametersRatio = 1;
+                        MatchedOrDefaultParametersRatio = 1;
+                    }
+                    else
+                    {
+                        MatchedParametersRatio = parameters.Count(p => members.ContainsKey(p.Name)) / (double)TotalParameters;
+                        MatchedOrDefaultParametersRatio = parameters.Count(p => members.ContainsKey(p.Name) || p.HasDefaultValue) / (double)TotalParameters;
+                    }
                 }
 
                 public ConstructorInfo Constructor { get; }
