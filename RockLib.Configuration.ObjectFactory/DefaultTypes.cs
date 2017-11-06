@@ -41,7 +41,7 @@ namespace RockLib.Configuration.ObjectFactory
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
-            if (matchingMembers.Count == 0) throw Exceptions.DefaultTypeHasNoMatchingMembers(declaringType, memberName);
+            if (matchingMembers.Count == 0) throw Exceptions.NoMatchingMembers(declaringType, memberName);
             var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(defaultType)).ToList();
             if (notAssignableMembers.Count > 0) throw Exceptions.DefaultTypeNotAssignableToMembers(declaringType, memberName, defaultType, notAssignableMembers);
 
@@ -64,6 +64,8 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (targetType == null) throw new ArgumentNullException(nameof(targetType));
             if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
+
+            if (defaultType.GetTypeInfo().IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
             if (!targetType.GetTypeInfo().IsAssignableFrom(defaultType))
                 throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);

@@ -196,7 +196,7 @@ namespace Tests
             var actual = Assert.Throws<ArgumentException>(() => defaultTypes.Add(typeof(Foo), "qux", typeof(Qux)));
 
 #if DEBUG
-            var expected = Exceptions.DefaultTypeHasNoMatchingMembers(typeof(Foo), "qux");
+            var expected = Exceptions.NoMatchingMembers(typeof(Foo), "qux");
             Assert.Equal(expected.Message, actual.Message);
 #endif
         }
@@ -227,6 +227,32 @@ namespace Tests
 #endif
         }
 
+        [Fact]
+        public void GivenAbstractDefaultType1_ThrowsArgumentException()
+        {
+            var defaultTypes = new DefaultTypes();
+
+            var actual = Assert.Throws<ArgumentException>(() => defaultTypes.Add(typeof(Foo), "bar", typeof(AbstractBar)));
+
+#if DEBUG
+            var expected = Exceptions.DefaultTypeCannotBeAbstract(typeof(AbstractBar));
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
+        [Fact]
+        public void GivenAbstractDefaultType2_ThrowsArgumentException()
+        {
+            var defaultTypes = new DefaultTypes();
+
+            var actual = Assert.Throws<ArgumentException>(() => defaultTypes.Add(typeof(IBar), typeof(AbstractBar)));
+
+#if DEBUG
+            var expected = Exceptions.DefaultTypeCannotBeAbstract(typeof(AbstractBar));
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
         private class Foo
         {
             public IBar Bar { get; set; }
@@ -240,5 +266,7 @@ namespace Tests
         private class Baz : IBaz { }
 
         private class Qux { }
+
+        private abstract class AbstractBar : IBar { }
     }
 }

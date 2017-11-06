@@ -102,9 +102,9 @@ namespace RockLib.Configuration.ObjectFactory
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
-            if (matchingMembers.Count == 0) throw new ArgumentException("no matching members");
+            if (matchingMembers.Count == 0) throw Exceptions.NoMatchingMembers(declaringType, memberName);
             var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(returnType)).ToList();
-            if (notAssignableMembers.Count > 0) throw new ArgumentException("return type not assignable to member type");
+            if (notAssignableMembers.Count > 0) throw Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(declaringType, memberName, returnType, notAssignableMembers);
 
             _converters.Add(GetKey(declaringType, memberName), new ValueConverter(returnType, convertFunc));
             return this;
@@ -113,7 +113,7 @@ namespace RockLib.Configuration.ObjectFactory
         private ValueConverters Add(Type targetType, Type returnType, Func<string, object> convertFunc)
         {
             if (targetType == null) throw new ArgumentNullException(nameof(targetType));
-            if (!targetType.GetTypeInfo().IsAssignableFrom(returnType)) throw new ArgumentException("must be able to assign returnType to targetType");
+            if (!targetType.GetTypeInfo().IsAssignableFrom(returnType)) throw Exceptions.ReturnTypeOfConvertFuncIsNotAssignableToTargetType(targetType, returnType);
             _converters.Add(GetKey(targetType), new ValueConverter(returnType, convertFunc));
             return this;
         }

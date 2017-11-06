@@ -1,5 +1,6 @@
 ﻿using RockLib.Configuration.ObjectFactory;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -184,6 +185,85 @@ namespace Tests
             Assert.Equal(-76.543, ((Baz)converted).Longitude);
         }
 
+        [Fact]
+        public void GivenNullDeclaringType_ThrowsArgumentNullException()
+        {
+            var valueConverters = new ValueConverters();
+
+            Assert.Throws<ArgumentNullException>(() => valueConverters.Add(null, "bar", value => new Bar(int.Parse(value))));
+        }
+
+        [Fact]
+        public void GivenNullMemberName_ThrowsArgumentNullException()
+        {
+            var valueConverters = new ValueConverters();
+
+            Assert.Throws<ArgumentNullException>(() => valueConverters.Add(typeof(Foo), null, value => new Bar(int.Parse(value))));
+        }
+
+        [Fact]
+        public void GivenNullConvertFunc1_ThrowsArgumentNullException()
+        {
+            var valueConverters = new ValueConverters();
+
+            Assert.Throws<ArgumentNullException>(() => valueConverters.Add<Bar>(typeof(Foo), "bar", null));
+        }
+
+        [Fact]
+        public void GivenNullTargetType_ThrowsArgumentNullException()
+        {
+            var valueConverters = new ValueConverters();
+
+            Assert.Throws<ArgumentNullException>(() => valueConverters.Add(null, value => new Bar(int.Parse(value))));
+        }
+
+        [Fact]
+        public void GivenNullConvertFunc2_ThrowsArgumentNullException()
+        {
+            var valueConverters = new ValueConverters();
+
+            Assert.Throws<ArgumentNullException>(() => valueConverters.Add<Bar>(typeof(Bar), null));
+        }
+
+        [Fact]
+        public void GivenNoMatchingMembers_ThrowsArgumentException()
+        {
+            var valueConverters = new ValueConverters();
+
+            var actual = Assert.Throws<ArgumentException>(() => valueConverters.Add(typeof(Foo), "qux", value => new Bar(int.Parse(value))));
+
+#if DEBUG
+            var expected = Exceptions.NoMatchingMembers(typeof(Foo), "qux");
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
+        [Fact]
+        public void GivenReturnTypeOfFunctionIsNotAssignableToMemberType_ThrowsArgumentException()
+        {
+            var valueConverters = new ValueConverters();
+
+            var actual = Assert.Throws<ArgumentException>(() => valueConverters.Add(typeof(Foo), "bar", value => new Qux()));
+
+#if DEBUG
+            var expected = Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(typeof(Foo), "bar", typeof(Qux), new List<Member> { new Member("Bar", typeof(Bar), MemberType.Property) });
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+        
+        [Fact]
+        public void GivenReturnTypeOfFunctionIsNotAssignableToTargetType_ThrowsArgumentException()
+        {
+            var valueConverters = new ValueConverters();
+
+            var actual = Assert.Throws<ArgumentException>(() => valueConverters.Add(typeof(Bar), value => new Qux()));
+
+#if DEBUG
+            var expected = Exceptions.ReturnTypeOfConvertFuncIsNotAssignableToTargetType(typeof(Bar), typeof(Qux));
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
         private static Baz ParseBaz(string value)
         {
             var split = value.Split(',');
@@ -222,5 +302,7 @@ namespace Tests
             public double Latitude { get; }
             public double Longitude { get; }
         }
+
+        private struct Qux { }
     }
 }

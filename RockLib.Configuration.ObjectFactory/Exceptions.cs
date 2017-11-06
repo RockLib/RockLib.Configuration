@@ -40,6 +40,9 @@ namespace RockLib.Configuration.ObjectFactory
         public static ArgumentException DefaultTypeIsNotAssignableToTargetType(Type targetType, Type defaultType) =>
             new ArgumentException($"The specified default type, {defaultType}, is not assignable to the target type {targetType}.");
 
+        public static ArgumentException ReturnTypeOfConvertFuncIsNotAssignableToTargetType(Type targetType, Type returnType) =>
+            new ArgumentException($"The return type, {returnType}, of the specified convert function is not assignable to the target type {targetType}.");
+
         public static InvalidOperationException InconsistentDefaultTypeAttributesForMultipleMembers(string memberName) =>
             new InvalidOperationException($"More than one member (property or constructor parameter) matching the name '{memberName}' is decorated with a {nameof(DefaultTypeAttribute)} attribute. All decorated members matching the same name must have the same type.");
 
@@ -51,20 +54,33 @@ namespace RockLib.Configuration.ObjectFactory
                 + "or parameters with a default value to total parameters, 3) then from the highest-to-lowest number of total parameters.");
 
         public static ArgumentException DefaultTypeCannotBeAbstract(Type defaultType) =>
-            new ArgumentException($"Cannot define abstract default type {defaultType}", nameof(defaultType));
+            new ArgumentException($"Cannot define default type {defaultType}: abstract types cannot be instantiated.", nameof(defaultType));
 
-        public static ArgumentException DefaultTypeHasNoMatchingMembers(Type declaringType, string memberName) =>
-            new ArgumentException(
-                $"There are no properties or constructor parameters in declaring type {declaringType} that match member name '{memberName}'.");
+        public static ArgumentException DefaultTypeFromAttributeCannotBeAbstract(Type defaultType) =>
+            new ArgumentException($"Cannot define default type {defaultType} via {nameof(DefaultTypeAttribute)}: abstract types cannot be instantiated.", nameof(defaultType));
+
+        public static ArgumentException NoMatchingMembers(Type declaringType, string memberName) =>
+            new ArgumentException($"There are no properties or constructor parameters in declaring type {declaringType} that match member name '{memberName}'.");
 
         public static ArgumentException DefaultTypeNotAssignableToMembers(Type declaringType, string memberName, Type defaultType, List<Member> notAssignableMembers) =>
             new ArgumentException(
                 $"The specified default type {defaultType} is not assignable to the following member(s) in declaring type {declaringType} that match the name '{memberName}':"
                     + string.Join("", notAssignableMembers.Select(m => $"{Environment.NewLine}- {m}")));
 
+        public static ArgumentException ReturnTypeOfConvertFuncNotAssignableToMembers(Type declaringType, string memberName, Type returnType, List<Member> notAssignableMembers) =>
+            new ArgumentException(
+                $"The return type, {returnType}, of the specified convert function is not assignable to the following member(s) in declaring type {declaringType} that match the name '{memberName}':"
+                    + string.Join("", notAssignableMembers.Select(m => $"{Environment.NewLine}- {m}")));
+
         public static InvalidOperationException TargetTypeRequiresConfigurationValue(IConfiguration configuration, Type targetType, Type declaringType, string memberName) =>
             new InvalidOperationException($"The {targetType.Description(declaringType, memberName)} requires the {configuration.Description()} to have a value and no children but it " +
                 $"instead has no value and children: {string.Join(", ", configuration.GetChildren().Select(c => "'" + c.Key + "'"))}.");
+
+        public static ArgumentException ReturnTypeOfMethodFromAttributeIsNotAssignableToTargetType(Type targetType, Type returnType, string convertMethodName) =>
+            new ArgumentException($"The return type, {returnType}, of the method with name '{convertMethodName}' specified in the {nameof(ConvertMethodAttribute)}, is not assignable to target type {targetType}.");
+
+        public static ArgumentException NoMethodFound(Type declaringType, string methodName) =>
+            new ArgumentException($"No static method named '{methodName}' could be found in the {declaringType} type that has a single string parameter and returns a type other than System.Object.");
 
         private static string Description(this Type targetType, Type declaringType, string memberName) =>
             declaringType == null || memberName == null

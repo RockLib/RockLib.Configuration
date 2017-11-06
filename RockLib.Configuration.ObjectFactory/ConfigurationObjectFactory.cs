@@ -154,7 +154,7 @@ namespace RockLib.Configuration.ObjectFactory
                 if (returnType != null)
                 {
                     if (!targetType.GetTypeInfo().IsAssignableFrom(returnType))
-                        throw new ArgumentException("must be able to assign returnType to targetType");
+                        throw Exceptions.ReturnTypeOfMethodFromAttributeIsNotAssignableToTargetType(targetType, returnType, convertMethodName);
                 }
             }
 
@@ -168,7 +168,7 @@ namespace RockLib.Configuration.ObjectFactory
                     m.Name == methodName
                     && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string)
                     && m.ReturnType != typeof(void) && m.ReturnType != typeof(object));
-            if (convertMethod == null) throw new ArgumentException($"No static method named '{methodName}' could be found in the {declaringType} type that has a single string parameter and returns a type other than System.Object.");
+            if (convertMethod == null) throw Exceptions.NoMethodFound(declaringType, methodName);
             returnType = convertMethod.ReturnType;
             convertFunc = value => convertMethod.Invoke(null, new object[] { value });
         }
@@ -300,8 +300,11 @@ namespace RockLib.Configuration.ObjectFactory
 
             if (defaultType != null)
             {
-                if (targetType.GetTypeInfo().IsAssignableFrom(defaultType)) return true;
-                throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
+                if (!targetType.GetTypeInfo().IsAssignableFrom(defaultType))
+                    throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
+                if (defaultType.GetTypeInfo().IsAbstract)
+                    throw Exceptions.DefaultTypeFromAttributeCannotBeAbstract(defaultType);
+                return true;
             }
 
             return false;

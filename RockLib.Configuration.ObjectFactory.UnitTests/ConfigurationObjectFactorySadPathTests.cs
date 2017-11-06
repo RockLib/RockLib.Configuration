@@ -275,6 +275,44 @@ namespace Tests
         }
 
         [Fact]
+        public void GivenAMemberDecoratedWithDefaultTypeAttributeWithAnAbstractValue_ThrowsArgumentException()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:bar", "123.45" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var actual = Assert.Throws<ArgumentException>(() => fooSection.Create<AbstractDefaultTypeForPropertyClass>());
+
+#if DEBUG
+            var expected = Exceptions.DefaultTypeFromAttributeCannotBeAbstract(typeof(AbstractClass));
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
+        [Fact]
+        public void GivenATypeDecoratedWithDefaultTypeAttributeWithAnAbstractValue_ThrowsArgumentException()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:bar", "123.45" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var actual = Assert.Throws<ArgumentException>(() => fooSection.Create<AbstractDefaultTypeForPropertyTypeClass>());
+
+#if DEBUG
+            var expected = Exceptions.DefaultTypeFromAttributeCannotBeAbstract(typeof(AbstractClassImplementingInterface));
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
+        [Fact]
         public void GivenATypeWithMultipleMembersWithTheSameNameAndDifferentDefaultTypeAttributeValues_ThrowsInvalidOperationException()
         {
             var config = new ConfigurationBuilder()
@@ -361,6 +399,44 @@ namespace Tests
 
 #if DEBUG
             var expected = Exceptions.TargetTypeRequiresConfigurationValue(fooSection.GetSection("bar"), type, classType, "Bar");
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
+        [Fact]
+        public void GivenTheReturnTypeOfTheMethodSpecifiedByAConvertMethodAttributeIsNotAssignableToTheTargetType_ThrowsArgumentException()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:qux", "123" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var actual = Assert.Throws<ArgumentException>(() => fooSection.Create<HasInvalidConvertMethodAttribute>());
+
+#if DEBUG
+            var expected = Exceptions.ReturnTypeOfMethodFromAttributeIsNotAssignableToTargetType(typeof(SomeStruct), typeof(AnotherStruct), nameof(HasInvalidConvertMethodAttribute.IllegalConvertMethod));
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
+        [Fact]
+        public void GivenNoSuitableMethodFoundForMethodSpecifiedByConvertMethodAttribute_ThrowsArgumentException()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:qux", "123" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var actual = Assert.Throws<ArgumentException>(() => fooSection.Create<HasNoMethodMatchingTheArgumentFromAConvertMethodAttribute>());
+
+#if DEBUG
+            var expected = Exceptions.NoMethodFound(typeof(HasNoMethodMatchingTheArgumentFromAConvertMethodAttribute), "ThisMethodDoesNotExist");
             Assert.Equal(expected.Message, actual.Message);
 #endif
         }
@@ -479,6 +555,49 @@ namespace Tests
         private class Bar2 : IBar
         {
             public string Baz { get; set; }
+        }
+
+        private struct SomeStruct
+        {
+            public SomeStruct(int bar) => Bar = bar;
+            public int Bar { get; }
+        }
+
+        private struct AnotherStruct
+        {
+            public AnotherStruct(int baz) => Baz = baz;
+            public int Baz { get; }
+        }
+
+        private class HasInvalidConvertMethodAttribute
+        {
+            public HasInvalidConvertMethodAttribute([ConvertMethod(nameof(IllegalConvertMethod))] SomeStruct qux) => Qux = qux;
+            public SomeStruct Qux { get; }
+            internal static AnotherStruct IllegalConvertMethod(string value) => new AnotherStruct(int.Parse(value));
+        }
+
+        private class HasNoMethodMatchingTheArgumentFromAConvertMethodAttribute
+        {
+            [ConvertMethod("ThisMethodDoesNotExist")] public SomeStruct Qux { get; set; }
+        }
+
+        private interface IInterface { }
+        private abstract class AbstractClass : IInterface { }
+
+        [DefaultType(typeof(AbstractClassImplementingInterface))]
+        private interface IInterfaceDecoratedWithAbstractDefaultType { }
+
+        private abstract class AbstractClassImplementingInterface : IInterfaceDecoratedWithAbstractDefaultType { }
+
+        private class AbstractDefaultTypeForPropertyClass
+        {
+            [DefaultType(typeof(AbstractClass))]
+            public IInterface Bar { get; set; }
+        }
+
+        private class AbstractDefaultTypeForPropertyTypeClass
+        {
+            public IInterfaceDecoratedWithAbstractDefaultType Bar { get; set; }
         }
     }
 }
