@@ -467,18 +467,16 @@ namespace RockLib.Configuration.ObjectFactory
                 if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
                 var orderedConstructors = constructors
                     .Select(ctor => new ConstructorOrderInfo(ctor, _members))
-                    .OrderByDescending(x => x.MatchedParametersRatio)
-                    .ThenByDescending(x => x.MatchedOrDefaultParametersRatio)
-                    .ThenByDescending(x => x.TotalParameters)
+                    .OrderBy(x => x)
                     .ToList();
-                if (orderedConstructors[0].HasSameSortOrderAs(orderedConstructors[1]))
+                if (orderedConstructors[0].CompareTo(orderedConstructors[1]) == 0)
                     throw Exceptions.AmbiguousConstructors(Type);
                 return orderedConstructors[0].Constructor;
             }
 
-            internal class ConstructorOrderInfo
+            internal class ConstructorOrderInfo : IComparable<ConstructorOrderInfo>
             {
-                public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> members)
+                public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers)
                 {
                     Constructor = constructor;
                     var parameters = constructor.GetParameters();
@@ -490,8 +488,8 @@ namespace RockLib.Configuration.ObjectFactory
                     }
                     else
                     {
-                        MatchedParametersRatio = parameters.Count(p => members.ContainsKey(p.Name)) / (double)TotalParameters;
-                        MatchedOrDefaultParametersRatio = parameters.Count(p => members.ContainsKey(p.Name) || p.HasDefaultValue) / (double)TotalParameters;
+                        MatchedParametersRatio = parameters.Count(p => availableMembers.ContainsKey(p.Name)) / (double)TotalParameters;
+                        MatchedOrDefaultParametersRatio = parameters.Count(p => availableMembers.ContainsKey(p.Name) || p.HasDefaultValue) / (double)TotalParameters;
                     }
                 }
 
@@ -500,10 +498,16 @@ namespace RockLib.Configuration.ObjectFactory
                 public double MatchedOrDefaultParametersRatio { get; }
                 public int TotalParameters { get; }
 
-                public bool HasSameSortOrderAs(ConstructorOrderInfo other) =>
-                    MatchedParametersRatio == other.MatchedParametersRatio
-                        && MatchedOrDefaultParametersRatio == other.MatchedOrDefaultParametersRatio
-                        && TotalParameters == other.TotalParameters;
+                public int CompareTo(ConstructorOrderInfo other)
+                {
+                    if (MatchedParametersRatio > other.MatchedParametersRatio) return -1;
+                    if (MatchedParametersRatio < other.MatchedParametersRatio) return 1;
+                    if (MatchedOrDefaultParametersRatio > other.MatchedOrDefaultParametersRatio) return -1;
+                    if (MatchedOrDefaultParametersRatio < other.MatchedOrDefaultParametersRatio) return 1;
+                    if (TotalParameters > other.TotalParameters) return -1;
+                    if (TotalParameters < other.TotalParameters) return 1;
+                    return 0;
+                }
             }
 
             private object[] GetArgs(ConstructorInfo constructor, IValueConverters valueConverters, IDefaultTypes defaultTypes)

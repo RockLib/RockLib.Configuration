@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿#if DEBUG
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace Tests
         [InlineData(typeof(OneParameterOneOptionalParameter), 1, "bar", "baz")]
         [InlineData(typeof(OneParameterOneOptionalParameter), 1, "bar")]
         [InlineData(typeof(OneParameterOneOptionalParameter), 0.5)]
-        public void MatchedOrDefaultParametersRatioIsCorrect(Type type, double expectedMatchedParametersRatio, params string[] resolvableMemberNames)
+        public void MatchedOrDefaultParametersRatioIsCorrect(Type type, double expectedMatchedOrDefaultParametersRatio, params string[] resolvableMemberNames)
         {
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
@@ -65,12 +66,37 @@ namespace Tests
             var orderInfo = new ConstructorOrderInfo(constructor, members);
 
             Assert.Same(constructor, orderInfo.Constructor);
-            Assert.Equal(expectedMatchedParametersRatio, orderInfo.MatchedOrDefaultParametersRatio);
+            Assert.Equal(expectedMatchedOrDefaultParametersRatio, orderInfo.MatchedOrDefaultParametersRatio);
         }
 
-        private class DefaultConstructor {}
-        private class OneParameter { public OneParameter(int bar) {} }
-        private class TwoParameters { public TwoParameters(int bar, int baz) {} }
-        private class OneParameterOneOptionalParameter { public OneParameterOneOptionalParameter(int bar, int baz = -1) {} }
+        [Theory]
+        [InlineData(typeof(OneParameter), typeof(TwoParameters), -1, "bar")]
+        [InlineData(typeof(TwoParameters), typeof(OneParameter), 1, "bar")]
+        [InlineData(typeof(TwoParameters), typeof(OneParameterOneOptionalParameter), 1, "bar")]
+        [InlineData(typeof(OneParameterOneOptionalParameter), typeof(TwoParameters), -1, "bar")]
+        [InlineData(typeof(OneParameter), typeof(TwoParameters), 1, "bar", "baz")]
+        [InlineData(typeof(TwoParameters), typeof(OneParameter), -1, "bar", "baz")]
+        [InlineData(typeof(TwoParameters), typeof(OneParameterOneOptionalParameter), 0, "bar", "baz")]
+        [InlineData(typeof(OneParameterOneOptionalParameter), typeof(TwoParameters), 0, "bar", "baz")]
+        public void CompareToReturnsTheCorrectValue(Type lhsConstructorType, Type rhsConstructorType, int expectedComparisonValue, params string[] resolvableMemberNames)
+        {
+            var lhsConstructor = lhsConstructorType.GetTypeInfo().GetConstructors()[0];
+            var rhsConstructor = rhsConstructorType.GetTypeInfo().GetConstructors()[0];
+
+            var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
+
+            var lhs = new ConstructorOrderInfo(lhsConstructor, members);
+            var rhs = new ConstructorOrderInfo(rhsConstructor, members);
+
+            var actual = lhs.CompareTo(rhs);
+
+            Assert.Equal(expectedComparisonValue, actual);
+        }
+
+        private class DefaultConstructor { }
+        private class OneParameter { public OneParameter(int bar) { } }
+        private class TwoParameters { public TwoParameters(int bar, int baz) { } }
+        private class OneParameterOneOptionalParameter { public OneParameterOneOptionalParameter(int bar, int baz = -1) { } }
     }
 }
+#endif
