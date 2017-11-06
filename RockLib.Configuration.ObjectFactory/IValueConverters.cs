@@ -21,7 +21,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// <returns>
         /// True, if a converter was found for the member. Otherwise, false if a converter could not be found.
         /// </returns>
-        bool TryGet(Type declaringType, string memberName, out Func<string, object> converter);
+        bool TryGet(Type declaringType, string memberName, out Func<string, object> convertFunc);
 
         /// <summary>
         /// Attempt to get a convert function for a specified target type.
@@ -34,6 +34,6 @@ namespace RockLib.Configuration.ObjectFactory
         /// <returns>
         /// True, if a converter was found for the member. Otherwise, false if a converter could not be found.
         /// </returns>
-        bool TryGet(Type targetType, out Func<string, object> converter);
+        bool TryGet(Type targetType, out Func<string, object> convertFunc);
     }
 }

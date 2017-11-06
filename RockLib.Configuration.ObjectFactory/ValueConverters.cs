@@ -18,8 +18,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// Configures a converter for the member (property or constructor parameter) specified by the
         /// provided declaring type and member name. Use this method when you need different members of
         /// a target type to each use a different converter. If you want all members of a target type to
-        /// use the same converter, use one of the other <see cref="Add(Type, Type)"/> or
-        /// <see cref="Add{T}(Type, Func{string, T})"/> methods.
+        /// use the same converter, use the other <see cref="Add{T}(Type, Func{string, T})"/> method.
         /// </summary>
         /// <param name="declaringType">The declaring type of a member that needs a converter.</param>
         /// <param name="memberName">The name of a member that needs a converter.</param>
@@ -42,12 +41,11 @@ namespace RockLib.Configuration.ObjectFactory
         /// <summary>
         /// Configures a converter for the specified target type. Use this method when you want all
         /// members (properties or constructor parameters) of the target type to use the same converter.
-        /// If you need different members of a target type to each use a different converter, use one of
-        /// the other <see cref="Add{T}(Type, string, Func{string, T})"/> or
-        /// <see cref="Add(Type, string, Type)"/> methods.
+        /// If you need different members of a target type to each use a different converter, use
+        /// the other <see cref="Add{T}(Type, string, Func{string, T})"/> method.
         /// </summary>
         /// <param name="targetType">A type that needs a default type.</param>
-        /// <param name="defaultType">The default type for the specified target type.</param>
+        /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
         /// <returns>This instance of <see cref="DefaultTypes"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="targetType"/> or <paramref name="convertFunc"/> is null.
