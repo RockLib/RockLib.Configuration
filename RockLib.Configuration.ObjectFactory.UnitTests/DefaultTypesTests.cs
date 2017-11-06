@@ -1,6 +1,7 @@
 ﻿using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Tests
@@ -14,21 +15,41 @@ namespace Tests
             // different properties of the same type to be have different default types.
 
             // Call the Add method for each default type that needs to be registered.
-            var defaultTypes = new DefaultTypes();
-            defaultTypes.Add(typeof(Foo), "bar", typeof(Bar));
-            defaultTypes.Add(typeof(Foo), "baz", typeof(Baz));
+            var first = new DefaultTypes();
+            first.Add(typeof(Foo), "bar", typeof(Bar));
+            first.Add(typeof(Foo), "baz", typeof(Baz));
 
             // The Add method returns 'this', so you can chain them together:
-            defaultTypes = new DefaultTypes()
+            var second = new DefaultTypes()
                 .Add(typeof(Foo), "bar", typeof(Bar))
                 .Add(typeof(Foo), "baz", typeof(Baz));
 
             // List initialization syntax works also.
-            defaultTypes = new DefaultTypes
+            var third = new DefaultTypes
             {
                 { typeof(Foo), "bar", typeof(Bar) },
                 { typeof(Foo), "baz", typeof(Baz) }
             };
+
+            // All three instances represent the same thing. Verify that their
+            // contents are the same.
+
+            // DefaultTypes implements IEnumerable<KeyValuePair<string, Type>>
+            var firstList = first.ToList();
+            var secondList = second.ToList();
+            var thirdList = third.ToList();
+
+            Assert.Equal(firstList.Count, secondList.Count);
+            Assert.Equal(secondList.Count, thirdList.Count);
+
+            for (int i = 0; i < firstList.Count; i++)
+            {
+                Assert.Equal(firstList[i].Key, secondList[i].Key);
+                Assert.Equal(firstList[i].Value, secondList[i].Value);
+
+                Assert.Equal(secondList[i].Key, thirdList[i].Key);
+                Assert.Equal(secondList[i].Value, thirdList[i].Value);
+            }
         }
 
         [Fact]
@@ -38,21 +59,41 @@ namespace Tests
             // target type to have the same default type.
 
             // Call the Add method for each default type that needs to be registered.
-            var defaultTypes = new DefaultTypes();
-            defaultTypes.Add(typeof(IBar), typeof(Bar));
-            defaultTypes.Add(typeof(IBaz), typeof(Baz));
+            var first = new DefaultTypes();
+            first.Add(typeof(IBar), typeof(Bar));
+            first.Add(typeof(IBaz), typeof(Baz));
 
             // The Add method returns 'this', so you can chain them together:
-            defaultTypes = new DefaultTypes()
+            var second = new DefaultTypes()
                 .Add(typeof(IBar), typeof(Bar))
                 .Add(typeof(IBaz), typeof(Baz));
 
             // List initialization syntax works also.
-            defaultTypes = new DefaultTypes
+            var third = new DefaultTypes
             {
                 { typeof(IBar), typeof(Bar) },
                 { typeof(IBaz), typeof(Baz) }
             };
+
+            // All three instances represent the same thing. Verify that their
+            // contents are the same.
+
+            // DefaultTypes implements IEnumerable<KeyValuePair<string, Type>>
+            var firstList = first.ToList();
+            var secondList = second.ToList();
+            var thirdList = third.ToList();
+
+            Assert.Equal(firstList.Count, secondList.Count);
+            Assert.Equal(secondList.Count, thirdList.Count);
+
+            for (int i = 0; i < firstList.Count; i++)
+            {
+                Assert.Equal(firstList[i].Key, secondList[i].Key);
+                Assert.Equal(firstList[i].Value, secondList[i].Value);
+
+                Assert.Equal(secondList[i].Key, thirdList[i].Key);
+                Assert.Equal(secondList[i].Value, thirdList[i].Value);
+            }
         }
 
         [Fact]

@@ -1,5 +1,6 @@
 ﻿using RockLib.Configuration.ObjectFactory;
 using System;
+using System.Linq;
 using Xunit;
 
 namespace Tests
@@ -13,21 +14,41 @@ namespace Tests
             // different properties of the same type to use different converters.
 
             // Call the Add method for each converter that needs to be registered.
-            var valueConverters = new ValueConverters();
-            valueConverters.Add(typeof(Foo), "bar", value => new Bar(int.Parse(value)));
-            valueConverters.Add(typeof(Foo), "baz", ParseBaz);
+            var first = new ValueConverters();
+            first.Add(typeof(Foo), "bar", value => new Bar(int.Parse(value)));
+            first.Add(typeof(Foo), "baz", ParseBaz);
 
             // The Add method returns 'this', so you can chain them together:
-            valueConverters = new ValueConverters()
+            var second = new ValueConverters()
                 .Add(typeof(Foo), "bar", value => new Bar(int.Parse(value)))
                 .Add(typeof(Foo), "baz", ParseBaz);
 
             // List initialization syntax works also.
-            valueConverters = new ValueConverters
+            var third = new ValueConverters
             {
                 { typeof(Foo), "bar", value => new Bar(int.Parse(value)) },
                 { typeof(Foo), "baz", ParseBaz }
             };
+
+            // All three instances represent the same thing. Verify that their
+            // contents are the same.
+
+            // ValueConverters implements IEnumerable<KeyValuePair<string, Type>>
+            var firstList = first.ToList();
+            var secondList = second.ToList();
+            var thirdList = third.ToList();
+
+            Assert.Equal(firstList.Count, secondList.Count);
+            Assert.Equal(secondList.Count, thirdList.Count);
+
+            for (int i = 0; i < firstList.Count; i++)
+            {
+                Assert.Equal(firstList[i].Key, secondList[i].Key);
+                Assert.Equal(firstList[i].Value, secondList[i].Value);
+
+                Assert.Equal(secondList[i].Key, thirdList[i].Key);
+                Assert.Equal(secondList[i].Value, thirdList[i].Value);
+            }
         }
 
         [Fact]
@@ -37,21 +58,41 @@ namespace Tests
             // target type to use the same converter.
 
             // Call the Add method for each converter that needs to be registered.
-            var valueConverters = new ValueConverters();
-            valueConverters.Add(typeof(Bar), value => new Bar(int.Parse(value)));
-            valueConverters.Add(typeof(Baz), ParseBaz);
+            var first = new ValueConverters();
+            first.Add(typeof(Bar), value => new Bar(int.Parse(value)));
+            first.Add(typeof(Baz), ParseBaz);
 
             // The Add method returns 'this', so you can chain them together:
-            valueConverters = new ValueConverters()
+            var second = new ValueConverters()
                 .Add(typeof(Bar), value => new Bar(int.Parse(value)))
                 .Add(typeof(Baz), ParseBaz);
 
             // List initialization syntax works also.
-            valueConverters = new ValueConverters
+            var third = new ValueConverters
             {
                 { typeof(Bar), value => new Bar(int.Parse(value)) },
                 { typeof(Baz), ParseBaz }
             };
+
+            // All three instances represent the same thing. Verify that their
+            // contents are the same.
+
+            // ValueConverters implements IEnumerable<KeyValuePair<string, Type>>
+            var firstList = first.ToList();
+            var secondList = second.ToList();
+            var thirdList = third.ToList();
+
+            Assert.Equal(firstList.Count, secondList.Count);
+            Assert.Equal(secondList.Count, thirdList.Count);
+
+            for (int i = 0; i < firstList.Count; i++)
+            {
+                Assert.Equal(firstList[i].Key, secondList[i].Key);
+                Assert.Equal(firstList[i].Value, secondList[i].Value);
+
+                Assert.Equal(secondList[i].Key, thirdList[i].Key);
+                Assert.Equal(secondList[i].Value, thirdList[i].Value);
+            }
         }
 
         [Fact]
