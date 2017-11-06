@@ -6,11 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RockLib.Configuration" Version="0.0.1-alpha03" />
+    <PackageReference Include="RockLib.Configuration" Version="0.0.1-alpha04" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="rocklib.config.json">
+    <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
