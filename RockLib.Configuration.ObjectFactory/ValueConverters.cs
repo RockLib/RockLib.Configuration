@@ -10,7 +10,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// A container for functions that are used to convert a configuration string value to a
     /// target type.
     /// </summary>
-    public class ValueConverters : IValueConverters, IEnumerable<KeyValuePair<string, Type>>
+    public sealed class ValueConverters : IValueConverters, IEnumerable<KeyValuePair<string, Type>>
     {
         private readonly Dictionary<string, ValueConverter> _converters = new Dictionary<string, ValueConverter>(StringComparer.OrdinalIgnoreCase);
 
