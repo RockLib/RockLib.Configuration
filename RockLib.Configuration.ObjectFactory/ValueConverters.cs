@@ -100,9 +100,12 @@ namespace RockLib.Configuration.ObjectFactory
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
-            if (matchingMembers.Count == 0) throw Exceptions.NoMatchingMembers(declaringType, memberName);
+            if (matchingMembers.Count == 0)
+                throw Exceptions.NoMatchingMembers(declaringType, memberName);
+
             var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(returnType)).ToList();
-            if (notAssignableMembers.Count > 0) throw Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(declaringType, memberName, returnType, notAssignableMembers);
+            if (notAssignableMembers.Count > 0)
+                throw Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(declaringType, memberName, returnType, notAssignableMembers);
 
             _converters.Add(GetKey(declaringType, memberName), new ValueConverter(returnType, convertFunc));
             return this;

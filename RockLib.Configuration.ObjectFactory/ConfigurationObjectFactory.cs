@@ -100,11 +100,16 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (IsValueSection(configuration, out IConfigurationSection valueSection)) return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsTypeSpecifiedObject(configuration)) return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (targetType.IsArray) return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsList(targetType)) return BuildList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsStringDictionary(targetType)) return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsValueSection(configuration, out IConfigurationSection valueSection))
+                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsTypeSpecifiedObject(configuration))
+                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (targetType.IsArray)
+                return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsList(targetType))
+                return BuildList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsStringDictionary(targetType))
+                return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
         }
 
@@ -123,11 +128,13 @@ namespace RockLib.Configuration.ObjectFactory
             var convert = GetConvertFunc(targetType, declaringType, memberName, valueConverters);
             if (convert != null)
                 return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
-            if (targetType == typeof(Encoding)) return Encoding.GetEncoding(valueSection.Value);
+            if (targetType == typeof(Encoding))
+                return Encoding.GetEncoding(valueSection.Value);
             var typeConverter = TypeDescriptor.GetConverter(targetType);
             if (typeConverter.CanConvertFrom(typeof(string)))
                 return typeConverter.ConvertFromInvariantString(valueSection.Value);
-            if (valueSection.Value == "") return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
+            if (valueSection.Value == "")
+                return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
             throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
         }
 
@@ -168,7 +175,8 @@ namespace RockLib.Configuration.ObjectFactory
                     m.Name == methodName
                     && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string)
                     && m.ReturnType != typeof(void) && m.ReturnType != typeof(object));
-            if (convertMethod == null) throw Exceptions.NoMethodFound(declaringType, methodName);
+            if (convertMethod == null)
+                throw Exceptions.NoMethodFound(declaringType, methodName);
             returnType = convertMethod.ReturnType;
             convertFunc = value => convertMethod.Invoke(null, new object[] { value });
         }
@@ -237,7 +245,8 @@ namespace RockLib.Configuration.ObjectFactory
         {
             int i = 0;
             foreach (var child in configuration.GetChildren())
-                if (child.Key != i++.ToString()) return false;
+                if (child.Key != i++.ToString())
+                    return false;
             return includeEmptyList || i > 0;
         }
 
@@ -263,10 +272,14 @@ namespace RockLib.Configuration.ObjectFactory
                 targetType = defaultType;
             if (IsSimpleType(targetType, declaringType, memberName, valueConverters))
                 throw Exceptions.TargetTypeRequiresConfigurationValue(configuration, targetType, declaringType, memberName);
-            if (targetType.GetTypeInfo().IsAbstract) throw Exceptions.CannotCreateAbstractType(configuration, targetType);
-            if (targetType == typeof(object)) throw Exceptions.CannotCreateObjectType;
-            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType)) throw Exceptions.UnsupportedCollectionType(targetType);
-            if (IsList(configuration, includeEmptyList: false)) throw Exceptions.ConfigurationIsAList(configuration, targetType);
+            if (targetType.GetTypeInfo().IsAbstract)
+                throw Exceptions.CannotCreateAbstractType(configuration, targetType);
+            if (targetType == typeof(object))
+                throw Exceptions.CannotCreateObjectType;
+            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType))
+                throw Exceptions.UnsupportedCollectionType(targetType);
+            if (IsList(configuration, includeEmptyList: false))
+                throw Exceptions.ConfigurationIsAList(configuration, targetType);
             return new ObjectBuilder(targetType, configuration).Build(valueConverters, defaultTypes);
         }
 
@@ -495,7 +508,8 @@ namespace RockLib.Configuration.ObjectFactory
                             _members.Remove(parameters[i].Name);
                         }
                     }
-                    else if (parameters[i].HasDefaultValue) args[i] = parameters[i].DefaultValue;
+                    else if (parameters[i].HasDefaultValue)
+                        args[i] = parameters[i].DefaultValue;
                 }
                 return args;
             }

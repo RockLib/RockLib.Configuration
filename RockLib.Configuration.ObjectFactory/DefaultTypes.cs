@@ -37,13 +37,17 @@ namespace RockLib.Configuration.ObjectFactory
             if (memberName == null) throw new ArgumentNullException(nameof(memberName));
             if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
 
-            if (defaultType.GetTypeInfo().IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
+            if (defaultType.GetTypeInfo().IsAbstract)
+                throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
-            if (matchingMembers.Count == 0) throw Exceptions.NoMatchingMembers(declaringType, memberName);
+            if (matchingMembers.Count == 0)
+                throw Exceptions.NoMatchingMembers(declaringType, memberName);
+
             var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(defaultType)).ToList();
-            if (notAssignableMembers.Count > 0) throw Exceptions.DefaultTypeNotAssignableToMembers(declaringType, memberName, defaultType, notAssignableMembers);
+            if (notAssignableMembers.Count > 0)
+                throw Exceptions.DefaultTypeNotAssignableToMembers(declaringType, memberName, defaultType, notAssignableMembers);
 
             _dictionary.Add(GetKey(declaringType, memberName), defaultType);
             return this;
