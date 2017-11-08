@@ -399,7 +399,7 @@ namespace RockLib.Configuration.ObjectFactory
             typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType))
                 .GetTypeInfo().GetMethod("Add");
 
-        internal class ObjectBuilder
+        private class ObjectBuilder
         {
             private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(StringComparer.OrdinalIgnoreCase);
 
@@ -475,42 +475,6 @@ namespace RockLib.Configuration.ObjectFactory
                 if (orderedConstructors[0].CompareTo(orderedConstructors[1]) == 0)
                     throw Exceptions.AmbiguousConstructors(Type);
                 return orderedConstructors[0].Constructor;
-            }
-
-            internal class ConstructorOrderInfo : IComparable<ConstructorOrderInfo>
-            {
-                public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers)
-                {
-                    Constructor = constructor;
-                    var parameters = constructor.GetParameters();
-                    TotalParameters = parameters.Length;
-                    if (TotalParameters == 0)
-                    {
-                        MatchedParametersRatio = 1;
-                        MatchedOrDefaultParametersRatio = 1;
-                    }
-                    else
-                    {
-                        MatchedParametersRatio = parameters.Count(p => availableMembers.ContainsKey(p.Name)) / (double)TotalParameters;
-                        MatchedOrDefaultParametersRatio = parameters.Count(p => availableMembers.ContainsKey(p.Name) || p.HasDefaultValue) / (double)TotalParameters;
-                    }
-                }
-
-                public ConstructorInfo Constructor { get; }
-                public double MatchedParametersRatio { get; }
-                public double MatchedOrDefaultParametersRatio { get; }
-                public int TotalParameters { get; }
-
-                public int CompareTo(ConstructorOrderInfo other)
-                {
-                    if (MatchedParametersRatio > other.MatchedParametersRatio) return -1;
-                    if (MatchedParametersRatio < other.MatchedParametersRatio) return 1;
-                    if (MatchedOrDefaultParametersRatio > other.MatchedOrDefaultParametersRatio) return -1;
-                    if (MatchedOrDefaultParametersRatio < other.MatchedOrDefaultParametersRatio) return 1;
-                    if (TotalParameters > other.TotalParameters) return -1;
-                    if (TotalParameters < other.TotalParameters) return 1;
-                    return 0;
-                }
             }
 
             private object[] GetArgs(ConstructorInfo constructor, IValueConverters valueConverters, IDefaultTypes defaultTypes)

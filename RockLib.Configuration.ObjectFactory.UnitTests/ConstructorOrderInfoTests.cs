@@ -1,11 +1,11 @@
 ﻿#if DEBUG
 using Microsoft.Extensions.Configuration;
+using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Xunit;
-using static RockLib.Configuration.ObjectFactory.ConfigurationObjectFactory.ObjectBuilder;
 
 namespace Tests
 {
