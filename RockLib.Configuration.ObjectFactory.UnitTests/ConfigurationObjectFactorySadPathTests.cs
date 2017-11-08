@@ -3,6 +3,7 @@ using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Xunit;
 
@@ -441,6 +442,28 @@ namespace Tests
 #endif
         }
 
+        [Fact]
+        public void GivenTheBestMatchingConstructorHasParametersNotMappedToAConfigurationChild_ThrowsArgumentException()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "123" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<TwoArgConstructor>());
+
+#if DEBUG
+            var constructorOrderInfo = new ConstructorOrderInfo(
+                typeof(TwoArgConstructor).GetTypeInfo().GetConstructors()[0],
+                new Dictionary<string, IConfigurationSection> { { "bar", null } });
+            var expected = Exceptions.MissingRequiredConstructorParameters(fooSection, constructorOrderInfo);
+            Assert.Equal(expected.Message, actual.Message);
+#endif
+        }
+
         private class EmptyClass { }
 
         private class SimplePropertyClass
@@ -598,6 +621,11 @@ namespace Tests
         private class AbstractDefaultTypeForPropertyTypeClass
         {
             public IInterfaceDecoratedWithAbstractDefaultType Bar { get; set; }
+        }
+
+        private class TwoArgConstructor
+        {
+            public TwoArgConstructor(int bar, int baz) {}
         }
     }
 }

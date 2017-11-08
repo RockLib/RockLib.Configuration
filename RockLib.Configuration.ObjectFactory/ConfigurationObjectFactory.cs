@@ -406,11 +406,13 @@ namespace RockLib.Configuration.ObjectFactory
             public ObjectBuilder(Type type, IConfiguration configuration)
             {
                 Type = type;
+                Configuration = configuration;
                 foreach (var childSection in configuration.GetChildren())
                     _members.Add(childSection.Key, childSection);
             }
 
             public Type Type { get; }
+            public IConfiguration Configuration { get; }
 
             public object Build(IValueConverters valueConverters, IDefaultTypes defaultTypes)
             {
@@ -466,14 +468,15 @@ namespace RockLib.Configuration.ObjectFactory
             private ConstructorInfo GetConstructor()
             {
                 var constructors = Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-                if (constructors.Length == 1) return constructors[0];
                 if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
                 var orderedConstructors = constructors
                     .Select(ctor => new ConstructorOrderInfo(ctor, _members))
                     .OrderBy(x => x)
                     .ToList();
-                if (orderedConstructors[0].CompareTo(orderedConstructors[1]) == 0)
+                if (orderedConstructors.Count > 1 && orderedConstructors[0].CompareTo(orderedConstructors[1]) == 0)
                     throw Exceptions.AmbiguousConstructors(Type);
+                if (orderedConstructors[0].MatchedOrDefaultParametersRatio < 1)
+                    throw Exceptions.MissingRequiredConstructorParameters(Configuration, orderedConstructors[0]);
                 return orderedConstructors[0].Constructor;
             }
 

@@ -17,11 +17,13 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 MatchedParametersRatio = 1;
                 MatchedOrDefaultParametersRatio = 1;
+                MissingParameterNames = Enumerable.Empty<string>();
             }
             else
             {
                 MatchedParametersRatio = parameters.Count(p => availableMembers.ContainsKey(p.Name)) / (double)TotalParameters;
                 MatchedOrDefaultParametersRatio = parameters.Count(p => availableMembers.ContainsKey(p.Name) || p.HasDefaultValue) / (double)TotalParameters;
+                MissingParameterNames = parameters.Where(p => !availableMembers.ContainsKey(p.Name) && !p.HasDefaultValue).Select(p => p.Name);
             }
         }
 
@@ -29,6 +31,7 @@ namespace RockLib.Configuration.ObjectFactory
         public double MatchedParametersRatio { get; }
         public double MatchedOrDefaultParametersRatio { get; }
         public int TotalParameters { get; }
+        public IEnumerable<string> MissingParameterNames { get; }
 
         public int CompareTo(ConstructorOrderInfo other)
         {

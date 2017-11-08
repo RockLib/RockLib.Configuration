@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace RockLib.Configuration.ObjectFactory
 {
@@ -82,6 +84,9 @@ namespace RockLib.Configuration.ObjectFactory
         public static ArgumentException NoMethodFound(Type declaringType, string methodName) =>
             new ArgumentException($"No static method named '{methodName}' could be found in the {declaringType} type that has a single string parameter and returns a type other than System.Object.");
 
+        public static InvalidOperationException MissingRequiredConstructorParameters(IConfiguration configuration, ConstructorOrderInfo constructorOrderInfo) =>
+            new InvalidOperationException($"The best matching constructor - `{constructorOrderInfo.Constructor.Format()}` - is missing the {constructorOrderInfo.MissingParameterNames.Format()} from {configuration.Description()}.");
+
         private static string Description(this Type targetType, Type declaringType, string memberName) =>
             declaringType == null || memberName == null
             ? $"target type '{targetType}'"
@@ -91,5 +96,24 @@ namespace RockLib.Configuration.ObjectFactory
             configuration is IConfigurationSection section ? section.Description() : "configuration";
 
         private static string Description(this IConfigurationSection section) => $"section '{section.Key}' at path '{section.Path}'";
+
+        private static string Format(this ConstructorInfo constructor) =>
+            constructor.ToString().Replace("Void .ctor", constructor.DeclaringType.ToString());
+
+        private static string Format(this IEnumerable<string> parameterNames)
+        {
+            var list = parameterNames.ToList();
+            if (list.Count == 1) return $"'{list[0]}' parameter";
+            if (list.Count == 2) return $"'{list[0]}' and '{list[1]}' parameters";
+            var sb = new StringBuilder();
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (i == list.Count - 1) sb.Append($"'{list[i]}'");
+                else if (i == list.Count - 2) sb.Append($"'{list[i]}', and ");
+                else sb.Append($"'{list[i]}', ");
+            }
+            sb.Append(" parameters");
+            return sb.ToString();
+        }
     }
 }
