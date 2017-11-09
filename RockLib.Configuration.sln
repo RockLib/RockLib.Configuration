@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration", "RockLib.Configuration\RockLib.Configuration.csproj", "{33869C6F-C539-4FC7-89A6-114BFA3B05D8}"
 EndProject
@@ -18,6 +18,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.AppConfigTests", "RockLib.Configuration.AppConfigTests\RockLib.Configuration.AppConfigTests.csproj", "{CC13FE1F-8A8F-4FFC-BF56-315295BAE7BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AppSettingsConfigTests", "RockLib.Configuration.AppSettingsConfigTests\RockLib.Configuration.AppSettingsConfigTests.csproj", "{B256C4B7-00A4-4FB5-9820-96DDF5F16E30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory", "RockLib.Configuration.ObjectFactory\RockLib.Configuration.ObjectFactory.csproj", "{1A866445-42C8-4A9B-82C5-D3B34EBF9147}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory.UnitTests", "RockLib.Configuration.ObjectFactory.UnitTests\RockLib.Configuration.ObjectFactory.UnitTests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +61,14 @@ Global
 		{B256C4B7-00A4-4FB5-9820-96DDF5F16E30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B256C4B7-00A4-4FB5-9820-96DDF5F16E30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B256C4B7-00A4-4FB5-9820-96DDF5F16E30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A866445-42C8-4A9B-82C5-D3B34EBF9147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A866445-42C8-4A9B-82C5-D3B34EBF9147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A866445-42C8-4A9B-82C5-D3B34EBF9147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A866445-42C8-4A9B-82C5-D3B34EBF9147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9DA180C2-E6BD-42E3-B157-D3164F6F269F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9DA180C2-E6BD-42E3-B157-D3164F6F269F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9DA180C2-E6BD-42E3-B157-D3164F6F269F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9DA180C2-E6BD-42E3-B157-D3164F6F269F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
