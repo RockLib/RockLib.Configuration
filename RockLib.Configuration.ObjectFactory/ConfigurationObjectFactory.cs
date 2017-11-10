@@ -113,6 +113,12 @@ namespace RockLib.Configuration.ObjectFactory
             return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
         }
 
+        private static bool IsValueSection(IConfiguration configuration)
+        {
+            var valueSection = configuration as IConfigurationSection;
+            return valueSection?.Value != null;
+        }
+
         private static bool IsValueSection(IConfiguration configuration, out IConfigurationSection valueSection)
         {
             valueSection = configuration as IConfigurationSection;
