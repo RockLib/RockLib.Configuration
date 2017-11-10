@@ -216,13 +216,24 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
             if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
+
             var elementType = targetType.GetElementType();
-            var items = configuration.GetChildren().Select(child => child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes)).ToList();
-            var array = Array.CreateInstance(elementType, items.Count);
-            for (int i = 0; i < array.Length; i++)
-                array.SetValue(items[i], i);
+            Array array;
+            if (IsValueSection(configuration) || !IsList(configuration))
+            {
+                var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes);
+                array = Array.CreateInstance(elementType, 1);
+                array.SetValue(item, 0);
+            }
+            else
+            {
+                var items = configuration.GetChildren().Select(child =>
+                    child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes)).ToList();
+                array = Array.CreateInstance(elementType, items.Count);
+                for (int i = 0; i < array.Length; i++)
+                    array.SetValue(items[i], i);
+            }
             return array;
         }
 
