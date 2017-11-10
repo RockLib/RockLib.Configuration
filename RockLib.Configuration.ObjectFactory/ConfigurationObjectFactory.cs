@@ -100,14 +100,14 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (IsValueSection(configuration, out IConfigurationSection valueSection))
-                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsTypeSpecifiedObject(configuration))
-                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (targetType.IsArray)
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsList(targetType))
                 return BuildList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsValueSection(configuration, out IConfigurationSection valueSection))
+                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsTypeSpecifiedObject(configuration))
+                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsStringDictionary(targetType))
                 return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
