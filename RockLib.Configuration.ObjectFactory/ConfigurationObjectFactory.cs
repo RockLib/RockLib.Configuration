@@ -248,13 +248,15 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
             var addMethod = GetListAddMethod(tType);
             var list = Activator.CreateInstance(listType);
-            foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
-                addMethod.Invoke(list, new object[] { item });
+            if (IsValueSection(configuration) || !IsList(configuration))
+                addMethod.Invoke(list, new[] {configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes)});
+            else
+                foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
+                    addMethod.Invoke(list, new[] {item});
             return list;
         }
 
