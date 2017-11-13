@@ -11,6 +11,9 @@ namespace RockLib.Configuration.ProxyFactory
 {
     public static class ConfigurationProxyFactory
     {
+        private const TypeAttributes _typeAttributes = TypeAttributes.NotPublic | TypeAttributes.Class | TypeAttributes.AutoClass | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.AutoLayout;
+        private const MethodAttributes _methodAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual;
+
         private static readonly ConcurrentDictionary<Type, Type> _proxyCache = new ConcurrentDictionary<Type, Type>();
 
         public static T CreateProxy<T>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
@@ -27,33 +30,20 @@ namespace RockLib.Configuration.ProxyFactory
         private static Type CreateProxyType(Type type)
         {
             ValidateType(type);
-            const TypeAttributes classTypeAttributes =
-                TypeAttributes.NotPublic | TypeAttributes.Class | TypeAttributes.AutoClass
-                | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.AutoLayout;
+            var typeBuilder = GetTypeBuilder(type);
 
-            var name = "<" + type.Name + ">__RockLibConfigurationProxy";
-            var interfaces = new[] { type };
-
-            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
-                new AssemblyName("<" + name + ">__RockLibConfigurationDynamicAssembly"), AssemblyBuilderAccess.Run);
-
-            var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
-
-            var typeBuilder = moduleBuilder.DefineType(name, classTypeAttributes, typeof(object), interfaces);
-
-            var readonlyFields = new List<Tuple<string, FieldBuilder>>();
+            var readonlyFields = new List<(FieldBuilder FieldBuilder, string PropertyName)>();
 
             foreach (var property in type.GetTypeInfo().GetProperties())
             {
-                const MethodAttributes methodAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.Virtual;
                 var backingFieldName = "<" + property.Name + ">k__BackingField";
 
                 if (property.CanWrite)
                 {
                     var fieldBuilder = typeBuilder.DefineField(backingFieldName, property.PropertyType, FieldAttributes.Private);
                     var propertyBuilder = typeBuilder.DefineProperty(property.Name, PropertyAttributes.HasDefault, property.PropertyType, null);
-                    var getMethodBuilder = GetGetMethodBuilder(property.Name, property.PropertyType, typeBuilder, methodAttributes, fieldBuilder);
-                    var setMethodBuilder = GetSetMethodBuilder(property.Name, property.PropertyType, typeBuilder, methodAttributes, fieldBuilder);
+                    var getMethodBuilder = GetGetMethodBuilder(property.Name, property.PropertyType, typeBuilder, fieldBuilder);
+                    var setMethodBuilder = GetSetMethodBuilder(property.Name, property.PropertyType, typeBuilder, fieldBuilder);
                     propertyBuilder.SetGetMethod(getMethodBuilder);
                     propertyBuilder.SetSetMethod(setMethodBuilder);
                 }
@@ -61,20 +51,21 @@ namespace RockLib.Configuration.ProxyFactory
                 {
                     var fieldBuilder = typeBuilder.DefineField(backingFieldName, property.PropertyType, FieldAttributes.Private | FieldAttributes.InitOnly);
                     var propertyBuilder = typeBuilder.DefineProperty(property.Name, PropertyAttributes.None, property.PropertyType, null);
-                    var getMethodBuilder = GetGetMethodBuilder(property.Name, property.PropertyType, typeBuilder, methodAttributes, fieldBuilder);
+                    var getMethodBuilder = GetGetMethodBuilder(property.Name, property.PropertyType, typeBuilder, fieldBuilder);
                     propertyBuilder.SetGetMethod(getMethodBuilder);
-                    readonlyFields.Add(Tuple.Create(property.Name, fieldBuilder));
+                    readonlyFields.Add((fieldBuilder, property.Name));
                 }
             }
 
-            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, readonlyFields.Select(f => f.Item2.FieldType).ToArray());
+            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard,
+                readonlyFields.Select(f => f.FieldBuilder.FieldType).ToArray());
             var il = constructorBuilder.GetILGenerator();
             for (int i = 0; i < readonlyFields.Count; i++)
             {
-                constructorBuilder.DefineParameter(i + 1, ParameterAttributes.None, readonlyFields[i].Item1);
+                constructorBuilder.DefineParameter(i + 1, ParameterAttributes.None, readonlyFields[i].PropertyName);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldarg, i + 1);
-                il.Emit(OpCodes.Stfld, readonlyFields[i].Item2);
+                il.Emit(OpCodes.Stfld, readonlyFields[i].FieldBuilder);
             }
 
             il.Emit(OpCodes.Ret);
@@ -82,11 +73,20 @@ namespace RockLib.Configuration.ProxyFactory
             return typeBuilder.CreateTypeInfo().AsType();
         }
 
-        private static MethodBuilder GetGetMethodBuilder(string name, Type type,
-            TypeBuilder tb, MethodAttributes methodAttributes, FieldBuilder fieldBuilder)
+        private static TypeBuilder GetTypeBuilder(Type type)
         {
-            var getMethodBuilder = tb.DefineMethod("get_" + name,
-                methodAttributes, type, Type.EmptyTypes);
+            var assemblyName = "<" + type.Name + ">a__RockLibDynamicAssembly";
+            var name = "<" + type.Name + ">c__RockLibProxyClass";
+            var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.Run);
+            var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
+            var typeBuilder = moduleBuilder.DefineType(name, _typeAttributes, typeof(object), new[] { type });
+            return typeBuilder;
+        }
+
+        private static MethodBuilder GetGetMethodBuilder(string name, Type type,
+            TypeBuilder tb, FieldBuilder fieldBuilder)
+        {
+            var getMethodBuilder = tb.DefineMethod("get_" + name, _methodAttributes, type, Type.EmptyTypes);
             var il = getMethodBuilder.GetILGenerator();
 
             il.Emit(OpCodes.Ldarg_0);
@@ -97,10 +97,9 @@ namespace RockLib.Configuration.ProxyFactory
         }
 
         private static MethodBuilder GetSetMethodBuilder(string name, Type type,
-            TypeBuilder tb, MethodAttributes methodAttributes, FieldBuilder fieldBuilder)
+            TypeBuilder tb, FieldBuilder fieldBuilder)
         {
-            var setMethodBuilder = tb.DefineMethod("set_" + name,
-                methodAttributes, null, new[] { type });
+            var setMethodBuilder = tb.DefineMethod("set_" + name, _methodAttributes, null, new[] { type });
             var il = setMethodBuilder.GetILGenerator();
 
             il.Emit(OpCodes.Ldarg_0);
