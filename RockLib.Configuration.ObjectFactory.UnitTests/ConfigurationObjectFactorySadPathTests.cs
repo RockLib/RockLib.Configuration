@@ -101,26 +101,6 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenAnArrayTargetTypeAndAConfigurationThatDoesNotRepresentAList_ThrowsInvalidOperationException()
-        {
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
-                {
-                    { "foo:bar:baz", "123.45" },
-                    { "foo:bar:qux", "456.78" },
-                })
-                .Build();
-
-            var fooSection = config.GetSection("foo");
-            var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<ArrayPropertyClass>());
-
-#if DEBUG
-            var expected = Exceptions.ConfigurationIsNotAList(fooSection.GetSection("bar"), typeof(double[]));
-            Assert.Equal(expected.Message, actual.Message);
-#endif
-        }
-
-        [Fact]
         public void GivenAnArrayTargetTypeWithARankGreaterThanOne_ThrowsInvalidOperationException()
         {
             var config = new ConfigurationBuilder()
@@ -136,26 +116,6 @@ namespace Tests
 
 #if DEBUG
             var expected = Exceptions.ArrayRankGreaterThanOneIsNotSupported(typeof(double[,]));
-            Assert.Equal(expected.Message, actual.Message);
-#endif
-        }
-
-        [Fact]
-        public void GivenAListTargetTypeAndAConfigurationThatDoesNotRepresentAList_ThrowsInvalidOperationException()
-        {
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
-                {
-                    { "foo:bar:baz", "123.45" },
-                    { "foo:bar:qux", "456.78" },
-                })
-                .Build();
-
-            var fooSection = config.GetSection("foo");
-            var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<ListPropertyClass>());
-
-#if DEBUG
-            var expected = Exceptions.ConfigurationIsNotAList(fooSection.GetSection("bar"), typeof(List<double>));
             Assert.Equal(expected.Message, actual.Message);
 #endif
         }

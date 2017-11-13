@@ -100,17 +100,23 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (IsValueSection(configuration, out IConfigurationSection valueSection))
-                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsTypeSpecifiedObject(configuration))
-                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (targetType.IsArray)
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsList(targetType))
                 return BuildList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsValueSection(configuration, out IConfigurationSection valueSection))
+                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsTypeSpecifiedObject(configuration))
+                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsStringDictionary(targetType))
                 return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+        }
+
+        private static bool IsValueSection(IConfiguration configuration)
+        {
+            var valueSection = configuration as IConfigurationSection;
+            return valueSection?.Value != null;
         }
 
         private static bool IsValueSection(IConfiguration configuration, out IConfigurationSection valueSection)
@@ -210,13 +216,24 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
             if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
+
             var elementType = targetType.GetElementType();
-            var items = configuration.GetChildren().Select(child => child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes)).ToList();
-            var array = Array.CreateInstance(elementType, items.Count);
-            for (int i = 0; i < array.Length; i++)
-                array.SetValue(items[i], i);
+            Array array;
+            if (IsValueSection(configuration) || !IsList(configuration))
+            {
+                var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes);
+                array = Array.CreateInstance(elementType, 1);
+                array.SetValue(item, 0);
+            }
+            else
+            {
+                var items = configuration.GetChildren().Select(child =>
+                    child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes)).ToList();
+                array = Array.CreateInstance(elementType, items.Count);
+                for (int i = 0; i < array.Length; i++)
+                    array.SetValue(items[i], i);
+            }
             return array;
         }
 
@@ -231,13 +248,15 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
-            if (!IsList(configuration)) throw Exceptions.ConfigurationIsNotAList(configuration, targetType);
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
             var addMethod = GetListAddMethod(tType);
             var list = Activator.CreateInstance(listType);
-            foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
-                addMethod.Invoke(list, new object[] { item });
+            if (IsValueSection(configuration) || !IsList(configuration))
+                addMethod.Invoke(list, new[] {configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes)});
+            else
+                foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
+                    addMethod.Invoke(list, new[] {item});
             return list;
         }
 
