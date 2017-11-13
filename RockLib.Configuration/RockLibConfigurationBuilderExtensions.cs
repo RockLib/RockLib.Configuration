@@ -1,7 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
+
+#if NET451
 using System.Collections.Generic;
 using System.Linq;
+#endif
 
 namespace RockLib.Configuration
 {
