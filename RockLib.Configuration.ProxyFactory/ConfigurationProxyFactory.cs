@@ -57,18 +57,7 @@ namespace RockLib.Configuration.ProxyFactory
                 }
             }
 
-            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard,
-                readonlyFields.Select(f => f.FieldBuilder.FieldType).ToArray());
-            var il = constructorBuilder.GetILGenerator();
-            for (int i = 0; i < readonlyFields.Count; i++)
-            {
-                constructorBuilder.DefineParameter(i + 1, ParameterAttributes.None, readonlyFields[i].PropertyName);
-                il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldarg, i + 1);
-                il.Emit(OpCodes.Stfld, readonlyFields[i].FieldBuilder);
-            }
-
-            il.Emit(OpCodes.Ret);
+            AddConstructor(typeBuilder, readonlyFields);
 
             return typeBuilder.CreateTypeInfo().AsType();
         }
@@ -83,8 +72,24 @@ namespace RockLib.Configuration.ProxyFactory
             return typeBuilder;
         }
 
-        private static MethodBuilder GetGetMethodBuilder(string name, Type type,
-            TypeBuilder tb, FieldBuilder fieldBuilder)
+        private static void AddConstructor(TypeBuilder typeBuilder, List<(FieldBuilder FieldBuilder, string PropertyName)> readonlyFields)
+        {
+            var constructorBuilder = typeBuilder.DefineConstructor(
+                MethodAttributes.Public, CallingConventions.Standard, readonlyFields.Select(f => f.FieldBuilder.FieldType).ToArray());
+            var il = constructorBuilder.GetILGenerator();
+
+            for (int i = 0; i < readonlyFields.Count; i++)
+            {
+                constructorBuilder.DefineParameter(i + 1, ParameterAttributes.None, readonlyFields[i].PropertyName);
+                il.Emit(OpCodes.Ldarg_0);
+                il.Emit(OpCodes.Ldarg, i + 1);
+                il.Emit(OpCodes.Stfld, readonlyFields[i].FieldBuilder);
+            }
+
+            il.Emit(OpCodes.Ret);
+        }
+
+        private static MethodBuilder GetGetMethodBuilder(string name, Type type, TypeBuilder tb, FieldBuilder fieldBuilder)
         {
             var getMethodBuilder = tb.DefineMethod("get_" + name, _methodAttributes, type, Type.EmptyTypes);
             var il = getMethodBuilder.GetILGenerator();
@@ -96,8 +101,7 @@ namespace RockLib.Configuration.ProxyFactory
             return getMethodBuilder;
         }
 
-        private static MethodBuilder GetSetMethodBuilder(string name, Type type,
-            TypeBuilder tb, FieldBuilder fieldBuilder)
+        private static MethodBuilder GetSetMethodBuilder(string name, Type type, TypeBuilder tb, FieldBuilder fieldBuilder)
         {
             var setMethodBuilder = tb.DefineMethod("set_" + name, _methodAttributes, null, new[] { type });
             var il = setMethodBuilder.GetILGenerator();
@@ -113,28 +117,21 @@ namespace RockLib.Configuration.ProxyFactory
         private static void ValidateType(Type type)
         {
             if (!type.GetTypeInfo().IsInterface)
-                throw new ArgumentException($"Cannot create proxy instance of non-interface type {type}.", nameof(type));
+                throw Exceptions.CannotCreateProxyOfNonInterfaceType(type);
 
             foreach (var member in type.GetTypeInfo().GetMembers())
             {
-                string errorMessage = null;
                 switch (member)
                 {
                     case MethodInfo m when !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.StartsWith("add_") && !m.Name.StartsWith("remove_"):
-                        errorMessage = $"Cannot create proxy {type} implementation: target interface cannot contain any methods. `{m}`";
-                        break;
+                        throw Exceptions.TargetInterfaceCannotHaveAnyMethods(type, m);
                     case EventInfo e:
-                        errorMessage = $"Cannot create proxy {type} implementation: target interface cannot contain any events. `{e}`";
-                        break;
+                        throw Exceptions.TargetInterfaceCannotHaveAnyEvents(type, e);
                     case PropertyInfo p when p.CanRead && p.GetGetMethod().GetParameters().Length > 0 || p.CanWrite && p.GetSetMethod().GetParameters().Length > 1:
-                        errorMessage = $"Cannot create proxy {type} implementation: target interface cannot contain any indexer properties. `{p.PropertyType.Name} this[{string.Join(", ", p.GetIndexParameters().Select(i => i.ParameterType.Name))}] {{ {(p.CanRead ? "get; " : "")} {(p.CanWrite ? "set; " : "")}}}`";
-                        break;
+                        throw Exceptions.TargetInterfaceCannotHaveAnyIndexerProperties(type, p);
                     case PropertyInfo p when !p.CanRead:
-                        errorMessage = $"Cannot create proxy {type} implementation: target interface cannot contain write-only methods. `{p} {{ set; }}`";
-                        break;
+                        throw Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(type, p);
                 }
-                if (errorMessage != null)
-                    throw new ArgumentException(errorMessage, nameof(type));
             }
         }
     }

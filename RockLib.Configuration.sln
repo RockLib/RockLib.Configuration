@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Objec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory.UnitTests", "RockLib.Configuration.ObjectFactory.UnitTests\RockLib.Configuration.ObjectFactory.UnitTests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.ProxyFactory", "RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj", "{668E5809-C181-4FFD-AF2B-29D342FD6909}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory", "RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj", "{668E5809-C181-4FFD-AF2B-29D342FD6909}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory.UnitTests", "RockLib.Configuration.ProxyFactory.UnitTests\RockLib.Configuration.ProxyFactory.UnitTests.csproj", "{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{668E5809-C181-4FFD-AF2B-29D342FD6909}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{668E5809-C181-4FFD-AF2B-29D342FD6909}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{668E5809-C181-4FFD-AF2B-29D342FD6909}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
