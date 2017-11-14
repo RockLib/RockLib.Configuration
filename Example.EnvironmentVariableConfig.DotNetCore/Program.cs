@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using RockLib.Configuration;
 using System;
+using RockLib.Configuration.ObjectFactory;
 
 namespace Example.EnvironmentVariableConfig.DotNetCore
 {
@@ -20,9 +20,9 @@ namespace Example.EnvironmentVariableConfig.DotNetCore
             var testKey1 = Config.AppSettings["test_key1"];
             var testKey2 = Config.AppSettings["test_key2"];
 
-            var foo = Config.Root.GetSection("foo_section").Get<Foo>();
+            var foo = Config.Root.GetSection("foo_section").Create<Foo>();
 
-            var qux = Config.Root.GetSection("qux_section").Get<Qux>();
+            var qux = Config.Root.GetSection("qux_section").Create<Qux>();
 
             Console.WriteLine($"testKey1: {testKey1}");
             Console.WriteLine($"testKey2: {testKey2}");
