@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using RockLib.Configuration;
 using System;
+using RockLib.Configuration.ObjectFactory;
 
 namespace Example.FileConfig.DotNetCore
 {
@@ -15,8 +16,12 @@ namespace Example.FileConfig.DotNetCore
             {
                 var key1 = Config.AppSettings["Key1"];
                 string defaultConnectionString = Config.Root.GetConnectionString("Default");
-                var foo = Config.Root.GetSection("Foo").Get<FooSection>();
-                var foo2 = Config.Root.GetSection("Foo").Get<FooSection>();
+
+                IConfigurationSection fooConfigSection = Config.Root.GetSection("foo_section");
+                Foo foo = fooConfigSection.Create<Foo>();
+
+                IConfigurationSection foo2ConfigSection = Config.Root.GetSection("foo_section");
+                Foo foo2 = foo2ConfigSection.Create<Foo>();
 
                 Console.WriteLine($"key1: {key1}");
                 Console.WriteLine($"defaultConnectionString: {defaultConnectionString}");
@@ -34,7 +39,7 @@ namespace Example.FileConfig.DotNetCore
 
         }
 
-        class FooSection
+        public class Foo
         {
             public int Bar { get; set; }
             public string Baz { get; set; }

@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RockLib.Configuration" Version="0.0.1-alpha04" />
+    <PackageReference Include="RockLib.Configuration" Version="0.0.1-alpha05" />
+    <PackageReference Include="RockLib.Configuration.ObjectFactory" Version="0.0.1-alpha02" />
   </ItemGroup>
 
   <ItemGroup>
