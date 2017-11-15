@@ -219,8 +219,15 @@ namespace RockLib.Configuration.ObjectFactory
             if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
 
             var elementType = targetType.GetElementType();
+            var isValueSection = IsValueSection(configuration);
+
             Array array;
-            if (IsValueSection(configuration) || !IsList(configuration))
+            if (isValueSection && elementType == typeof(byte))
+            {
+                var item = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes);
+                array = Convert.FromBase64String(item);
+            }
+            else if (isValueSection || !IsList(configuration))
             {
                 var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes);
                 array = Array.CreateInstance(elementType, 1);
