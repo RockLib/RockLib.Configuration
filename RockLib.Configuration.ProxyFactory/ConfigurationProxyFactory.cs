@@ -134,6 +134,9 @@ namespace RockLib.Configuration.ProxyFactory
                 MethodAttributes.Public, CallingConventions.Standard, readonlyFields.Select(f => f.FieldBuilder.FieldType).ToArray());
             var il = constructorBuilder.GetILGenerator();
 
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Call, typeof(object).GetTypeInfo().GetConstructors()[0]);
+
             for (int i = 0; i < readonlyFields.Count; i++)
             {
                 constructorBuilder.DefineParameter(i + 1, ParameterAttributes.None, readonlyFields[i].PropertyName);
