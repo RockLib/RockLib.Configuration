@@ -148,9 +148,9 @@ namespace RockLib.Configuration.ProxyFactory
             il.Emit(OpCodes.Ret);
         }
 
-        private static MethodBuilder GetGetMethodBuilder(string name, Type type, TypeBuilder tb, FieldBuilder fieldBuilder)
+        private static MethodBuilder GetGetMethodBuilder(string name, Type type, TypeBuilder typeBuilder, FieldBuilder fieldBuilder)
         {
-            var getMethodBuilder = tb.DefineMethod("get_" + name, _methodAttributes, type, Type.EmptyTypes);
+            var getMethodBuilder = typeBuilder.DefineMethod("get_" + name, _methodAttributes, type, Type.EmptyTypes);
             var il = getMethodBuilder.GetILGenerator();
 
             il.Emit(OpCodes.Ldarg_0);
@@ -160,9 +160,9 @@ namespace RockLib.Configuration.ProxyFactory
             return getMethodBuilder;
         }
 
-        private static MethodBuilder GetSetMethodBuilder(string name, Type type, TypeBuilder tb, FieldBuilder fieldBuilder)
+        private static MethodBuilder GetSetMethodBuilder(string name, Type type, TypeBuilder typeBuilder, FieldBuilder fieldBuilder)
         {
-            var setMethodBuilder = tb.DefineMethod("set_" + name, _methodAttributes, null, new[] { type });
+            var setMethodBuilder = typeBuilder.DefineMethod("set_" + name, _methodAttributes, null, new[] { type });
             var il = setMethodBuilder.GetILGenerator();
 
             il.Emit(OpCodes.Ldarg_0);
