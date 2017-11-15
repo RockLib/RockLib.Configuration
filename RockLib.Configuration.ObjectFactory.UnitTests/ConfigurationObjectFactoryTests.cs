@@ -427,6 +427,31 @@ namespace Tests
         }
 
         [Fact]
+        public void TypeSpecificationIsCaseInsensitive()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:type", typeof(HasReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:value:qux", "true" },
+                    { "foo:bar:value:garply", "123.45" },
+                    { "foo:baz:Type", typeof(AlsoHasReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:baz:Value:grault", guid.ToString() },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasReadWriteInterfaceProperties>();
+
+            Assert.IsType<HasReadWriteProperties>(foo.Bar);
+            Assert.Equal(true, foo.Bar.Qux);
+            Assert.Equal(123.45, foo.Bar.Garply);
+            Assert.IsType<AlsoHasReadWriteProperties>(foo.Baz);
+            Assert.Equal(guid, foo.Baz.Grault);
+        }
+
+        [Fact]
         public void CanBindToReadWriteSimpleProperties()
         {
             var now = DateTime.Now;
@@ -922,6 +947,34 @@ namespace Tests
         }
 
         [Fact]
+        public void CanBindToByteCollectionConstructorParameters()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "QmFy" },
+                    { "foo:baz", "QmF6" },
+                    { "foo:qux", "UXV6" },
+                    { "foo:garply", "R2FycGx5" },
+                    { "foo:grault", "R3JhdWx0" },
+                    { "foo:fred", "RnJlZA==" },
+                    { "foo:waldo", "V2FsZG8=" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasByteCollectionConstructorParameters>();
+
+            Assert.Equal("QmFy", foo.Bar);
+            Assert.Equal("QmF6", foo.Baz);
+            Assert.Equal("UXV6", foo.Qux);
+            Assert.Equal("R2FycGx5", foo.Garply);
+            Assert.Equal("R3JhdWx0", foo.Grault);
+            Assert.Equal("RnJlZA==", foo.Fred);
+            Assert.Equal("V2FsZG8=", foo.Waldo);
+        }
+
+        [Fact]
         public void CanBindToSimpleCollectionConstructorParametersWithSingleNonListItem()
         {
             var config = new ConfigurationBuilder()
@@ -1003,6 +1056,34 @@ namespace Tests
             Assert.Equal(2, foo.Waldo.Count);
             Assert.Equal(Encoding.UTF8, foo.Waldo[0].Baz);
             Assert.Equal(Encoding.ASCII, foo.Waldo[1].Baz);
+        }
+
+        [Fact]
+        public void CanBindToByteCollectionProperties()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "QmFy" },
+                    { "foo:baz", "QmF6" },
+                    { "foo:qux", "UXV6" },
+                    { "foo:garply", "R2FycGx5" },
+                    { "foo:grault", "R3JhdWx0" },
+                    { "foo:fred", "RnJlZA==" },
+                    { "foo:waldo", "V2FsZG8=" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasByteCollectionProperties>();
+
+            Assert.Equal("QmFy", Convert.ToBase64String(foo.Bar));
+            Assert.Equal("QmF6", Convert.ToBase64String(foo.Baz.ToArray()));
+            Assert.Equal("UXV6", Convert.ToBase64String(foo.Qux.ToArray()));
+            Assert.Equal("R2FycGx5", Convert.ToBase64String(foo.Garply.ToArray()));
+            Assert.Equal("R3JhdWx0", Convert.ToBase64String(foo.Grault.ToArray()));
+            Assert.Equal("RnJlZA==", Convert.ToBase64String(foo.Fred.ToArray()));
+            Assert.Equal("V2FsZG8=", Convert.ToBase64String(foo.Waldo.ToArray()));
         }
 
         [Fact]
@@ -2017,6 +2098,34 @@ namespace Tests
         public IReadOnlyList<int> Waldo { get; }
     }
 
+    public class HasByteCollectionConstructorParameters
+    {
+        public HasByteCollectionConstructorParameters(
+            byte[] bar,
+            List<byte> baz,
+            IList<byte> qux,
+            ICollection<byte> garply,
+            IEnumerable<byte> grault,
+            IReadOnlyCollection<byte> fred,
+            IReadOnlyList<byte> waldo)
+        {
+            Bar = Convert.ToBase64String(bar);
+            Baz = Convert.ToBase64String(baz.ToArray());
+            Qux = Convert.ToBase64String(qux.ToArray());
+            Garply = Convert.ToBase64String(garply.ToArray());
+            Grault = Convert.ToBase64String(grault.ToArray());
+            Fred = Convert.ToBase64String(fred.ToArray());
+            Waldo = Convert.ToBase64String(waldo.ToArray());
+        }
+        public string Bar { get; }
+        public string Baz { get; }
+        public string Qux { get; }
+        public string Garply { get; }
+        public string Grault { get; }
+        public string Fred { get; }
+        public string Waldo { get; }
+    }
+
     public class HasConcreteReadWriteCollectionProperties
     {
         public HasSomething[] Bar { get; set; }
@@ -2026,6 +2135,17 @@ namespace Tests
         public IEnumerable<HasSomething> Grault { get; set; }
         public IReadOnlyCollection<HasSomething> Fred { get; set; }
         public IReadOnlyList<HasSomething> Waldo { get; set; }
+    }
+
+    public class HasByteCollectionProperties
+    {
+        public byte[] Bar { get; set; }
+        public List<byte> Baz { get; set; }
+        public IList<byte> Qux { get; set; }
+        public ICollection<byte> Garply { get; set; }
+        public IEnumerable<byte> Grault { get; set; }
+        public IReadOnlyCollection<byte> Fred { get; set; }
+        public IReadOnlyList<byte> Waldo { get; set; }
     }
 
     public class HasConcreteReadonlyCollectionProperties

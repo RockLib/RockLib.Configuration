@@ -193,12 +193,12 @@ namespace RockLib.Configuration.ObjectFactory
             var i = 0;
             foreach (var child in configuration.GetChildren())
             {
-                if (child.Key == _typeKey)
+                if (child.Key.Equals(_typeKey, StringComparison.OrdinalIgnoreCase))
                 {
                     if (string.IsNullOrEmpty(child.Value)) return false;
                     typeFound = true;
                 }
-                else if (child.Key != _valueKey) return false;
+                else if (!child.Key.Equals(_valueKey, StringComparison.OrdinalIgnoreCase)) return false;
                 i++;
             }
             if (i == 1) return typeFound;
@@ -219,8 +219,15 @@ namespace RockLib.Configuration.ObjectFactory
             if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
 
             var elementType = targetType.GetElementType();
+            var isValueSection = IsValueSection(configuration);
+
             Array array;
-            if (IsValueSection(configuration) || !IsList(configuration))
+            if (isValueSection && elementType == typeof(byte))
+            {
+                var item = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes);
+                array = Convert.FromBase64String(item);
+            }
+            else if (isValueSection || !IsList(configuration))
             {
                 var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes);
                 array = Array.CreateInstance(elementType, 1);
@@ -252,7 +259,16 @@ namespace RockLib.Configuration.ObjectFactory
             var listType = typeof(List<>).MakeGenericType(tType);
             var addMethod = GetListAddMethod(tType);
             var list = Activator.CreateInstance(listType);
-            if (IsValueSection(configuration) || !IsList(configuration))
+            var isValueSection = IsValueSection(configuration);
+
+            if (isValueSection && tType == typeof(byte))
+            {
+                var base64String = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes);
+                var byteArray = Convert.FromBase64String(base64String);
+                foreach (var item in byteArray)
+                    addMethod.Invoke(list, new object[] { item });
+            }
+            else if (isValueSection || !IsList(configuration))
                 addMethod.Invoke(list, new[] {configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes)});
             else
                 foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
