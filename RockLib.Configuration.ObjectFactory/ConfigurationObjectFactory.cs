@@ -193,12 +193,12 @@ namespace RockLib.Configuration.ObjectFactory
             var i = 0;
             foreach (var child in configuration.GetChildren())
             {
-                if (child.Key == _typeKey)
+                if (child.Key.Equals(_typeKey, StringComparison.OrdinalIgnoreCase))
                 {
                     if (string.IsNullOrEmpty(child.Value)) return false;
                     typeFound = true;
                 }
-                else if (child.Key != _valueKey) return false;
+                else if (!child.Key.Equals(_valueKey, StringComparison.OrdinalIgnoreCase)) return false;
                 i++;
             }
             if (i == 1) return typeFound;
