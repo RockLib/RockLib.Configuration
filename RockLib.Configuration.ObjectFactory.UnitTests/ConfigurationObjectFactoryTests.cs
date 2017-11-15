@@ -427,6 +427,31 @@ namespace Tests
         }
 
         [Fact]
+        public void TypeSpecificationIsCaseInsensitive()
+        {
+            var guid = Guid.NewGuid();
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:type", typeof(HasReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:bar:value:qux", "true" },
+                    { "foo:bar:value:garply", "123.45" },
+                    { "foo:baz:Type", typeof(AlsoHasReadWriteProperties).AssemblyQualifiedName },
+                    { "foo:baz:Value:grault", guid.ToString() },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasReadWriteInterfaceProperties>();
+
+            Assert.IsType<HasReadWriteProperties>(foo.Bar);
+            Assert.Equal(true, foo.Bar.Qux);
+            Assert.Equal(123.45, foo.Bar.Garply);
+            Assert.IsType<AlsoHasReadWriteProperties>(foo.Baz);
+            Assert.Equal(guid, foo.Baz.Grault);
+        }
+
+        [Fact]
         public void CanBindToReadWriteSimpleProperties()
         {
             var now = DateTime.Now;
@@ -466,6 +491,22 @@ namespace Tests
             Assert.Equal(123, foo.Bar);
             Assert.Equal(now, foo.Baz);
             Assert.Equal(true, foo.Qux);
+        }
+
+        [Fact]
+        public void CanBindToBindToByteArrayConstructorParameters()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:key", "1J9Og/OaZKWdfdwM6jWMpvlr3q3o7r20xxFDN7TEj6s=" }
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasByteArrayConstructorParameter>();
+
+            Assert.Equal("1J9Og/OaZKWdfdwM6jWMpvlr3q3o7r20xxFDN7TEj6s=", foo.Key);
         }
 
         [Fact]
@@ -2143,6 +2184,16 @@ namespace Tests
         public int Bar { get; }
         public DateTime Baz { get; }
         public bool Qux { get; }
+    }
+
+    public class HasByteArrayConstructorParameter
+    {
+        public HasByteArrayConstructorParameter(byte[] key)
+        {
+            Key = Convert.ToBase64String(key);
+        }
+
+        public string Key { get; set; }
     }
 
     public class HasReadWriteConcreteProperties
