@@ -98,7 +98,7 @@ namespace RockLib.Configuration
         {
             var builder = new ConfigurationBuilder();
 
-#if NET451
+#if NET451 || NET462
             builder
                 .AddConfigurationManager();
 #endif

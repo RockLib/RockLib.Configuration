@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Configuration;
 
-#if NET451
+#if NET451 || NET462
 using System.Collections.Generic;
 using System.Linq;
 #endif
@@ -38,7 +38,7 @@ namespace RockLib.Configuration
             return builder;
         }
 
-#if NET451
+#if NET451 || NET462
         /// <summary>
         /// Adds support for .Net Framework applications to pull in App or Web.config AppSettings values.
         /// </summary>
