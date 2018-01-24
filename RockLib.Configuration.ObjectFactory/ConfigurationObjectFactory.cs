@@ -132,15 +132,25 @@ namespace RockLib.Configuration.ObjectFactory
             IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
             var convert = GetConvertFunc(targetType, declaringType, memberName, valueConverters);
-            if (convert != null)
-                return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
-            if (targetType == typeof(Encoding))
-                return Encoding.GetEncoding(valueSection.Value);
-            var typeConverter = TypeDescriptor.GetConverter(targetType);
-            if (typeConverter.CanConvertFrom(typeof(string)))
-                return typeConverter.ConvertFromInvariantString(valueSection.Value);
-            if (valueSection.Value == "")
-                return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
+            try
+            {
+                if (convert != null)
+                    return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
+                if (targetType == typeof(Encoding))
+                    return Encoding.GetEncoding(valueSection.Value);
+                if (targetType == typeof(Type))
+                    return Type.GetType(valueSection.Value, true, true);
+                var typeConverter = TypeDescriptor.GetConverter(targetType);
+                if (typeConverter.CanConvertFrom(typeof(string)))
+                    return typeConverter.ConvertFromInvariantString(valueSection.Value);
+                if (valueSection.Value == "")
+                    return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
+            }
+            catch (Exception ex)
+            {
+                // TODO: Add tests that verify this sad path.
+                throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType, ex);
+            }
             throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
         }
 
@@ -331,6 +341,7 @@ namespace RockLib.Configuration.ObjectFactory
                 || type == typeof(TimeSpan)
                 || type == typeof(Uri)
                 || type == typeof(Encoding)
+                || type == typeof(Type)
                 || GetConvertFunc(targetType, declaringType, memberName, valueConverters) != null;
         }
 

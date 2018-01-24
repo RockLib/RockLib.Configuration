@@ -455,12 +455,13 @@ namespace Tests
         public void CanBindToReadWriteSimpleProperties()
         {
             var now = DateTime.Now;
+            var quxType = this.GetType();
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>
                 {
                     { "foo:bar", "123" },
                     { "foo:baz", now.ToString("O") },
-                    { "foo:qux", "true" },
+                    { "foo:qux", quxType.AssemblyQualifiedName },
                 })
                 .Build();
 
@@ -469,7 +470,7 @@ namespace Tests
 
             Assert.Equal(123, foo.Bar);
             Assert.Equal(now, foo.Baz);
-            Assert.Equal(true, foo.Qux);
+            Assert.Equal(quxType, foo.Qux);
         }
 
         [Fact]
@@ -2248,7 +2249,7 @@ namespace Tests
     {
         public int Bar { get; set; }
         public DateTime Baz { get; set; }
-        public bool Qux { get; set; }
+        public Type Qux { get; set; }
     }
 
     public class HasSimpleConstructorParameters
