@@ -14,8 +14,8 @@ namespace RockLib.Configuration.ObjectFactory
         public static InvalidOperationException ResultCannotBeNull(Type targetType, Type declaringType, string memberName) =>
             new InvalidOperationException($"A null {targetType} value was returned by the custom convert func for {(declaringType == null ? "the value" : $"the {declaringType}.{memberName} member")}");
 
-        public static InvalidOperationException CannotConvertSectionValueToTargetType(IConfigurationSection section, Type targetType) =>
-            new InvalidOperationException($"Unable to convert value '{section.Value}' in {section.Description()} to target type '{targetType}'.");
+        public static InvalidOperationException CannotConvertSectionValueToTargetType(IConfigurationSection section, Type targetType, Exception innerException = null) =>
+            new InvalidOperationException($"Unable to convert value '{section.Value}' in {section.Description()} to target type '{targetType}'.", innerException);
 
         public static InvalidOperationException ConfigurationSpecifiedTypeIsNotAssignableToTargetType(Type targetType, Type specifiedType) =>
             new InvalidOperationException($"The configuration-specified type, '{specifiedType}' is not assignable to the target type {targetType}.");
