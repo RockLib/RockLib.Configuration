@@ -102,8 +102,10 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (targetType.IsArray)
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsList(targetType))
-                return BuildList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsGenericList(targetType))
+                return BuildGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsNonGenericList(targetType))
+                return BuildNonGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsValueSection(configuration, out IConfigurationSection valueSection))
                 return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsTypeSpecifiedObject(configuration))
@@ -259,7 +261,7 @@ namespace RockLib.Configuration.ObjectFactory
             return array;
         }
 
-        private static bool IsList(Type type) =>
+        private static bool IsGenericList(Type type) =>
             type.GetTypeInfo().IsGenericType
                 && (type.GetGenericTypeDefinition() == typeof(List<>)
                     || type.GetGenericTypeDefinition() == typeof(IList<>)
@@ -268,7 +270,7 @@ namespace RockLib.Configuration.ObjectFactory
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
 
-        private static object BuildList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object BuildGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
         {
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
@@ -284,10 +286,50 @@ namespace RockLib.Configuration.ObjectFactory
                     addMethod.Invoke(list, new object[] { item });
             }
             else if (isValueSection || !IsList(configuration))
-                addMethod.Invoke(list, new[] {configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes)});
+                addMethod.Invoke(list, new[] { configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes) });
             else
                 foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
-                    addMethod.Invoke(list, new[] {item});
+                    addMethod.Invoke(list, new[] { item });
+            return list;
+        }
+
+        internal static bool IsNonGenericList(this Type type)
+        {
+            if (typeof(IList).GetTypeInfo().IsAssignableFrom(type))
+            {
+                return type.GetTypeInfo().GetConstructor(Type.EmptyTypes) != null
+                    && GetNonGenericListItemType(type) != null;
+            }
+            return false;
+        }
+
+        private static Type GetNonGenericListItemType(Type nonGenericListType)
+        {
+            var itemTypes =
+                nonGenericListType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(m => (m.Name == "Add" || m.Name == "Contains" || m.Name == "IndexOf" || m.Name == "Remove")
+                        && m.GetParameters().Length == 1
+                        && m.GetParameters()[0].ParameterType != typeof(object))
+                    .Select(m => m.GetParameters()[0].ParameterType)
+                    .Distinct()
+                    .ToList();
+            if (itemTypes.Count == 1)
+                return itemTypes[0];
+            return null;
+        }
+
+        private static object BuildNonGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        {
+            var itemType = GetNonGenericListItemType(targetType);
+            var addMethod = GetListAddMethod(null);
+            var list = Activator.CreateInstance(targetType);
+            var isValueSection = IsValueSection(configuration);
+
+            if (isValueSection || !IsList(configuration))
+                addMethod.Invoke(list, new[] { configuration.Create(itemType, declaringType, memberName, valueConverters, defaultTypes) });
+            else
+                foreach (var item in configuration.GetChildren().Select(child => child.Create(itemType, declaringType, memberName, valueConverters, defaultTypes)))
+                    addMethod.Invoke(list, new[] { item });
             return list;
         }
 
@@ -456,11 +498,11 @@ namespace RockLib.Configuration.ObjectFactory
                 .FirstOrDefault();
 
         private static MethodInfo GetListAddMethod(Type tType) =>
-            typeof(ICollection<>).MakeGenericType(tType)
+            (tType != null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList))
                 .GetTypeInfo().GetMethod("Add");
 
         private static MethodInfo GetListClearMethod(Type tType) =>
-            typeof(ICollection<>).MakeGenericType(tType)
+            (tType != null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList))
                 .GetTypeInfo().GetMethod("Clear");
 
         private static MethodInfo GetDictionaryAddMethod(Type tValueType) =>
@@ -515,7 +557,9 @@ namespace RockLib.Configuration.ObjectFactory
                 {
                     var list = property.GetValue(obj);
                     if (list == null) return;
-                    var tType = property.PropertyType.GetTypeInfo().GetGenericArguments()[0];
+                    var tType = IsGenericList(property.PropertyType)
+                        ? property.PropertyType.GetTypeInfo().GetGenericArguments()[0]
+                        : null;
                     var addMethod = GetListAddMethod(tType);
                     var clearMethod = GetListClearMethod(tType);
                     var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);

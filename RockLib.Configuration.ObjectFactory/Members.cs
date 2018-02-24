@@ -31,10 +31,11 @@ namespace RockLib.Configuration.ObjectFactory
         public static bool IsReadonlyList(this PropertyInfo p) =>
             p.CanRead
             && !p.CanWrite
-            && p.PropertyType.GetTypeInfo().IsGenericType
-            && (p.PropertyType.GetGenericTypeDefinition() == typeof(List<>)
-                || p.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)
-                || p.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>));
+            && (p.PropertyType.GetTypeInfo().IsGenericType
+                && (p.PropertyType.GetGenericTypeDefinition() == typeof(List<>)
+                    || p.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)
+                    || p.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>))
+                || p.PropertyType.IsNonGenericList());
 
         public static bool IsReadonlyDictionary(this PropertyInfo p) =>
             p.CanRead
