@@ -454,9 +454,17 @@ namespace RockLib.Configuration.ObjectFactory
             typeof(ICollection<>).MakeGenericType(tType)
                 .GetTypeInfo().GetMethod("Add");
 
+        private static MethodInfo GetListClearMethod(Type tType) =>
+            typeof(ICollection<>).MakeGenericType(tType)
+                .GetTypeInfo().GetMethod("Clear");
+
         private static MethodInfo GetDictionaryAddMethod(Type tValueType) =>
             typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType))
                 .GetTypeInfo().GetMethod("Add");
+
+        private static MethodInfo GetDictionaryClearMethod(Type tValueType) =>
+            typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType))
+                .GetTypeInfo().GetMethod("Clear");
 
         private class ObjectBuilder
         {
@@ -504,7 +512,9 @@ namespace RockLib.Configuration.ObjectFactory
                     if (list == null) return;
                     var tType = property.PropertyType.GetTypeInfo().GetGenericArguments()[0];
                     var addMethod = GetListAddMethod(tType);
+                    var clearMethod = GetListClearMethod(tType);
                     var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    clearMethod.Invoke(list, null);
                     foreach (var item in (IEnumerable)propertyValue)
                         addMethod.Invoke(list, new[] { item });
                 }
@@ -518,9 +528,11 @@ namespace RockLib.Configuration.ObjectFactory
                     if (dictionary == null) return;
                     var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
                     var addMethod = GetDictionaryAddMethod(tValueType);
+                    var clearMethod = GetDictionaryClearMethod(tValueType);
                     var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    clearMethod.Invoke(dictionary, null);
                     foreach (var item in (IEnumerable)propertyValue)
-                        addMethod.Invoke(dictionary, new object[] { item });
+                        addMethod.Invoke(dictionary, new[] { item });
                 }
             }
 
