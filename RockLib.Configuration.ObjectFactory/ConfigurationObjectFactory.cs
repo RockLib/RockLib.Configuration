@@ -142,7 +142,12 @@ namespace RockLib.Configuration.ObjectFactory
                     return Type.GetType(valueSection.Value, true, true);
                 var typeConverter = TypeDescriptor.GetConverter(targetType);
                 if (typeConverter.CanConvertFrom(typeof(string)))
-                    return typeConverter.ConvertFromInvariantString(valueSection.Value);
+                {
+                    var value = valueSection.Value;
+                    if (targetType.GetTypeInfo().IsEnum)
+                        value = value.Replace('|', ',');
+                    return typeConverter.ConvertFromInvariantString(value);
+                }
                 if (valueSection.Value == "")
                     return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
             }
