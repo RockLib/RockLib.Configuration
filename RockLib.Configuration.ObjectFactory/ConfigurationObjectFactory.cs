@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RockLib.Configuration.ObjectFactory
 {
@@ -147,7 +148,10 @@ namespace RockLib.Configuration.ObjectFactory
                 {
                     var value = valueSection.Value;
                     if (targetType.GetTypeInfo().IsEnum)
-                        value = value.Replace('|', ',');
+                    {
+                        // Replace flags delimiters: c#'s "|" and vb's " Or ".
+                        value = Regex.Replace(value, @"\s*\|\s*|\s+[Oo][Rr]\s+", ", ");
+                    }
                     return typeConverter.ConvertFromInvariantString(value);
                 }
                 if (valueSection.Value == "")

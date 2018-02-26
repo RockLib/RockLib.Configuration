@@ -1214,6 +1214,26 @@ namespace Tests
         }
 
         [Fact]
+        public void FlagsEnumsSupportCSharpAndVisualBasicEnumDelimiters()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "Garply, Grault, Corge" },
+                    { "foo:baz", "Garply | Grault | Corge" },
+                    { "foo:qux", "Garply Or Grault Or Corge" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasFlagsEnumProperties>();
+
+            Assert.Equal(Flags.Garply | Flags.Grault | Flags.Corge, foo.Bar);
+            Assert.Equal(Flags.Garply | Flags.Grault | Flags.Corge, foo.Baz);
+            Assert.Equal(Flags.Garply | Flags.Grault | Flags.Corge, foo.Qux);
+        }
+
+        [Fact]
         public void CanBindToReadonlyConcreteCollectionPropertiesWithSingleNonListItem()
         {
             var config = new ConfigurationBuilder()
@@ -2234,6 +2254,21 @@ namespace Tests
     {
         public List<HasSomething> Bar { get; } = new List<HasSomething>() { new HasSomething { Baz = Encoding.ASCII } };
         public HasSomethingCollection Baz { get; } = new HasSomethingCollection() { new HasSomething { Baz = Encoding.ASCII } };
+    }
+
+    public class HasFlagsEnumProperties
+    {
+        public Flags Bar { get; set; }
+        public Flags Baz { get; set; }
+        public Flags Qux { get; set; }
+    }
+
+    [Flags]
+    public enum Flags
+    {
+        Garply = 1,
+        Grault = 2,
+        Corge = 4
     }
 
     public class HasSomethingCollection : IList
