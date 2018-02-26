@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration.ObjectFactory;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -1152,6 +1153,87 @@ namespace Tests
         }
 
         [Fact]
+        public void CanBindToNonGenericListProperties()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:0:baz", "utf-8" },
+                    { "foo:bar:1:baz", "ascii" },
+                    { "foo:baz:0:baz", "utf-8" },
+                    { "foo:baz:1:baz", "ascii" },
+                    { "foo:qux:0:baz", "utf-8" },
+                    { "foo:qux:1:baz", "ascii" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasNonGenericCollectionProperties>();
+
+            Assert.Equal(2, foo.Bar.Count);
+            Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
+            Assert.Equal(Encoding.ASCII, foo.Bar[1].Baz);
+            Assert.Equal(2, foo.Baz.Count);
+            Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
+            Assert.Equal(Encoding.ASCII, foo.Baz[1].Baz);
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(Encoding.UTF8, foo.Qux[0].Baz);
+            Assert.Equal(Encoding.ASCII, foo.Qux[1].Baz);
+        }
+
+        [Fact]
+        public void ReadonlyListPropertiesAreClearedBeforeAddingToThem()
+        {
+            // Verify that the object starts out with initial items.
+            var defaultFoo = new HasReadonlyListPropertiesWithInitialItems();
+
+            Assert.Equal(1, defaultFoo.Bar.Count);
+            Assert.Equal(Encoding.ASCII, defaultFoo.Bar[0].Baz);
+            Assert.Equal(1, defaultFoo.Baz.Count);
+            Assert.Equal(Encoding.ASCII, defaultFoo.Baz[0].Baz);
+
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:0:baz", "utf-8" },
+                    { "foo:bar:1:baz", "utf-32" },
+                    { "foo:baz:0:baz", "utf-8" },
+                    { "foo:baz:1:baz", "utf-32" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasReadonlyListPropertiesWithInitialItems>();
+
+            Assert.Equal(2, foo.Bar.Count);
+            Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
+            Assert.Equal(Encoding.UTF32, foo.Bar[1].Baz);
+            Assert.Equal(2, foo.Baz.Count);
+            Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
+            Assert.Equal(Encoding.UTF32, foo.Baz[1].Baz);
+        }
+
+        [Fact]
+        public void FlagsEnumsSupportCSharpAndVisualBasicEnumDelimiters()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar", "Garply, Grault, Corge" },
+                    { "foo:baz", "Garply | Grault | Corge" },
+                    { "foo:qux", "Garply Or Grault Or Corge" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasFlagsEnumProperties>();
+
+            Assert.Equal(Flags.Garply | Flags.Grault | Flags.Corge, foo.Bar);
+            Assert.Equal(Flags.Garply | Flags.Grault | Flags.Corge, foo.Baz);
+            Assert.Equal(Flags.Garply | Flags.Grault | Flags.Corge, foo.Qux);
+        }
+
+        [Fact]
         public void CanBindToReadonlyConcreteCollectionPropertiesWithSingleNonListItem()
         {
             var config = new ConfigurationBuilder()
@@ -2154,6 +2236,128 @@ namespace Tests
         public List<HasSomething> Baz { get; } = new List<HasSomething>();
         public IList<HasSomething> Qux { get; } = new List<HasSomething>();
         public ICollection<HasSomething> Garply { get; } = new List<HasSomething>();
+    }
+
+    public class HasNonGenericCollectionProperties
+    {
+        public HasNonGenericCollectionProperties(HasSomethingCollection baz)
+        {
+            Baz = baz;
+        }
+
+        public HasSomethingCollection Bar { get; set; }
+        public HasSomethingCollection Baz { get; }
+        public HasSomethingCollection Qux { get; } = new HasSomethingCollection();
+    }
+
+    public class HasReadonlyListPropertiesWithInitialItems
+    {
+        public List<HasSomething> Bar { get; } = new List<HasSomething>() { new HasSomething { Baz = Encoding.ASCII } };
+        public HasSomethingCollection Baz { get; } = new HasSomethingCollection() { new HasSomething { Baz = Encoding.ASCII } };
+    }
+
+    public class HasFlagsEnumProperties
+    {
+        public Flags Bar { get; set; }
+        public Flags Baz { get; set; }
+        public Flags Qux { get; set; }
+    }
+
+    [Flags]
+    public enum Flags
+    {
+        Garply = 1,
+        Grault = 2,
+        Corge = 4
+    }
+
+    public class HasSomethingCollection : IList
+    {
+        private readonly List<HasSomething> _list = new List<HasSomething>();
+
+        object IList.this[int index] { get => this[index]; set => this[index] = (HasSomething)value; }
+
+        public HasSomething this[int index] { get => _list[index]; set => _list[index] = value; }
+
+        bool IList.IsFixedSize => ((IList)_list).IsFixedSize;
+
+        bool IList.IsReadOnly => ((IList)_list).IsReadOnly;
+
+        public int Count => _list.Count;
+
+        bool ICollection.IsSynchronized => ((IList)_list).IsSynchronized;
+
+        object ICollection.SyncRoot => ((IList)_list).SyncRoot;
+
+        int IList.Add(object value)
+        {
+            return Add((HasSomething)value);
+        }
+
+        public int Add(HasSomething value)
+        {
+            return ((IList)_list).Add(value);
+        }
+
+        public void Clear()
+        {
+            _list.Clear();
+        }
+
+        bool IList.Contains(object value)
+        {
+            return Contains((HasSomething)value);
+        }
+
+        public bool Contains(HasSomething value)
+        {
+            return _list.Contains(value);
+        }
+
+        void ICollection.CopyTo(Array array, int index)
+        {
+            ((IList)_list).CopyTo(array, index);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IList)_list).GetEnumerator();
+        }
+
+        int IList.IndexOf(object value)
+        {
+            return IndexOf((HasSomething)value);
+        }
+
+        public int IndexOf(HasSomething value)
+        {
+            return _list.IndexOf(value);
+        }
+
+        void IList.Insert(int index, object value)
+        {
+            Insert(index, (HasSomething)value);
+        }
+
+        public void Insert(int index, HasSomething value)
+        {
+            _list.Insert(index, value);
+        }
+
+        void IList.Remove(object value)
+        {
+            Remove((HasSomething)value);
+        }
+
+        public void Remove(HasSomething value)
+        {
+            _list.Remove(value);
+        }
+
+        public void RemoveAt(int index)
+        {
+            _list.RemoveAt(index);
+        }
     }
 
     public class HasConcreteCollectionConstructorParameters
