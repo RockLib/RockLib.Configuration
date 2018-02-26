@@ -6,11 +6,11 @@ namespace RockLib.Configuration.CustomConfigurationManagerTests
 {
     public class ConfigTests
     {
-        private static readonly IConfigurationRoot _configurationRoot;
+        private static readonly IConfiguration _configuration;
 
         static ConfigTests()
         {
-            _configurationRoot = new ConfigurationBuilder()
+            _configuration = new ConfigurationBuilder()
                     .AddInMemoryCollection(
                         new Dictionary<string, string>
                         {
@@ -19,7 +19,7 @@ namespace RockLib.Configuration.CustomConfigurationManagerTests
                         })
                     .Build();
 
-            Config.SetRoot(_configurationRoot);
+            Config.SetRoot(_configuration);
         }
 
         [Fact(DisplayName = "CustomConfigurationManagerTests: IsDefault is false when SetConfigurationRoot has been called.")]
@@ -31,7 +31,7 @@ namespace RockLib.Configuration.CustomConfigurationManagerTests
         [Fact(DisplayName = "CustomConfigurationManagerTests: The ConfigurationRoot property is the same instance passed to SetConfigurationRoot.")]
         public void TheCustomConfigurationRootIsUsed()
         {
-            Assert.Same(_configurationRoot, Config.Root);
+            Assert.Same(_configuration, Config.Root);
             Assert.Equal("Test", Config.AppSettings["Environment"]);
             Assert.Equal("200001", Config.AppSettings["ApplicationId"]);
         }
