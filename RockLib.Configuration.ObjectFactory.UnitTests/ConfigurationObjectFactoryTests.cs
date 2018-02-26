@@ -1182,6 +1182,38 @@ namespace Tests
         }
 
         [Fact]
+        public void ReadonlyListPropertiesAreClearedBeforeAddingToThem()
+        {
+            // Verify that the object starts out with initial items.
+            var defaultFoo = new HasReadonlyListPropertiesWithInitialItems();
+
+            Assert.Equal(1, defaultFoo.Bar.Count);
+            Assert.Equal(Encoding.ASCII, defaultFoo.Bar[0].Baz);
+            Assert.Equal(1, defaultFoo.Baz.Count);
+            Assert.Equal(Encoding.ASCII, defaultFoo.Baz[0].Baz);
+
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:0:baz", "utf-8" },
+                    { "foo:bar:1:baz", "utf-32" },
+                    { "foo:baz:0:baz", "utf-8" },
+                    { "foo:baz:1:baz", "utf-32" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<HasReadonlyListPropertiesWithInitialItems>();
+
+            Assert.Equal(2, foo.Bar.Count);
+            Assert.Equal(Encoding.UTF8, foo.Bar[0].Baz);
+            Assert.Equal(Encoding.UTF32, foo.Bar[1].Baz);
+            Assert.Equal(2, foo.Baz.Count);
+            Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
+            Assert.Equal(Encoding.UTF32, foo.Baz[1].Baz);
+        }
+
+        [Fact]
         public void CanBindToReadonlyConcreteCollectionPropertiesWithSingleNonListItem()
         {
             var config = new ConfigurationBuilder()
@@ -2196,6 +2228,12 @@ namespace Tests
         public HasSomethingCollection Bar { get; set; }
         public HasSomethingCollection Baz { get; }
         public HasSomethingCollection Qux { get; } = new HasSomethingCollection();
+    }
+
+    public class HasReadonlyListPropertiesWithInitialItems
+    {
+        public List<HasSomething> Bar { get; } = new List<HasSomething>() { new HasSomething { Baz = Encoding.ASCII } };
+        public HasSomethingCollection Baz { get; } = new HasSomethingCollection() { new HasSomething { Baz = Encoding.ASCII } };
     }
 
     public class HasSomethingCollection : IList
