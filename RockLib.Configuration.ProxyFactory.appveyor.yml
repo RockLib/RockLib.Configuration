@@ -1,0 +1,31 @@
+version: '{build}'
+image: Visual Studio 2017
+configuration: Release
+only_commits:
+ files:
+   - RockLib.Configuration.ProxyFactory/
+   - RockLib.Configuration.ProxyFactory.UnitTests/
+   - RockLib.Configuration.ProxyFactory.sln
+   - RockLib.Configuration.ProxyFactory.appveyor.yml
+before_build:
+- ps: nuget restore RockLib.Configuration.ProxyFactory.sln
+build:
+  project: RockLib.Configuration.ProxyFactory.sln
+  verbosity: minimal
+artifacts:
+- path: RockLib.Configuration.ProxyFactory\bin\Release\RockLib.Configuration.ProxyFactory.*.nupkg
+deploy:
+- provider: GitHub
+  tag: $(appveyor_repo_tag_name)
+  release: $(appveyor_repo_tag_name)
+  auth_token:
+    secure: yjDw1QLeuxM3Wvq9ZEJIB8JaEK/L2e7MhwrKicm3/SBh0FwbAEb3Fpg82h0fFALU
+  on:
+    appveyor_repo_tag: true
+    appveyor_repo_tag_name: /RockLib\.Configuration\.ProxyFactory\.\d+.\d+.\d+(-\w+)?/
+- provider: NuGet
+  api_key:
+    secure: n0btQo8iZJZTJ3S5vLWokuOxzv4dtYBi3cx6EbW41jTF5OfcshJs+dTMAGCTquLY
+  on:
+    appveyor_repo_tag: true
+    appveyor_repo_tag_name: /RockLib\.Configuration\.ProxyFactory\.\d+.\d+.\d+(-\w+)?/
