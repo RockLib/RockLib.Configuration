@@ -23,7 +23,7 @@ deploy:
     secure: yjDw1QLeuxM3Wvq9ZEJIB8JaEK/L2e7MhwrKicm3/SBh0FwbAEb3Fpg82h0fFALU
   on:
     appveyor_repo_tag: true
-    appveyor_repo_tag_name: /RockLib.Configuration\.\d+.\d+.\d+(-\w+)?/
+    appveyor_repo_tag_name: /RockLib\.Configuration\.\d+.\d+.\d+(-\w+)?/
 - provider: NuGet
   api_key:
     secure: n0btQo8iZJZTJ3S5vLWokuOxzv4dtYBi3cx6EbW41jTF5OfcshJs+dTMAGCTquLY
