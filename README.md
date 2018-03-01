@@ -1,4 +1,14 @@
-# RockLib Configuration [![Build status](https://ci.appveyor.com/api/projects/status/0qxs1k1bw36cn8ly?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration)
+# RockLib Configuration
+
+This repository contains three packages:
+
+- RockLib.Configuration
+  - [![Build status](https://ci.appveyor.com/api/projects/status/0qxs1k1bw36cn8ly?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration)
+- RockLib.Configuration.ObjectFactory
+  - [![Build status](https://ci.appveyor.com/api/projects/status/ox9velgud5ljj8d0?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-owv0n)
+- RockLib.Configuration.ProxyFactory
+  - [![Build status](https://ci.appveyor.com/api/projects/status/ogf4axfokbklh638?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-fe27m)
+
 All RockLib packages will depend on the RockLib.Configuration package to provide its configuration features.
 
 ## Table Of Contents
