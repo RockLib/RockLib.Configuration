@@ -43,13 +43,6 @@ before_build:
     Set-AppveyorBuildVariable -Name "package_tag" -Value $package_tag
 
 
-    "Nuget release notes: $nuget_release_notes"
-
-    "Github release notes: $github_release_notes"
-
-    "Package tag: $package_tag"
-
-
     nuget restore RockLib.Configuration.ObjectFactory.sln
 build:
   project: RockLib.Configuration.ObjectFactory.sln
