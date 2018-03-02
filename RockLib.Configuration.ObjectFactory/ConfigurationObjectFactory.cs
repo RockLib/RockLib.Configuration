@@ -105,7 +105,7 @@ namespace RockLib.Configuration.ObjectFactory
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsGenericList(targetType))
                 return BuildGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsNonGenericList(targetType))
+            if (IsNonGenericList(targetType, true))
                 return BuildNonGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsValueSection(configuration, out IConfigurationSection valueSection))
                 return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
@@ -297,11 +297,13 @@ namespace RockLib.Configuration.ObjectFactory
             return list;
         }
 
-        internal static bool IsNonGenericList(this Type type)
+        internal static bool IsNonGenericList(this Type type, bool defaultConstructorRequired = false)
         {
             if (typeof(IList).GetTypeInfo().IsAssignableFrom(type))
             {
-                return type.GetTypeInfo().GetConstructor(Type.EmptyTypes) != null
+                return
+                    (!defaultConstructorRequired
+                        || type.GetTypeInfo().GetConstructor(Type.EmptyTypes) != null)
                     && GetNonGenericListItemType(type) != null;
             }
             return false;
@@ -311,7 +313,7 @@ namespace RockLib.Configuration.ObjectFactory
         {
             var itemTypes =
                 nonGenericListType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(m => (m.Name == "Add" || m.Name == "Contains" || m.Name == "IndexOf" || m.Name == "Remove")
+                    .Where(m => m.Name == "Add"
                         && m.GetParameters().Length == 1
                         && m.GetParameters()[0].ParameterType != typeof(object))
                     .Select(m => m.GetParameters()[0].ParameterType)
@@ -566,7 +568,10 @@ namespace RockLib.Configuration.ObjectFactory
                         : null;
                     var addMethod = GetListAddMethod(tType);
                     var clearMethod = GetListClearMethod(tType);
-                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    var targetType = property.PropertyType;
+                    if (tType == null)
+                        targetType = typeof(List<>).MakeGenericType(GetNonGenericListItemType(targetType));
+                    var propertyValue = section.Create(targetType, Type, property.Name, valueConverters, defaultTypes);
                     clearMethod.Invoke(list, null);
                     foreach (var item in (IEnumerable)propertyValue)
                         addMethod.Invoke(list, new[] { item });
