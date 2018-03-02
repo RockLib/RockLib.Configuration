@@ -3,6 +3,7 @@ using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -1211,6 +1212,29 @@ namespace Tests
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz[0].Baz);
             Assert.Equal(Encoding.UTF32, foo.Baz[1].Baz);
+        }
+
+        [Fact]
+        public void CanMapReadOnlyPropertiesOfTypeNonGenericIListImplementationWithoutDefaultConstructor()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "name", "source1" },
+                    { "listeners:0:name", "listener1" },
+                    { "listeners:1:name", "listener2" },
+                })
+                .Build();
+
+            // The TraceSource.Listeners property is readonly, and the TraceListenerCollection class
+            // does not have a default constructor, so this is a good example class to use for testing.
+
+            var traceSource = config.Create<TraceSource>();
+
+            Assert.Equal("source1", traceSource.Name);
+            Assert.Equal(2, traceSource.Listeners.Count);
+            Assert.Equal("listener1", traceSource.Listeners[0].Name);
+            Assert.Equal("listener2", traceSource.Listeners[1].Name);
         }
 
         [Fact]
