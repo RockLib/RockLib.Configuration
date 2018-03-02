@@ -311,7 +311,7 @@ namespace RockLib.Configuration.ObjectFactory
         {
             var itemTypes =
                 nonGenericListType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(m => (m.Name == "Add" || m.Name == "Contains" || m.Name == "IndexOf" || m.Name == "Remove")
+                    .Where(m => m.Name == "Add"
                         && m.GetParameters().Length == 1
                         && m.GetParameters()[0].ParameterType != typeof(object))
                     .Select(m => m.GetParameters()[0].ParameterType)
