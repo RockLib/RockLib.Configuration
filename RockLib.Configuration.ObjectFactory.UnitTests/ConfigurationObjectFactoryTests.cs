@@ -1229,7 +1229,9 @@ namespace Tests
             // The TraceSource.Listeners property is readonly, and the TraceListenerCollection class
             // does not have a default constructor, so this is a good example class to use for testing.
 
-            var traceSource = config.Create<TraceSource>();
+            var defaultTypes = new DefaultTypes { { typeof(TraceListener), typeof(DefaultTraceListener) } };
+
+            var traceSource = config.Create<TraceSource>(defaultTypes);
 
             Assert.Equal("source1", traceSource.Name);
             Assert.Equal(2, traceSource.Listeners.Count);
