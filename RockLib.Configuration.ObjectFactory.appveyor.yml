@@ -58,7 +58,7 @@ deploy:
 notifications:
 - provider: Email
   to:
-  - brianfriesen@quickenloans.com
+  - itteamappcore@quickenloans.com
   on_build_success: false
   on_build_failure: false
   on_build_status_changed: true
