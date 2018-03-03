@@ -1,4 +1,4 @@
-version: '{build}'
+version: 'RockLib.Configuration.ProxyFactory.{build}.0.0-ci'
 image: Visual Studio 2017
 configuration: Release
 only_commits:
@@ -8,42 +8,32 @@ only_commits:
    - RockLib.Configuration.ProxyFactory.sln
    - RockLib.Configuration.ProxyFactory.appveyor.yml
 before_build:
-- ps: >-
-    $nuget_release_notes = "$env:appveyor_repo_commit_message`n`n$env:appveyor_repo_commit_message_extended".Replace("\n", "`n").TrimEnd()
+   - ps: |
+      $sln_path = "RockLib.Configuration.ProxyFactory.sln"
+      $csproj_path = "RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj"
+      
+      $commit_message = "$Env:appveyor_repo_commit_message`n`n$Env:appveyor_repo_commit_message_extended".Replace("\n", "`n").TrimEnd()
+      
+      $csproj = [xml](Get-Content $csproj_path)
+      
+      $package_version_node = $csproj.SelectSingleNode("/Project/PropertyGroup/PackageVersion")
 
-
-    $github_release_notes = "### $nuget_release_notes".Replace("`n", "\n")
-
-
-    $file = "RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj"
-
-
-    $doc = [xml](Get-Content $file)
-
-
-    $package_release_notes = $doc.SelectSingleNode("/Project/PropertyGroup/PackageReleaseNotes")
-
-
-    $package_release_notes.InnerText = $nuget_release_notes
-
-
-    $doc.Save((get-item $file))
-
-
-    $package_id = $doc.SelectSingleNode("/Project/PropertyGroup/PackageId").InnerText
-
-    $package_version = $doc.SelectSingleNode("/Project/PropertyGroup/PackageVersion").InnerText
-
-
-    $package_tag = "$package_id.$package_version"
-
-
-    Set-AppveyorBuildVariable -Name "release_notes" -Value $github_release_notes
-
-    Set-AppveyorBuildVariable -Name "package_tag" -Value $package_tag
-
-
-    nuget restore RockLib.Configuration.ProxyFactory.sln
+      $package_id = $csproj.SelectSingleNode("/Project/PropertyGroup/PackageId").InnerText
+      $package_version = $package_version_node.InnerText
+      $csproj_build_version = "$package_id.$package_version"
+      
+      If ($Env:appveyor_repo_tag -eq "true" -AND $Env:appveyor_repo_tag_name -eq $csproj_build_version) {
+         Update-AppVeyorBuild -Version $csproj_build_version
+      } else {
+         $package_version_node.InnerText = "$Env:appveyor_build_version.0.0-ci"
+      }
+      
+      $package_release_notes_node = $csproj.SelectSingleNode("/Project/PropertyGroup/PackageReleaseNotes")
+      $package_release_notes_node.InnerText = $commit_message
+      
+      $csproj.Save((Get-Item $csproj_path))
+      
+      nuget restore $sln_path
 build:
   project: RockLib.Configuration.ProxyFactory.sln
   verbosity: minimal
@@ -52,22 +42,23 @@ artifacts:
 deploy:
 - provider: GitHub
   tag: $(appveyor_repo_tag_name)
-  release: $(appveyor_repo_tag_name)
+  release: $(appveyor_repo_commit_message)
+  description: $(appveyor_repo_commit_message_extended)
   auth_token:
     secure: yjDw1QLeuxM3Wvq9ZEJIB8JaEK/L2e7MhwrKicm3/SBh0FwbAEb3Fpg82h0fFALU
   on:
     appveyor_repo_tag: true
-    appveyor_repo_tag_name: $(package_tag)
+    appveyor_repo_tag_name: $(appveyor_build_version)
 - provider: NuGet
   api_key:
     secure: n0btQo8iZJZTJ3S5vLWokuOxzv4dtYBi3cx6EbW41jTF5OfcshJs+dTMAGCTquLY
   on:
     appveyor_repo_tag: true
-    appveyor_repo_tag_name: $(package_tag)
+    appveyor_repo_tag_name: $(appveyor_build_version)
 notifications:
 - provider: Email
   to:
   - brianfriesen@quickenloans.com
   on_build_success: false
-  on_build_failure: true
-  on_build_status_changed: false
+  on_build_failure: false
+  on_build_status_changed: true
