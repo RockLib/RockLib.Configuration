@@ -25,7 +25,7 @@ before_build:
       If ($Env:appveyor_repo_tag -eq "true" -AND $Env:appveyor_repo_tag_name -eq $csproj_build_version) {
          Update-AppVeyorBuild -Version $csproj_build_version
       } else {
-         $package_version_node.InnerText = "$Env:appveyor_build_version.0.0-ci"
+         $package_version_node.InnerText = "$Env:appveyor_build_number.0.0-ci"
       }
       
       $package_release_notes_node = $csproj.SelectSingleNode("/Project/PropertyGroup/PackageReleaseNotes")
