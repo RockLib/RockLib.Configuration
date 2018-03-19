@@ -1,13 +1,16 @@
-# RockLib Configuration
+This repository contains the source code for three nuget packages:
 
-This repository contains three packages:
+### RockLib.Configuration [![Build status](https://ci.appveyor.com/api/projects/status/0qxs1k1bw36cn8ly?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration)
+  
+  Defines a static `Config` class as a general replacement for the old .NET Framework `ConfigurationManager` class.
 
-- RockLib.Configuration
-  - [![Build status](https://ci.appveyor.com/api/projects/status/0qxs1k1bw36cn8ly?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration)
-- RockLib.Configuration.ObjectFactory
-  - [![Build status](https://ci.appveyor.com/api/projects/status/ox9velgud5ljj8d0?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-owv0n)
-- RockLib.Configuration.ProxyFactory
-  - [![Build status](https://ci.appveyor.com/api/projects/status/ogf4axfokbklh638?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-fe27m)
+### RockLib.Configuration.ObjectFactory [![Build status](https://ci.appveyor.com/api/projects/status/ox9velgud5ljj8d0?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-owv0n)
+
+An alternative to `Microsoft.Extensions.Configuration.Binder` that supports readonly properties and other features commonly found in JSON and XML serializers.
+
+### RockLib.Configuration.ProxyFactory [![Build status](https://ci.appveyor.com/api/projects/status/ogf4axfokbklh638?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-fe27m)
+
+A factory that creates instances of property-only interfaces, defined at run-time, and populated with values defined in an instance of `IConfiguration`.
 
 All RockLib packages will depend on the RockLib.Configuration package to provide its configuration features.
 
