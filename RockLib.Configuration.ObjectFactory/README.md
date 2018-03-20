@@ -261,4 +261,72 @@ can be rewritten like this:
 
 ### Default Types
 
+If a type `Foo` has an abstract property `Bar`:
+
+```c#
+public class Foo
+{
+    public IBar Bar { get; set; }
+}
+
+public interface IBar
+{
+}
+
+public class DefaultBar : IBar
+{
+    public int Baz { get; set; }
+}
+
+we would like to be able to define the `DefaultBar` type as the default type - if the type is not otherwise specified, create an instance of `DefaultBar`. There are two ways of specifying the default type: by property or by type. When specified by property, we want to say: "when setting the `Foo.Bar` property, if the configuration is *not* type-specified, set the property to an instance of `DefaultBar`." When specified by type we want to say: "whenever creating an instance of `IBar`, if the configuration is *not* type-specified, create an instance of `DefaultBar`.
+
+To programmatically set `DefaultBar` as the default type for the `Foo.Bar`, call the `Create` extension method as follows:
+
+```c#
+DefaultValues defaultValues =
+    new DefaultValues().Add(typeof(Foo), nameof(Bar), typeof(DefaultBar));
+    
+Foo foo = configuration.Create<Foo>(defaultValues: defaultValues);
+```
+
+To programmatically set `DefaultBar` as the default type for the `IBar`, call the `Create` extension method as follows:
+
+```c#
+DefaultValues defaultValues =
+    new DefaultValues().Add(typeof(IBar), typeof(DefaultBar));
+
+var foo = configuration.Create<Foo>(defaultValues: defaultValues);
+```
+
+Default values can also be specified via attributes, so that the extra parameter when in the `Create` extension method can be omitted. 
+
+```c#
+public class Foo
+{
+    [DefaultType(typeof(DefaultBar))]
+    public IBar Bar { get; set; }
+    
+    public IBaz Baz { get; set; }
+}
+
+public interface IBar
+{
+}
+
+public class DefaultBar : IBar
+{
+    public string Qux { get; set; }
+}
+
+[DefaultType(typeof(DefaultBaz))]
+public interface IBaz
+{
+}
+
+public class Baz : IBaz
+{
+    public bool Corge { get; set; }
+}
+```
+
 ### Value Converters
