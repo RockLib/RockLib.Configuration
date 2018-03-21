@@ -6,7 +6,7 @@ This repository contains the source code for three nuget packages:
 
 ### [RockLib.Configuration.ObjectFactory](RockLib.Configuration.ObjectFactory) [![Build status](https://ci.appveyor.com/api/projects/status/ox9velgud5ljj8d0?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-owv0n)
 
-An alternative to `Microsoft.Extensions.Configuration.Binder` that supports readonly properties and other features commonly found in JSON and XML serializers.
+An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-default constructors and other features commonly found in JSON and XML serializers.
 
 ### [RockLib.Configuration.ProxyFactory](RockLib.Configuration.ProxyFactory) [![Build status](https://ci.appveyor.com/api/projects/status/ogf4axfokbklh638?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-fe27m)
 
