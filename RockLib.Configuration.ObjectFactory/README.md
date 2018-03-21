@@ -138,7 +138,7 @@ namespace MyNamespace
 }
 ```
 
-a instance of `Foo` can be created with a `Baz` property with a value of type `BazDerived` by specifying a `type/value` pair where the `type` is a *[assembly quallified name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname.aspx)*:
+a instance of `Foo` can be created with a `Baz` property with a value of type `BazDerived` by specifying a `type/value` pair where the `type` is a *[assembly qualified name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname.aspx)*:
 
 ```json
 {
@@ -277,6 +277,7 @@ public class DefaultBar : IBar
 {
     public int Baz { get; set; }
 }
+```
 
 We would like to be able to define the `DefaultBar` type as the default type - if the type is not otherwise specified, create an instance of `DefaultBar`. There are two ways of specifying the default type: by property or by type. When specified by property, we want to say: "when setting the `Foo.Bar` property, if the configuration is *not* type-specified, set the property to an instance of `DefaultBar`." When specified by type we want to say: "whenever creating an instance of `IBar`, if the configuration is *not* type-specified, create an instance of `DefaultBar`.
 
@@ -331,7 +332,7 @@ public class Baz : IBaz
 
 ### Value Converters
 
-RockLib converts most configuration string values to the target type by using the `TypeConverter` obtained by calling `TypeDescriptor.GetConverter(targetType)`. In addition, there is support for target types `Encoding` and `Type`. If value conversions need to be supported for additional types, value converters can be registered. These value converters a functions that have a single string parameter and return the target type. Similar to default types, they can be registered by property or by type.
+RockLib converts most configuration string values to the target type by using the `TypeConverter` obtained by calling `TypeDescriptor.GetConverter(targetType)`. In addition, there is support for target types `Encoding` and `Type`. If value conversions need to be supported for additional types, value converters can be registered. These value converters are functions that have a single string parameter and return the target type. Similar to default types, they can be registered by property or by type.
 
 This example defines a class that has a property of type `System.Numerics.BigInteger`, which does not have a `TypeConverter` defined.
 
