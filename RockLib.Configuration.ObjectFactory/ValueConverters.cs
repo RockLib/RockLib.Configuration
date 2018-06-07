@@ -46,7 +46,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// </summary>
         /// <param name="targetType">A type that needs a default type.</param>
         /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
-        /// <returns>This instance of <see cref="DefaultTypes"/>.</returns>
+        /// <returns>This instance of <see cref="ValueConverters"/>.</returns>
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="targetType"/> or <paramref name="convertFunc"/> is null.
         /// </exception>
