@@ -2087,6 +2087,40 @@ namespace Tests
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
             Assert.IsType<HasSomething>(foo.Baz["waldo"]);
         }
+
+        [Fact]
+        public void UsesDefaultTypeAttributeForTopLevelType()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "fred", "123.45" },
+                })
+                .Build();
+
+            var instance = config.Create<IHasDefaultType>();
+
+            Assert.IsType<DefaultHasDefaultType>(instance);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)instance).Fred);
+        }
+
+        [Fact]
+        public void UsesDefaultTypesObjectForTopLevelType()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "waldo", "123.45" },
+                })
+                .Build();
+
+            var defaults = new DefaultTypes().Add(typeof(IHasNoDefaultType), typeof(DefaultHasNoDefaultType));
+
+            var instance = config.Create<IHasNoDefaultType>(defaults);
+
+            Assert.IsType<DefaultHasNoDefaultType>(instance);
+            Assert.Equal(123.45, ((DefaultHasNoDefaultType)instance).Waldo);
+        }
     }
 
     public class HasSimpleReadWriteDictionaryProperties
