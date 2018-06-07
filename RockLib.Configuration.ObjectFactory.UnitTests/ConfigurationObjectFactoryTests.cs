@@ -2087,6 +2087,72 @@ namespace Tests
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
             Assert.IsType<HasSomething>(foo.Baz["waldo"]);
         }
+
+        [Fact]
+        public void UsesDefaultTypeAttributeForTopLevelType()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "fred", "123.45" },
+                })
+                .Build();
+
+            var instance = config.Create<IHasDefaultType>();
+
+            Assert.IsType<DefaultHasDefaultType>(instance);
+            Assert.Equal(123.45, ((DefaultHasDefaultType)instance).Fred);
+        }
+
+        [Fact]
+        public void UsesDefaultTypesObjectForTopLevelType()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "waldo", "123.45" },
+                })
+                .Build();
+
+            var defaults = new DefaultTypes().Add(typeof(IHasNoDefaultType), typeof(DefaultHasNoDefaultType));
+
+            var instance = config.Create<IHasNoDefaultType>(defaults);
+
+            Assert.IsType<DefaultHasNoDefaultType>(instance);
+            Assert.Equal(123.45, ((DefaultHasNoDefaultType)instance).Waldo);
+        }
+
+        [Fact]
+        public void UsesConvertMethodAttributeForTopLevelType()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "fred", "123.45" },
+                })
+                .Build();
+
+            var instance = config.GetSection("fred").Create<HasConvertMethod>();
+
+            Assert.Equal(123.45, instance.Fred);
+        }
+
+        [Fact]
+        public void UsesValueConvertersObjectForTopLevelType()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "waldo", "123.45" },
+                })
+                .Build();
+
+            var valueConverters = new ValueConverters().Add(typeof(HasNoConvertMethod), value => new HasNoConvertMethod { Waldo = double.Parse(value) });
+
+            var instance = config.GetSection("waldo").Create<HasNoConvertMethod>(valueConverters: valueConverters);
+
+            Assert.Equal(123.45, instance.Waldo);
+        }
     }
 
     public class HasSimpleReadWriteDictionaryProperties
@@ -2687,6 +2753,22 @@ namespace Tests
     }
 
     public class DefaultHasNoDefaultType : IHasNoDefaultType
+    {
+        public double Waldo { get; set; }
+    }
+
+    [ConvertMethod(nameof(Convert))]
+    public class HasConvertMethod
+    {
+        public double Fred { get; set; }
+
+        private static HasConvertMethod Convert(string value)
+        {
+            return new HasConvertMethod { Fred = double.Parse(value) };
+        }
+    }
+
+    public class HasNoConvertMethod
     {
         public double Waldo { get; set; }
     }

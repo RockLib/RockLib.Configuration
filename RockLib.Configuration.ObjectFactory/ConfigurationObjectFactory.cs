@@ -400,9 +400,6 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static bool TryGetDefaultType(IDefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
         {
-            defaultType = null;
-            if (declaringType == null || memberName == null) return false;
-
             if (defaultTypes.TryGet(declaringType, memberName, out defaultType)) return true;
             if (defaultTypes.TryGet(targetType, out defaultType)) return true;
 
