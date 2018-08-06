@@ -28,16 +28,16 @@ namespace Tests
         }
 
         [Theory]
-        [InlineData(typeof(DefaultConstructor), 1)]
-        [InlineData(typeof(OneParameter), 1, "bar")]
-        [InlineData(typeof(OneParameter), 0)]
-        [InlineData(typeof(TwoParameters), 1, "bar", "baz")]
-        [InlineData(typeof(TwoParameters), 0.5, "bar")]
-        [InlineData(typeof(TwoParameters), 0)]
-        [InlineData(typeof(OneParameterOneOptionalParameter), 1, "bar", "baz")]
-        [InlineData(typeof(OneParameterOneOptionalParameter), 0.5, "bar")]
-        [InlineData(typeof(OneParameterOneOptionalParameter), 0)]
-        public void MatchedParametersRatioIsCorrect(Type type, double expectedMatchedParametersRatio, params string[] resolvableMemberNames)
+        [InlineData(typeof(DefaultConstructor), true)]
+        [InlineData(typeof(OneParameter), true, "bar")]
+        [InlineData(typeof(OneParameter), false)]
+        [InlineData(typeof(TwoParameters), true, "bar", "baz")]
+        [InlineData(typeof(TwoParameters), false, "bar")]
+        [InlineData(typeof(TwoParameters), false)]
+        [InlineData(typeof(OneParameterOneOptionalParameter), true, "bar", "baz")]
+        [InlineData(typeof(OneParameterOneOptionalParameter), false, "bar")]
+        [InlineData(typeof(OneParameterOneOptionalParameter), false)]
+        public void IsInvokableWithoutDefaultParametersIsCorrect(Type type, bool expectedIsInvokableWithoutDefaultParameters, params string[] resolvableMemberNames)
         {
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
@@ -45,20 +45,20 @@ namespace Tests
             var orderInfo = new ConstructorOrderInfo(constructor, members);
 
             Assert.Same(constructor, orderInfo.Constructor);
-            Assert.Equal(expectedMatchedParametersRatio, orderInfo.MatchedParametersRatio);
+            Assert.Equal(expectedIsInvokableWithoutDefaultParameters, orderInfo.IsInvokableWithoutDefaultParameters);
         }
 
         [Theory]
-        [InlineData(typeof(DefaultConstructor), 1)]
-        [InlineData(typeof(OneParameter), 1, "bar")]
-        [InlineData(typeof(OneParameter), 0)]
-        [InlineData(typeof(TwoParameters), 1, "bar", "baz")]
-        [InlineData(typeof(TwoParameters), 0.5, "bar")]
-        [InlineData(typeof(TwoParameters), 0)]
-        [InlineData(typeof(OneParameterOneOptionalParameter), 1, "bar", "baz")]
-        [InlineData(typeof(OneParameterOneOptionalParameter), 1, "bar")]
-        [InlineData(typeof(OneParameterOneOptionalParameter), 0.5)]
-        public void MatchedOrDefaultParametersRatioIsCorrect(Type type, double expectedMatchedOrDefaultParametersRatio, params string[] resolvableMemberNames)
+        [InlineData(typeof(DefaultConstructor), true)]
+        [InlineData(typeof(OneParameter), true, "bar")]
+        [InlineData(typeof(OneParameter), false)]
+        [InlineData(typeof(TwoParameters), true, "bar", "baz")]
+        [InlineData(typeof(TwoParameters), false, "bar")]
+        [InlineData(typeof(TwoParameters), false)]
+        [InlineData(typeof(OneParameterOneOptionalParameter), true, "bar", "baz")]
+        [InlineData(typeof(OneParameterOneOptionalParameter), true, "bar")]
+        [InlineData(typeof(OneParameterOneOptionalParameter), false)]
+        public void IsInvokableWithDefaultParametersIsCorrect(Type type, bool expectedIsInvokableWithDefaultParameters, params string[] resolvableMemberNames)
         {
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
@@ -66,7 +66,7 @@ namespace Tests
             var orderInfo = new ConstructorOrderInfo(constructor, members);
 
             Assert.Same(constructor, orderInfo.Constructor);
-            Assert.Equal(expectedMatchedOrDefaultParametersRatio, orderInfo.MatchedOrDefaultParametersRatio);
+            Assert.Equal(expectedIsInvokableWithDefaultParameters, orderInfo.IsInvokableWithDefaultParameters);
         }
 
         [Theory]

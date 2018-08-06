@@ -601,7 +601,7 @@ namespace RockLib.Configuration.ObjectFactory
                     .ToList();
                 if (orderedConstructors.Count > 1 && orderedConstructors[0].CompareTo(orderedConstructors[1]) == 0)
                     throw Exceptions.AmbiguousConstructors(Type);
-                if (orderedConstructors[0].MatchedOrDefaultParametersRatio < 1)
+                if (!orderedConstructors[0].IsInvokableWithDefaultParameters)
                     throw Exceptions.MissingRequiredConstructorParameters(Configuration, orderedConstructors[0]);
                 return orderedConstructors[0].Constructor;
             }
