@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 #if NET451 || NET462
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 #endif
 
@@ -50,8 +51,12 @@ namespace RockLib.Configuration
             var inMemoryKeys = appSettings
                 .AllKeys
                 .ToDictionary(k => $"AppSettings:{k}", k => appSettings[k]);
-
             builder.AddInMemoryCollection(inMemoryKeys);
+
+            var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            if (configuration != null && configuration.Sections != null)
+                foreach (var rockLibConfigurationSection in configuration.Sections.OfType<RockLibConfigurationSection>())
+                    builder.AddInMemoryCollection(rockLibConfigurationSection.Settings);
 
             return builder;
         }
