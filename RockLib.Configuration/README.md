@@ -2,6 +2,15 @@
 
 Defines a static `Config` class as a general replacement for the old .NET Framework `ConfigurationManager` class.
 
+##### Table of Contents
+- [Overview](#overview)
+- [Library Usage](#library-usage)
+- [Application Usage](#application-usage)
+  - [.NET Framework Application Usage](#net-framework-application-usage)
+- [Extension Methods](#extension-methods)
+
+------
+
 ## Overview
 
 The old .NET Framework `ConfigurationManager` class was very useful for libraries to use as a default source of per-application settings. For example, a class could define two constructors: one that defines all the settings for the class, and one parameterless constructor that reads the settings from configuration. But since `ConfigurationManager` no longer exists, this pattern becomes impossible. The `Config` class makes it possible again.
@@ -30,7 +39,7 @@ public Startup(IConfiguration configuration)
 ```
 
 If the configuration root is not explicitly set, it will load configuration settings, in order, from:
-3
+
 1) If the application is a .NET Framework app, from `ConfigurationManager` (see [.NET Framework Application Usage](#net-framework-application-usage) for details);
 2) A `'appsettings.json'` file, relative to the current working directory;
 3) A `'appsettings.{environment}.json file'`, relative to the corrent working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable;
@@ -38,7 +47,7 @@ If the configuration root is not explicitly set, it will load configuration sett
 
 **Note that ASP.NET Core applications do not automatically load settings from `'appsettings.json'` - the configuration root must be set explicitly as described above.**
 
-## .NET Framework Application Usage
+### .NET Framework Application Usage
 
 Starting in RockLib.Configuration version 2.1.0, .NET Framework applications can configure their application completely through their app.config/web.config, without any additional setup.
 
@@ -151,3 +160,11 @@ That example uses attributes. The following equivalent example uses elements.
     </item>
 </my_section>
 ```
+
+## Extension Methods
+
+The RockLib.Configuration library defines extension methods for `IConfigurationBuilder` that configure the builder the same way that the default `Config.Root` is configured.
+
+The `AddAppSettingsJson` extension method adds settings from an `'appsettings.json'` file, relative to the current working directory, then addes settings from an `'appsettings.{environment}.json file'`, relative to the corrent working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable. Both of these files are optional.
+
+The `AddConfigurationManager` extension method (only available from .NET Framework applications) adds settings from the `ConfigurationManager` class to the configuration builder (see [.NET Framework Application Usage](#net-framework-application-usage) for details).
