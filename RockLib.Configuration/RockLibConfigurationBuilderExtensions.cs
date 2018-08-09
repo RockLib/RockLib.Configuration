@@ -47,18 +47,29 @@ namespace RockLib.Configuration
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
         public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder)
         {
-            var appSettings = System.Configuration.ConfigurationManager.AppSettings;
-            var inMemoryKeys = appSettings
-                .AllKeys
-                .ToDictionary(k => $"AppSettings:{k}", k => appSettings[k]);
-            builder.AddInMemoryCollection(inMemoryKeys);
+            var settings = new Dictionary<string, string>();
 
-            var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            if (configuration != null && configuration.Sections != null)
-                foreach (var rockLibConfigurationSection in configuration.Sections.OfType<RockLibConfigurationSection>())
-                    builder.AddInMemoryCollection(rockLibConfigurationSection.Settings);
+            try
+            {
+                foreach (var key in ConfigurationManager.AppSettings.AllKeys)
+                    settings[$"AppSettings:{key}"] = ConfigurationManager.AppSettings[key];
+            }
+            catch
+            {
+            }
 
-            return builder;
+            try
+            {
+                var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                if (configuration != null && configuration.Sections != null)
+                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
+                        settings[setting.Key] = setting.Value;
+            }
+            catch
+            {
+            }
+
+            return builder.AddInMemoryCollection(settings);
         }
 #endif
     }
