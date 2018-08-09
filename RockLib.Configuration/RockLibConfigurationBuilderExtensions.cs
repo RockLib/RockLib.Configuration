@@ -10,7 +10,7 @@ using System.Linq;
 namespace RockLib.Configuration
 {
     /// <summary>
-    /// Extension methods for adding RockLib's standard JSON config file to a <see cref="IConfigurationBuilder"/>.
+    /// Extension methods for adding to configuration providers to an instance of <see cref="IConfigurationBuilder"/>.
     /// </summary>
     public static class RockLibConfigurationBuilderExtensions
     {
@@ -41,7 +41,9 @@ namespace RockLib.Configuration
 
 #if NET451 || NET462
         /// <summary>
-        /// Adds support for .Net Framework applications to pull in App or Web.config AppSettings values.
+        /// Adds the settings from the current application's App.config or Web.config to the
+        /// specified configuration builder. Settings from <see cref="ConfigurationManager.AppSettings"/>
+        /// along with any custom sections of type <see cref="RockLibConfigurationSection"/> will be added.
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
