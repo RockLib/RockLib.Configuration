@@ -105,8 +105,10 @@ namespace RockLib.Configuration
 
             builder
                 .AddAppSettingsJson()
-                .AddEnvironmentVariables()
-                .AddInMemoryCollection(additionalValues ?? new List<KeyValuePair<string, string>>());
+                .AddEnvironmentVariables();
+
+            if (additionalValues != null)
+                builder.AddInMemoryCollection(additionalValues);
             
             var configurationRoot = builder.Build();
            

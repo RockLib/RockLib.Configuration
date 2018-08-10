@@ -3,13 +3,14 @@ using Microsoft.Extensions.Configuration;
 
 #if NET451 || NET462
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 #endif
 
 namespace RockLib.Configuration
 {
     /// <summary>
-    /// Extension methods for adding RockLib's standard JSON config file to a <see cref="IConfigurationBuilder"/>.
+    /// Extension methods for adding to configuration providers to an instance of <see cref="IConfigurationBuilder"/>.
     /// </summary>
     public static class RockLibConfigurationBuilderExtensions
     {
@@ -40,20 +41,37 @@ namespace RockLib.Configuration
 
 #if NET451 || NET462
         /// <summary>
-        /// Adds support for .Net Framework applications to pull in App or Web.config AppSettings values.
+        /// Adds the settings from the current application's App.config or Web.config to the
+        /// specified configuration builder. Settings from <see cref="ConfigurationManager.AppSettings"/>
+        /// along with any custom sections of type <see cref="RockLibConfigurationSection"/> will be added.
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
         public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder)
         {
-            var appSettings = System.Configuration.ConfigurationManager.AppSettings;
-            var inMemoryKeys = appSettings
-                .AllKeys
-                .ToDictionary(k => $"AppSettings:{k}", k => appSettings[k]);
+            var settings = new Dictionary<string, string>();
 
-            builder.AddInMemoryCollection(inMemoryKeys);
+            try
+            {
+                foreach (var key in ConfigurationManager.AppSettings.AllKeys)
+                    settings[$"AppSettings:{key}"] = ConfigurationManager.AppSettings[key];
+            }
+            catch
+            {
+            }
 
-            return builder;
+            try
+            {
+                var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                if (configuration != null && configuration.Sections != null)
+                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
+                        settings[setting.Key] = setting.Value;
+            }
+            catch
+            {
+            }
+
+            return builder.AddInMemoryCollection(settings);
         }
 #endif
     }
