@@ -11,6 +11,8 @@
     <Description>Creates objects from IConfiguration and IConfigurationSection objects. A replacement for some of the functionality of Microsoft.Extensions.Configuration.Binder.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ObjectFactory</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RockLib/RockLib.Configuration/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright 2017 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration Factory Binder IConfiguration IConfigurationSection</PackageTags>
     <Version>1.1.2</Version>

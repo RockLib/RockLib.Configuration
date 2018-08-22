@@ -11,6 +11,8 @@
     <Description>Creates proxy objects from interfaces using IConfiguration and IConfigurationSection objects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ProxyFactory</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/RockLib/RockLib.Configuration/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright 2017 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration Factory Proxy IConfiguration IConfigurationSection</PackageTags>
     <Version>1.0.0</Version>
