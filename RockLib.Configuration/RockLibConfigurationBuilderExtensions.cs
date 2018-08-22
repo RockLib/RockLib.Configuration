@@ -10,7 +10,7 @@ using System.Linq;
 namespace RockLib.Configuration
 {
     /// <summary>
-    /// Extension methods for adding to configuration providers to an instance of <see cref="IConfigurationBuilder"/>.
+    /// Extension methods for adding configuration providers to an instance of <see cref="IConfigurationBuilder"/>.
     /// </summary>
     public static class RockLibConfigurationBuilderExtensions
     {
@@ -34,7 +34,7 @@ namespace RockLib.Configuration
                 environment = Environment.GetEnvironmentVariable("ROCKLIB_ENVIRONMENT");
 
             if (!string.IsNullOrEmpty(environment))
-                builder = builder.AddJsonFile($"appsettings.{environment.ToLower()}.json", optional: true);
+                builder = builder.AddJsonFile($"appsettings.{environment}.json", optional: true);
 
             return builder;
         }
