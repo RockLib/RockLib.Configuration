@@ -10,7 +10,7 @@ using System.Linq;
 namespace RockLib.Configuration
 {
     /// <summary>
-    /// Extension methods for adding to configuration providers to an instance of <see cref="IConfigurationBuilder"/>.
+    /// Extension methods for adding configuration providers to an instance of <see cref="IConfigurationBuilder"/>.
     /// </summary>
     public static class RockLibConfigurationBuilderExtensions
     {
