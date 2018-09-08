@@ -350,7 +350,7 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static bool IsStringDictionary(Type type) =>
             type.GetTypeInfo().IsGenericType
-                && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>) || type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                 && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string);
 
         private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
