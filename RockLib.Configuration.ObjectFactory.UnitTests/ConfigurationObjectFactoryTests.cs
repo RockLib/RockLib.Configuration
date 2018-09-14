@@ -1834,6 +1834,8 @@ namespace Tests
                     { "foo:bar:waldo", "456" },
                     { "foo:baz:fred", "123" },
                     { "foo:baz:waldo", "456" },
+                    { "foo:qux:fred", "123" },
+                    { "foo:qux:waldo", "456" },
                 })
                 .Build();
 
@@ -1846,6 +1848,9 @@ namespace Tests
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(123, foo.Baz["fred"]);
             Assert.Equal(456, foo.Baz["waldo"]);
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(123, foo.Qux["fred"]);
+            Assert.Equal(456, foo.Qux["waldo"]);
         }
 
         [Fact]
@@ -1882,6 +1887,8 @@ namespace Tests
                     { "foo:bar:waldo", "456" },
                     { "foo:baz:fred", "123" },
                     { "foo:baz:waldo", "456" },
+                    { "foo:qux:fred", "123" },
+                    { "foo:qux:waldo", "456" },
                 })
                 .Build();
 
@@ -1894,6 +1901,9 @@ namespace Tests
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(123, foo.Baz["fred"]);
             Assert.Equal(456, foo.Baz["waldo"]);
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(123, foo.Qux["fred"]);
+            Assert.Equal(456, foo.Qux["waldo"]);
         }
 
         [Fact]
@@ -1906,6 +1916,8 @@ namespace Tests
                     { "foo:bar:waldo:baz", "ascii" },
                     { "foo:baz:fred:baz", "utf-8" },
                     { "foo:baz:waldo:baz", "ascii" },
+                    { "foo:qux:fred:baz", "utf-8" },
+                    { "foo:qux:waldo:baz", "ascii" },
                 })
                 .Build();
 
@@ -1918,6 +1930,9 @@ namespace Tests
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz["fred"].Baz);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(Encoding.UTF8, foo.Qux["fred"].Baz);
+            Assert.Equal(Encoding.ASCII, foo.Qux["waldo"].Baz);
         }
 
         [Fact]
@@ -1954,6 +1969,8 @@ namespace Tests
                     { "foo:bar:waldo:baz", "ascii" },
                     { "foo:baz:fred:baz", "utf-8" },
                     { "foo:baz:waldo:baz", "ascii" },
+                    { "foo:qux:fred:baz", "utf-8" },
+                    { "foo:qux:waldo:baz", "ascii" },
                 })
                 .Build();
 
@@ -1966,6 +1983,9 @@ namespace Tests
             Assert.Equal(2, foo.Baz.Count);
             Assert.Equal(Encoding.UTF8, foo.Baz["fred"].Baz);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(Encoding.UTF8, foo.Qux["fred"].Baz);
+            Assert.Equal(Encoding.ASCII, foo.Qux["waldo"].Baz);
         }
 
         [Fact]
@@ -1987,6 +2007,12 @@ namespace Tests
                     { "foo:baz:fred:value:qux", quxValue.ToString() },
                     { "foo:baz:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:waldo:value:baz", "ascii" },
+
+                    { "foo:qux:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
+                    { "foo:qux:fred:value:baz", "utf-8" },
+                    { "foo:qux:fred:value:qux", quxValue.ToString() },
+                    { "foo:qux:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
+                    { "foo:qux:waldo:value:baz", "ascii" },
                 })
                 .Build();
 
@@ -2006,6 +2032,13 @@ namespace Tests
             Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
             Assert.IsType<HasSomething>(foo.Baz["waldo"]);
+
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(Encoding.UTF8, foo.Qux["fred"].Baz);
+            Assert.IsType<DerivedHasSomething>(foo.Qux["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Qux["fred"]).Qux);
+            Assert.Equal(Encoding.ASCII, foo.Qux["waldo"].Baz);
+            Assert.IsType<HasSomething>(foo.Qux["waldo"]);
         }
 
         [Fact]
@@ -2067,6 +2100,12 @@ namespace Tests
                     { "foo:baz:fred:value:qux", quxValue.ToString() },
                     { "foo:baz:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
                     { "foo:baz:waldo:value:baz", "ascii" },
+
+                    { "foo:qux:fred:type", typeof(DerivedHasSomething).AssemblyQualifiedName },
+                    { "foo:qux:fred:value:baz", "utf-8" },
+                    { "foo:qux:fred:value:qux", quxValue.ToString() },
+                    { "foo:qux:waldo:type", typeof(HasSomething).AssemblyQualifiedName },
+                    { "foo:qux:waldo:value:baz", "ascii" },
                 })
                 .Build();
 
@@ -2086,6 +2125,13 @@ namespace Tests
             Assert.Equal(quxValue, ((DerivedHasSomething)foo.Baz["fred"]).Qux);
             Assert.Equal(Encoding.ASCII, foo.Baz["waldo"].Baz);
             Assert.IsType<HasSomething>(foo.Baz["waldo"]);
+
+            Assert.Equal(2, foo.Qux.Count);
+            Assert.Equal(Encoding.UTF8, foo.Qux["fred"].Baz);
+            Assert.IsType<DerivedHasSomething>(foo.Qux["fred"]);
+            Assert.Equal(quxValue, ((DerivedHasSomething)foo.Qux["fred"]).Qux);
+            Assert.Equal(Encoding.ASCII, foo.Qux["waldo"].Baz);
+            Assert.IsType<HasSomething>(foo.Qux["waldo"]);
         }
 
         [Fact]
@@ -2159,6 +2205,7 @@ namespace Tests
     {
         public Dictionary<string, int> Bar { get; set; }
         public IDictionary<string, int> Baz { get; set; }
+        public IReadOnlyDictionary<string, int> Qux { get; set; }
     }
 
     public class HasSimpleReadonlyDictionaryProperties
@@ -2169,20 +2216,23 @@ namespace Tests
 
     public class HasSimpleDictionaryConstructorParameters
     {
-        public HasSimpleDictionaryConstructorParameters(Dictionary<string, int> bar, IDictionary<string, int> baz)
+        public HasSimpleDictionaryConstructorParameters(Dictionary<string, int> bar, IDictionary<string, int> baz, IReadOnlyDictionary<string, int> qux)
         {
             Bar = bar;
             Baz = baz;
+            Qux = qux;
         }
 
         public Dictionary<string, int> Bar { get; }
         public IDictionary<string, int> Baz { get; }
+        public IReadOnlyDictionary<string, int> Qux { get; }
     }
 
     public class HasConcreteReadWriteDictionaryProperties
     {
         public Dictionary<string, HasSomething> Bar { get; set; }
         public IDictionary<string, HasSomething> Baz { get; set; }
+        public IReadOnlyDictionary<string, HasSomething> Qux { get; set; }
     }
 
     public class HasConcreteReadonlyDictionaryProperties
@@ -2193,20 +2243,23 @@ namespace Tests
 
     public class HasConcreteDictionaryParameters
     {
-        public HasConcreteDictionaryParameters(Dictionary<string, HasSomething> bar, IDictionary<string, HasSomething> baz)
+        public HasConcreteDictionaryParameters(Dictionary<string, HasSomething> bar, IDictionary<string, HasSomething> baz, IReadOnlyDictionary<string, HasSomething> qux)
         {
             Bar = bar;
             Baz = baz;
+            Qux = qux;
         }
 
         public Dictionary<string, HasSomething> Bar { get; }
         public IDictionary<string, HasSomething> Baz { get; }
+        public IReadOnlyDictionary<string, HasSomething> Qux { get; }
     }
 
     public class HasInterfaceReadWriteDictionaryProperties
     {
         public Dictionary<string, IHasSomething> Bar { get; set; }
         public IDictionary<string, IHasSomething> Baz { get; set; }
+        public IReadOnlyDictionary<string, IHasSomething> Qux { get; set; }
     }
 
     public class HasInterfaceReadonlyDictionaryProperties
@@ -2217,14 +2270,16 @@ namespace Tests
 
     public class HasInterfaceDictionaryParameters
     {
-        public HasInterfaceDictionaryParameters(Dictionary<string, IHasSomething> bar, IDictionary<string, IHasSomething> baz)
+        public HasInterfaceDictionaryParameters(Dictionary<string, IHasSomething> bar, IDictionary<string, IHasSomething> baz, IReadOnlyDictionary<string, IHasSomething> qux)
         {
             Bar = bar;
             Baz = baz;
+            Qux = qux;
         }
 
         public Dictionary<string, IHasSomething> Bar { get; }
         public IDictionary<string, IHasSomething> Baz { get; }
+        public IReadOnlyDictionary<string, IHasSomething> Qux { get; }
     }
 
     public class HasSimpleReadWriteCollectionProperties
