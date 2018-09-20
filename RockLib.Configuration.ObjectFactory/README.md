@@ -8,6 +8,7 @@ An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-
 - [Non-default constructors](#non-default-constructors)
 - [Type-specified values](#type-specified-values)
 - [Lists](#lists)
+- [Dictionaries](#dictionaries)
 - [Default Types](#default-types)
 - [Value Converters](#value-converters)
 
@@ -220,7 +221,7 @@ If a list property is readonly, one of the following conditions must be met:
   - `ICollectionList<T>`
 - The property type implements `IList` and has a single `Add` method that has one parameter with a type other than `object`.
 
-If a class has a list-type property, but the application only want to define one item, the configuration can be flattened. For the `Foo` class:
+If a class has a list-type property, but the application only wants to define one item, the configuration can be flattened. For the `Foo` class:
 
 ```c#
 public class Foo
@@ -255,6 +256,43 @@ can be rewritten like this:
     "bars": {
         "baz": "abc",
         "qux": 123
+    }
+}
+```
+
+### Dictionaries
+
+RockLib.Configuration.ObjectFactory currently supports the following dictionary types - note that the key of each dictionary type must be `string`:
+
+- `Dictionary<string, TValue>`
+- `IDictionary<string, TValue>`
+- `IReadOnlyDictionary<string, TValue>`
+
+If a dictionary property is readonly, it must be one of the following dictionary types:
+- `Dictionary<string, TValue>`
+- `IDictionary<string, TValue>`
+
+Dictionaries take the form of regular objects in configuration. For example, in the following Foo class:
+
+```c#
+public class Foo
+{
+    public Foo(IReadOnlyDictionary<string, int> bar)
+    {
+        Bar = bar;
+    }
+    
+    public IReadOnlyDictionary<string, int> Bar { get; }
+}
+```
+
+A configuration might look like this:
+
+```json
+{
+    "bar": {
+        "baz": 123,
+        "qux": 456
     }
 }
 ```
