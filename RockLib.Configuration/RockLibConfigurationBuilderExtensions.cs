@@ -15,6 +15,21 @@ namespace RockLib.Configuration
     public static class RockLibConfigurationBuilderExtensions
     {
         /// <summary>
+        /// Sets the value of the <see cref="Config.Root"/> property by building the specified
+        /// <see cref="IConfigurationBuilder"/>.
+        /// </summary>
+        /// <param name="builder">
+        /// The <see cref="IConfigurationBuilder"/> that will be the source of
+        /// the <see cref="Config.Root"/> property.
+        /// </param>
+        /// <returns>The <see cref="IConfigurationBuilder"/></returns>
+        public static IConfigurationBuilder SetConfigRoot(this IConfigurationBuilder builder)
+        {
+            Config.SetRoot(() => builder.Build());
+            return builder;
+        }
+
+        /// <summary>
         /// Adds the ASP.NET Core appsettings.json configuration provider to the builder using the configuration file "appsettings.json",
         /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
         /// </summary>
