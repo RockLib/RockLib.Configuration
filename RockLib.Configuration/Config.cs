@@ -2,6 +2,7 @@
 using RockLib.Immutable;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace RockLib.Configuration
 {
@@ -109,10 +110,34 @@ namespace RockLib.Configuration
 
             if (additionalValues != null)
                 builder.AddInMemoryCollection(additionalValues);
-            
+
+            builder.AddRockLibSecrets();
+
             var configurationRoot = builder.Build();
            
             return configurationRoot;
+        }
+
+        private static IConfigurationBuilder AddRockLibSecrets(this IConfigurationBuilder builder)
+        {
+            try
+            {
+                const string extensionTypeName = "RockLib.Secrets.ConfigurationBuilderExtensions, RockLib.Secrets";
+                var extensionType = Type.GetType(extensionTypeName)?.GetTypeInfo();
+                if (extensionType != null)
+                {
+                    var addRockLibSecretsMethod = extensionType.GetMethod("AddRockLibSecrets",
+                        new Type[] { typeof(IConfigurationBuilder) });
+
+                    if (addRockLibSecretsMethod != null)
+                        addRockLibSecretsMethod.Invoke(null, new object[] { builder });
+                }
+            }
+            catch
+            {
+            }
+
+            return builder;
         }
     }
 }
