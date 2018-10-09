@@ -15,9 +15,9 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public static class ConfigurationObjectFactory
     {
-        internal const string _typeKey = "type";
-        internal const string _valueKey = "value";
-        internal const string _reloadOnChangeKey = "reloadOnChange";
+        internal const string TypeKey = "type";
+        internal const string ValueKey = "value";
+        internal const string ReloadOnChangeKey = "reloadOnChange";
 
         private static readonly DefaultTypes _emptyDefaultTypes = new DefaultTypes();
         private static readonly ValueConverters _emptyValueConverters = new ValueConverters();
@@ -215,12 +215,12 @@ namespace RockLib.Configuration.ObjectFactory
             var i = 0;
             foreach (var child in configuration.GetChildren())
             {
-                if (child.Key.Equals(_typeKey, StringComparison.OrdinalIgnoreCase))
+                if (child.Key.Equals(TypeKey, StringComparison.OrdinalIgnoreCase))
                 {
                     if (string.IsNullOrEmpty(child.Value)) return false;
                     typeFound = true;
                 }
-                else if (!child.Key.Equals(_valueKey, StringComparison.OrdinalIgnoreCase)) return false;
+                else if (!child.Key.Equals(ValueKey, StringComparison.OrdinalIgnoreCase)) return false;
                 i++;
             }
             if (i == 1) return typeFound;
@@ -229,11 +229,11 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static object BuildTypeSpecifiedObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
-            var typeSection = configuration.GetSection(_typeKey);
+            var typeSection = configuration.GetSection(TypeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);
             if (!targetType.GetTypeInfo().IsAssignableFrom(specifiedType))
                 throw Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(targetType, specifiedType);
-            return BuildObject(configuration.GetSection(_valueKey), specifiedType, declaringType, memberName, valueConverters, defaultTypes, true);
+            return BuildObject(configuration.GetSection(ValueKey), specifiedType, declaringType, memberName, valueConverters, defaultTypes, true);
         }
 
         private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)

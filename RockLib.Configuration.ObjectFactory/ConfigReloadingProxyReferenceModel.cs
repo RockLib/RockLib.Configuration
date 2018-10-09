@@ -84,7 +84,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
         private void ReloadObject()
         {
             // If there has been a change to explicitly turn off reloadOnChange, don't reload the object.
-            if (_section[ConfigurationObjectFactory._reloadOnChangeKey]?.ToLowerInvariant() == "false")
+            if (_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant() == "false")
                 return;
 
             // Before doing anything, invoke Reloading.
@@ -124,12 +124,12 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             IConfiguration valueSection;
 
             // If _section contains a type-specified value, extract the type and use the value sub-section.
-            var typeValue = _section[ConfigurationObjectFactory._typeKey];
+            var typeValue = _section[ConfigurationObjectFactory.TypeKey];
             if (typeValue != null)
             {
                 // Throw if the value does not represent a valid Type.
                 concreteType = Type.GetType(typeValue, true);
-                valueSection = _section.GetSection(ConfigurationObjectFactory._valueKey);
+                valueSection = _section.GetSection(ConfigurationObjectFactory.ValueKey);
             }
 
             // If there is a registered default type, use it, and assume _section is the value section.
