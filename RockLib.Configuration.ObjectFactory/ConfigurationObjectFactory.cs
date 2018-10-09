@@ -17,6 +17,7 @@ namespace RockLib.Configuration.ObjectFactory
     {
         internal const string _typeKey = "type";
         internal const string _valueKey = "value";
+        internal const string _reloadOnChangeKey = "reloadOnChange";
 
         private static readonly DefaultTypes _emptyDefaultTypes = new DefaultTypes();
         private static readonly ValueConverters _emptyValueConverters = new ValueConverters();
@@ -398,7 +399,7 @@ namespace RockLib.Configuration.ObjectFactory
                 || GetConvertFunc(targetType, declaringType, memberName, valueConverters) != null;
         }
 
-        private static bool TryGetDefaultType(DefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
+        public static bool TryGetDefaultType(DefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
         {
             if (defaultTypes.TryGet(declaringType, memberName, out defaultType)) return true;
             if (defaultTypes.TryGet(targetType, out defaultType)) return true;

@@ -29,7 +29,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             _valueConverters = valueConverters;
             _declaringType = declaringType;
             _memberName = memberName;
-            _object = section.Create<IFoo>(defaultTypes, valueConverters);
+            _object = CreateObject();
             ChangeToken.OnChange(_section.GetReloadToken, ReloadObject);
         }
 
@@ -83,12 +83,16 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
 
         private void ReloadObject()
         {
+            // If there has been a change to explicitly turn off reloadOnChange, don't reload the object.
+            if (_section[ConfigurationObjectFactory._reloadOnChangeKey]?.ToLowerInvariant() == "false")
+                return;
+
             // Before doing anything, invoke Reloading.
             _reloading?.Invoke(this, EventArgs.Empty);
 
             // Capture the old object and create the new one.
             IFoo oldObject = _object;
-            IFoo newObject = _section.Create<IFoo>(_defaultTypes, _valueConverters);
+            IFoo newObject = CreateObject();
 
             if (oldObject != null)
             {
@@ -110,6 +114,38 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
 
             // After doing everything, invoke Reloaded.
             _reloaded?.Invoke(this, EventArgs.Empty);
+        }
+
+        private IFoo CreateObject()
+        {
+            // In order to create the object (and avoid infinite recursion), we need to figure out
+            // the concrete type to create and the config section that defines the value to create.
+            Type concreteType;
+            IConfiguration valueSection;
+
+            // If _section contains a type-specified value, extract the type and use the value sub-section.
+            var typeValue = _section[ConfigurationObjectFactory._typeKey];
+            if (typeValue != null)
+            {
+                // Throw if the value does not represent a valid Type.
+                concreteType = Type.GetType(typeValue, true);
+                valueSection = _section.GetSection(ConfigurationObjectFactory._valueKey);
+            }
+
+            // If there is a registered default type, use it, and assume _section is the value section.
+            else if (ConfigurationObjectFactory.TryGetDefaultType(_defaultTypes, typeof(IFoo), _declaringType, _memberName, out concreteType))
+            {
+                valueSection = _section;
+            }
+
+            // Throw if no type can be located.
+            else
+            {
+                throw new InvalidOperationException("Type not specified.");
+            }
+
+            // Put everything together.
+            return (IFoo)valueSection.Create(concreteType, _defaultTypes, _valueConverters);
         }
     }
 }
