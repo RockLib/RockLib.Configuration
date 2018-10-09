@@ -10,7 +10,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// Defines the default types used by <see cref="ConfigurationObjectFactory"/> when a type is not explicitly specified
     /// by a configuration section.
     /// </summary>
-    public sealed class DefaultTypes : IDefaultTypes, IEnumerable<KeyValuePair<string, Type>>
+    public sealed class DefaultTypes : IEnumerable<KeyValuePair<string, Type>>
     {
         private readonly Dictionary<string, Type> _dictionary = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 

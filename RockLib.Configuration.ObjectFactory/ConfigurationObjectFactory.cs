@@ -18,8 +18,8 @@ namespace RockLib.Configuration.ObjectFactory
         internal const string _typeKey = "type";
         internal const string _valueKey = "value";
 
-        private static readonly IDefaultTypes _emptyDefaultTypes = new DefaultTypes();
-        private static readonly IValueConverters _emptyValueConverters = new ValueConverters();
+        private static readonly DefaultTypes _emptyDefaultTypes = new DefaultTypes();
+        private static readonly ValueConverters _emptyValueConverters = new ValueConverters();
 
         /// <summary>
         /// Create an object of type <typeparamref name="T"/> based on the specified configuration.
@@ -99,7 +99,7 @@ namespace RockLib.Configuration.ObjectFactory
             return configuration.Create(type, null, null, valueConverters ?? _emptyValueConverters, defaultTypes ?? _emptyDefaultTypes);
         }
 
-        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             if (targetType.IsArray)
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
@@ -132,7 +132,7 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         private static object ConvertToType(
-            IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+            IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             var convert = GetConvertFunc(targetType, declaringType, memberName, valueConverters);
             try
@@ -165,7 +165,7 @@ namespace RockLib.Configuration.ObjectFactory
             throw Exceptions.CannotConvertSectionValueToTargetType(valueSection, targetType);
         }
 
-        private static Func<string, object> GetConvertFunc(Type targetType, Type declaringType, string memberName, IValueConverters valueConverters)
+        private static Func<string, object> GetConvertFunc(Type targetType, Type declaringType, string memberName, ValueConverters valueConverters)
         {
             if (!valueConverters.TryGet(declaringType, memberName, out Func<string, object> convert)
                 && !valueConverters.TryGet(targetType, out convert))
@@ -226,7 +226,7 @@ namespace RockLib.Configuration.ObjectFactory
             return i == 2;
         }
 
-        private static object BuildTypeSpecifiedObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object BuildTypeSpecifiedObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             var typeSection = configuration.GetSection(_typeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);
@@ -235,7 +235,7 @@ namespace RockLib.Configuration.ObjectFactory
             return BuildObject(configuration.GetSection(_valueKey), specifiedType, declaringType, memberName, valueConverters, defaultTypes, true);
         }
 
-        private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
 
@@ -274,7 +274,7 @@ namespace RockLib.Configuration.ObjectFactory
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
 
-        private static object BuildGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object BuildGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
@@ -324,7 +324,7 @@ namespace RockLib.Configuration.ObjectFactory
             return null;
         }
 
-        private static object BuildNonGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object BuildNonGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             var itemType = GetNonGenericListItemType(targetType);
             var addMethod = GetListAddMethod(null);
@@ -353,7 +353,7 @@ namespace RockLib.Configuration.ObjectFactory
                 && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>) || type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
                 && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string);
 
-        private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+        private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             var tValueType = targetType.GetTypeInfo().GetGenericArguments()[1];
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), tValueType);
@@ -364,7 +364,7 @@ namespace RockLib.Configuration.ObjectFactory
             return dictionary;
         }
 
-        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, IValueConverters valueConverters, IDefaultTypes defaultTypes, bool skipDefaultTypes = false)
+        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, bool skipDefaultTypes = false)
         {
             if (!skipDefaultTypes && TryGetDefaultType(defaultTypes, targetType, declaringType, memberName, out Type defaultType))
                 targetType = defaultType;
@@ -381,7 +381,7 @@ namespace RockLib.Configuration.ObjectFactory
             return new ObjectBuilder(targetType, configuration).Build(valueConverters, defaultTypes);
         }
 
-        private static bool IsSimpleType(Type targetType, Type declaringType, string memberName, IValueConverters valueConverters)
+        private static bool IsSimpleType(Type targetType, Type declaringType, string memberName, ValueConverters valueConverters)
         {
             var type = Nullable.GetUnderlyingType(targetType) ?? targetType;
             return type.GetTypeInfo().IsPrimitive
@@ -398,7 +398,7 @@ namespace RockLib.Configuration.ObjectFactory
                 || GetConvertFunc(targetType, declaringType, memberName, valueConverters) != null;
         }
 
-        private static bool TryGetDefaultType(IDefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
+        private static bool TryGetDefaultType(DefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
         {
             if (defaultTypes.TryGet(declaringType, memberName, out defaultType)) return true;
             if (defaultTypes.TryGet(targetType, out defaultType)) return true;
@@ -531,7 +531,7 @@ namespace RockLib.Configuration.ObjectFactory
             public Type Type { get; }
             public IConfiguration Configuration { get; }
 
-            public object Build(IValueConverters valueConverters, IDefaultTypes defaultTypes)
+            public object Build(ValueConverters valueConverters, DefaultTypes defaultTypes)
             {
                 var constructor = GetConstructor();
                 var args = GetArgs(constructor, valueConverters, defaultTypes);
@@ -545,7 +545,7 @@ namespace RockLib.Configuration.ObjectFactory
                 return obj;
             }
 
-            private void SetWritableProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            private void SetWritableProperty(object obj, PropertyInfo property, DefaultTypes defaultTypes, ValueConverters valueConverters)
             {
                 if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                 {
@@ -554,7 +554,7 @@ namespace RockLib.Configuration.ObjectFactory
                 }
             }
 
-            private void SetReadonlyListProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            private void SetReadonlyListProperty(object obj, PropertyInfo property, DefaultTypes defaultTypes, ValueConverters valueConverters)
             {
                 if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                 {
@@ -575,7 +575,7 @@ namespace RockLib.Configuration.ObjectFactory
                 }
             }
 
-            private void SetReadonlyDictionaryProperty(object obj, PropertyInfo property, IDefaultTypes defaultTypes, IValueConverters valueConverters)
+            private void SetReadonlyDictionaryProperty(object obj, PropertyInfo property, DefaultTypes defaultTypes, ValueConverters valueConverters)
             {
                 if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                 {
@@ -606,7 +606,7 @@ namespace RockLib.Configuration.ObjectFactory
                 return orderedConstructors[0].Constructor;
             }
 
-            private object[] GetArgs(ConstructorInfo constructor, IValueConverters valueConverters, IDefaultTypes defaultTypes)
+            private object[] GetArgs(ConstructorInfo constructor, ValueConverters valueConverters, DefaultTypes defaultTypes)
             {
                 var parameters = constructor.GetParameters();
                 var args = new object[parameters.Length];
