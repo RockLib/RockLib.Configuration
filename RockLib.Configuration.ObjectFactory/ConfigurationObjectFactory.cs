@@ -15,8 +15,8 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public static class ConfigurationObjectFactory
     {
-        private const string _typeKey = "type";
-        private const string _valueKey = "value";
+        internal const string _typeKey = "type";
+        internal const string _valueKey = "value";
 
         private static readonly IDefaultTypes _emptyDefaultTypes = new DefaultTypes();
         private static readonly IValueConverters _emptyValueConverters = new ValueConverters();

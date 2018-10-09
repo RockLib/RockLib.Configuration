@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard1.6;net462;net451</TargetFrameworks>
+    <Configurations>Debug;Release;ReferenceModel</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,6 +22,10 @@
 
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\RockLib.Configuration.ObjectFactory.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
+    <DefineConstants>TRACE;REFERENCE_MODEL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='net462'">
