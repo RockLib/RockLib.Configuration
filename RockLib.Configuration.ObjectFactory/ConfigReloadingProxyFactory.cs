@@ -10,6 +10,10 @@ using System.Reflection.Emit;
 
 namespace RockLib.Configuration.ObjectFactory
 {
+    /// <summary>
+    /// Static class that allows the creation of dynmaic proxy objects that reload their
+    /// backing fields upon configuration change.
+    /// </summary>
     public static class ConfigReloadingProxyFactory
     {
         private const MethodAttributes ExplicitInterfaceImplementation = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final;
@@ -28,9 +32,45 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static readonly ConcurrentDictionary<Type, Func<IConfiguration, DefaultTypes, ValueConverters, Type, string, object>> _proxyFactories = new ConcurrentDictionary<Type, Func<IConfiguration, DefaultTypes, ValueConverters, Type, string, object>>();
 
+        /// <summary>
+        /// Create an object of type <typeparamref name="TInterface"/> based on the specified configuration. The returned
+        /// object delegates its functionality to a backing field that is reloaded when the configuration changes.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface type to create.</typeparam>
+        /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <returns>
+        /// An object of type <typeparamref name="TInterface"/> with values set from the configuration that reloads
+        /// itself when the configuration changes.
+        /// </returns>
         public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
             (TInterface)configuration.CreateReloadingProxy(typeof(TInterface), defaultTypes, valueConverters);
 
+        /// <summary>
+        /// Create an object of type <paramref name="interfaceType"/> based on the specified configuration. The returned
+        /// object delegates its functionality to a backing field that is reloaded when the configuration changes.
+        /// </summary>
+        /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="interfaceType">The interface type to create.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <returns>
+        /// An object of type <paramref name="interfaceType"/> with values set from the configuration that reloads
+        /// itself when the configuration changes.
+        /// </returns>
         public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
             configuration.CreateReloadingProxy(interfaceType, defaultTypes ?? ConfigurationObjectFactory.EmptyDefaultTypes, valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters, null, null);
 

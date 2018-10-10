@@ -419,7 +419,7 @@ namespace RockLib.Configuration.ObjectFactory
                 || GetConvertFunc(targetType, declaringType, memberName, valueConverters) != null;
         }
 
-        public static bool TryGetDefaultType(DefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
+        internal static bool TryGetDefaultType(DefaultTypes defaultTypes, Type targetType, Type declaringType, string memberName, out Type defaultType)
         {
             if (defaultTypes.TryGet(declaringType, memberName, out defaultType)) return true;
             if (defaultTypes.TryGet(targetType, out defaultType)) return true;

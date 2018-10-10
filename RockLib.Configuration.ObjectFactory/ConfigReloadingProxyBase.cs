@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace RockLib.Configuration.ObjectFactory
 {
+    /// <summary>
+    /// A base class for reloading proxy classes.
+    /// </summary>
     public abstract class ConfigReloadingProxyBase : IDisposable
     {
         private readonly Type _interfaceType;
@@ -13,8 +16,27 @@ namespace RockLib.Configuration.ObjectFactory
         private readonly ValueConverters _valueConverters;
         private readonly Type _declaringType;
         private readonly string _memberName;
+
+        /// <summary>
+        /// The backing field that holds the underlying object.
+        /// </summary>
         protected internal object _object;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigReloadingProxyBase"/> class.
+        /// </summary>
+        /// <param name="interfaceType">The type of the interface that this proxy class will implement.</param>
+        /// <param name="section">The configuration section that defines the object that this class creates.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <param name="declaringType">If present the declaring type of the member that this instance is a value of.</param>
+        /// <param name="memberName">If present, the name of the member that this instance is the value of.</param>
         protected ConfigReloadingProxyBase(Type interfaceType, IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
         {
             _interfaceType = interfaceType;
@@ -27,11 +49,25 @@ namespace RockLib.Configuration.ObjectFactory
             ChangeToken.OnChange(section.GetReloadToken, ReloadObject);
         }
 
+        /// <summary>
+        /// Occurs immediately before the underlying object is reloaded.
+        /// </summary>
         public event EventHandler Reloading;
+
+        /// <summary>
+        /// Occurs immediately after the underlying object is reloaded.
+        /// </summary>
         public event EventHandler Reloaded;
 
+        /// <summary>
+        /// Reload the underlying object.
+        /// </summary>
         protected internal abstract void ReloadObject();
 
+        /// <summary>
+        /// Create the underlying object using the current section.
+        /// </summary>
+        /// <returns>The underlying object.</returns>
         protected internal object CreateObject()
         {
             // In order to create the object (and avoid infinite recursion), we need to figure out
@@ -56,7 +92,7 @@ namespace RockLib.Configuration.ObjectFactory
             else if (ConfigurationObjectFactory.TryGetDefaultType(_defaultTypes, _interfaceType, _declaringType, _memberName, out concreteType))
             {
                 // The value section depends on whether the 'ReloadOnChange' flag is set to true.
-                if (IsReloadOnChangeExplicitlyTurnedOn)
+                if (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "true"))
                     valueSection = _section.GetSection(ConfigurationObjectFactory.ValueKey);
                 else
                     valueSection = _section;
@@ -72,13 +108,20 @@ namespace RockLib.Configuration.ObjectFactory
             return valueSection.Create(concreteType, _defaultTypes, _valueConverters);
         }
 
-        protected internal bool IsReloadOnChangeExplicitlyTurnedOn =>
-            string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "true");
-
+        /// <summary>
+        /// Gets a value indicating whether the ReloadOnChange flag has been explicitly set to false.
+        /// </summary>
         protected internal bool IsReloadOnChangeExplicitlyTurnedOff =>
             string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false");
 
+        /// <summary>
+        /// Fires the <see cref="Reloading"/> event.
+        /// </summary>
         protected internal void OnReloading() => Reloading?.Invoke(this, EventArgs.Empty);
+
+        /// <summary>
+        /// Fires the <see cref="Reloaded"/> event.
+        /// </summary>
         protected internal void OnReloaded() => Reloaded?.Invoke(this, EventArgs.Empty);
 
         void IDisposable.Dispose() => (_object as IDisposable)?.Dispose();
