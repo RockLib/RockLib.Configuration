@@ -76,29 +76,25 @@ namespace RockLib.Configuration
             {
             }
 
-            try
-            {
-                var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                if (configuration != null && configuration.Sections != null)
-                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
-                        settings[setting.Key] = setting.Value;
-            }
-            catch (Exception ex)
-            {
-            }
-
-            try
-            {
-                var configuration =   WebConfigurationManager.OpenWebConfiguration("~");
-                if (configuration != null && configuration.Sections != null)
-                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
-                        settings[setting.Key] = setting.Value;
-            }
-            catch (Exception ex)
-            {
-            }
+            LoadConfiguration(() => ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None), settings);
+            LoadConfiguration(() => WebConfigurationManager.OpenWebConfiguration("~"), settings);
 
             return builder.AddInMemoryCollection(settings);
+        }
+
+        private static void LoadConfiguration(Func<System.Configuration.Configuration> getConfiguration, Dictionary<string, string> settings)
+        {
+            try
+            {
+                var configuration = getConfiguration();
+                if (configuration?.Sections != null)
+                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>()
+                        .SelectMany(x => x.Settings))
+                        settings[setting.Key] = setting.Value;
+            }
+            catch
+            {
+            }
         }
 #endif
     }
