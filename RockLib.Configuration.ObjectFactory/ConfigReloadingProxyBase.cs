@@ -82,5 +82,16 @@ namespace RockLib.Configuration.ObjectFactory
         protected internal void OnReloaded() => Reloaded?.Invoke(this, EventArgs.Empty);
 
         void IDisposable.Dispose() => (_object as IDisposable)?.Dispose();
+
+        // This class doesn't seem necessary, does it? Without it, the "partial interface implementation
+        // in an abstract class" doesn't seem to work. Gluing the base class and the interface together
+        // in the library makes everything work. Without it, the Reloading/Reloaded events aren't properly
+        // implemented. So leave this class here for now, ok?
+        private class MagicGlue : ConfigReloadingProxyBase, IConfigReloadingProxy<int>
+        {
+            public MagicGlue() : base(null, null, null, null, null, null) => throw new NotImplementedException();
+            public int Object => throw new NotImplementedException();
+            protected internal override void ReloadObject() => throw new NotImplementedException();
+        }
     }
 }
