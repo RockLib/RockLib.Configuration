@@ -30,7 +30,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             _declaringType = declaringType;
             _memberName = memberName;
             _object = CreateObject();
-            ChangeToken.OnChange(_section.GetReloadToken, ReloadObject);
+            ChangeToken.OnChange(section.GetReloadToken, ReloadObject);
         }
 
         // Properties are strictly pass-through.
@@ -83,28 +83,25 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
 
         private void ReloadObject()
         {
-            // If there has been a change to explicitly turn off reloadOnChange, don't reload the object.
-            if (_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant() == "false")
+            // If reloadOnChange is explicitly turned off, don't reload the object - just return.
+            if (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false"))
                 return;
 
             // Before doing anything, invoke Reloading.
             _reloading?.Invoke(this, EventArgs.Empty);
 
-            // Capture the old object and create the new one.
+            // Capture the old object and instantiate the new one (but don't set the field).
             IFoo oldObject = _object;
             IFoo newObject = CreateObject();
 
-            if (oldObject != null)
-            {
-                // Event handlers from the old object need to be copied to the new one.
-                newObject.Garply += _garply;
+            // Event handlers from the old object need to be copied to the new one.
+            newObject.Garply += _garply;
 
-                // Special case for when the interface has a read/write property: if the new
-                // property value is null and the old property value is not null, then copy
-                // the value from old to new.
-                if (oldObject.Qux != null && newObject.Qux == null)
-                    newObject.Qux = oldObject.Qux;
-            }
+            // Special case for when the interface has a read/write property: if the new
+            // property value is null and the old property value is not null, then copy
+            // the value from old to new.
+            if (oldObject.Qux != null && newObject.Qux == null)
+                newObject.Qux = oldObject.Qux;
 
             // After the new object has been fully initialized, set the backing field.
             _object = newObject;
@@ -124,7 +121,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             IConfiguration valueSection;
 
             // If _section contains a type-specified value, extract the type and use the value sub-section.
-            var typeValue = _section[ConfigurationObjectFactory.TypeKey];
+            string typeValue = _section[ConfigurationObjectFactory.TypeKey];
             if (typeValue != null)
             {
                 // Throw if the value does not represent a valid Type.
