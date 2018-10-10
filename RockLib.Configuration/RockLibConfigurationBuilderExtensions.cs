@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Web.Configuration;
 #endif
 
 namespace RockLib.Configuration
@@ -82,7 +83,18 @@ namespace RockLib.Configuration
                     foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
                         settings[setting.Key] = setting.Value;
             }
-            catch
+            catch (Exception ex)
+            {
+            }
+
+            try
+            {
+                var configuration =   WebConfigurationManager.OpenWebConfiguration("~");
+                if (configuration != null && configuration.Sections != null)
+                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
+                        settings[setting.Key] = setting.Value;
+            }
+            catch (Exception ex)
             {
             }
 
