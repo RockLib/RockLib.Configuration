@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Web.Configuration;
 #endif
 
 namespace RockLib.Configuration
@@ -75,18 +76,25 @@ namespace RockLib.Configuration
             {
             }
 
+            LoadConfiguration(() => ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None), settings);
+            LoadConfiguration(() => WebConfigurationManager.OpenWebConfiguration("~"), settings);
+
+            return builder.AddInMemoryCollection(settings);
+        }
+
+        private static void LoadConfiguration(Func<System.Configuration.Configuration> getConfiguration, Dictionary<string, string> settings)
+        {
             try
             {
-                var configuration = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                if (configuration != null && configuration.Sections != null)
-                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>().SelectMany(x => x.Settings))
+                var configuration = getConfiguration();
+                if (configuration?.Sections != null)
+                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>()
+                        .SelectMany(x => x.Settings))
                         settings[setting.Key] = setting.Value;
             }
             catch
             {
             }
-
-            return builder.AddInMemoryCollection(settings);
         }
 #endif
     }
