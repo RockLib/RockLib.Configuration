@@ -20,6 +20,9 @@ namespace RockLib.Configuration.ObjectFactory
         public static InvalidOperationException ConfigurationSpecifiedTypeIsNotAssignableToTargetType(Type targetType, Type specifiedType) =>
             new InvalidOperationException($"The configuration-specified type, '{specifiedType}' is not assignable to the target type {targetType}.");
 
+        public static InvalidOperationException TypeNotSpecifiedForReloadingProxy =>
+            new InvalidOperationException($"Type not specified for reloading proxy. {SpecifyType}");
+
         public static InvalidOperationException ConfigurationIsNotAList(IConfiguration configuration, Type targetCollectionType) =>
             new InvalidOperationException($"The {configuration.Description()} does not represent a list. It should be convertible to target collection type '{targetCollectionType}'.");
 

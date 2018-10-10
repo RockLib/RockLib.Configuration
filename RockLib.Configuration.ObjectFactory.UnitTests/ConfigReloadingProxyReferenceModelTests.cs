@@ -118,6 +118,110 @@ namespace Tests
         }
 
         [Fact]
+        public void ReloadOnChangeSetAndTypeSpecifiedExplicitly()
+        {
+            var config = GetReloadingConfig(typeof(Foo));
+
+            var garplies = 0;
+            var reloading = 0;
+            var reloaded = 0;
+
+            IFoo foo = new ProxyFoo(config.GetSection("foo"), new DefaultTypes(), new ValueConverters(), null, null);
+
+            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            Foo initialFoo = (Foo)proxyFoo.Object;
+
+            foo.Qux = "xyz";
+            foo.Garply += (s, e) => { garplies++; };
+
+            proxyFoo.Reloading += (s, e) => { reloading++; };
+            proxyFoo.Reloaded += (s, e) => { reloaded++; };
+
+            initialFoo.OnGarply();
+
+            Assert.Equal(123, foo.Bar);
+            Assert.Equal("xyz", foo.Qux);
+            Assert.Equal(1, garplies);
+
+            Assert.False(initialFoo.IsDisposed);
+            Assert.Equal(0, reloading);
+            Assert.Equal(0, reloaded);
+
+            ChangeConfig(config);
+
+            Assert.True(initialFoo.IsDisposed);
+            Assert.Equal(1, reloading);
+            Assert.Equal(1, reloaded);
+
+            Foo changedFoo = (Foo)proxyFoo.Object;
+
+            changedFoo.OnGarply();
+
+            Assert.Equal(456, foo.Bar);
+            Assert.Equal("xyz", foo.Qux);
+            Assert.Equal(2, garplies);
+
+            Assert.False(changedFoo.IsDisposed);
+
+            ((IDisposable)foo).Dispose();
+
+            Assert.True(changedFoo.IsDisposed);
+        }
+
+        [Fact]
+        public void ReloadOnChangeSetAndTypeSpecifiedByDefaultType()
+        {
+            var config = GetReloadingConfig();
+
+            var garplies = 0;
+            var reloading = 0;
+            var reloaded = 0;
+
+            var defaultTypes = new DefaultTypes().Add(typeof(IFoo), typeof(Foo));
+
+            IFoo foo = new ProxyFoo(config.GetSection("foo"), defaultTypes, new ValueConverters(), null, null);
+
+            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            Foo initialFoo = (Foo)proxyFoo.Object;
+
+            foo.Qux = "xyz";
+            foo.Garply += (s, e) => { garplies++; };
+
+            proxyFoo.Reloading += (s, e) => { reloading++; };
+            proxyFoo.Reloaded += (s, e) => { reloaded++; };
+
+            initialFoo.OnGarply();
+
+            Assert.Equal(123, foo.Bar);
+            Assert.Equal("xyz", foo.Qux);
+            Assert.Equal(1, garplies);
+
+            Assert.False(initialFoo.IsDisposed);
+            Assert.Equal(0, reloading);
+            Assert.Equal(0, reloaded);
+
+            ChangeConfig(config);
+
+            Assert.True(initialFoo.IsDisposed);
+            Assert.Equal(1, reloading);
+            Assert.Equal(1, reloaded);
+
+            Foo changedFoo = (Foo)proxyFoo.Object;
+
+            changedFoo.OnGarply();
+
+            Assert.Equal(456, foo.Bar);
+            Assert.Equal("xyz", foo.Qux);
+            Assert.Equal(2, garplies);
+
+            Assert.False(changedFoo.IsDisposed);
+
+            ((IDisposable)foo).Dispose();
+
+            Assert.True(changedFoo.IsDisposed);
+        }
+
+        [Fact]
         public void WhenReloadOnChangeIsChangedToFalseObjectIsNotReloaded()
         {
             var config = GetConfig();
@@ -180,6 +284,20 @@ namespace Tests
             {
                 ["foo:bar"] = "123",
             }).Build();
+        }
+
+        private static IConfigurationRoot GetReloadingConfig(Type type = null)
+        {
+            var initialData = new Dictionary<string, string>
+            {
+                ["foo:reloadOnChange"] = "true",
+                ["foo:value:bar"] = "123",
+            };
+
+            if (type != null)
+                initialData.Add("foo:type", type.AssemblyQualifiedName);
+
+            return new ConfigurationBuilder().AddInMemoryCollection(initialData).Build();
         }
 
         private static IConfigurationRoot GetConfig(string type = null)

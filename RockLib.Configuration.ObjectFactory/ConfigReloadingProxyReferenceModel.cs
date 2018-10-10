@@ -1,6 +1,5 @@
 ﻿#if REFERENCE_MODEL
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 using System;
 
 namespace RockLib.Configuration.ObjectFactory.ReferenceModel
@@ -13,34 +12,21 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
         event EventHandler Garply;
     }
 
-    public class ProxyFoo : IFoo, IDisposable, IConfigReloadingProxy<IFoo>
+    public class ProxyFoo : ConfigReloadingProxyBase, IFoo, IConfigReloadingProxy<IFoo>
     {
-        private readonly IConfiguration _section;
-        private readonly DefaultTypes _defaultTypes;
-        private readonly ValueConverters _valueConverters;
-        private readonly Type _declaringType;
-        private readonly string _memberName;
-        private IFoo _object;
-
         public ProxyFoo(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
+            : base(typeof(IFoo), section, defaultTypes, valueConverters, declaringType, memberName)
         {
-            _section = section;
-            _defaultTypes = defaultTypes;
-            _valueConverters = valueConverters;
-            _declaringType = declaringType;
-            _memberName = memberName;
-            _object = CreateObject();
-            ChangeToken.OnChange(section.GetReloadToken, ReloadObject);
         }
 
         // Properties are strictly pass-through.
-        int IFoo.Bar => _object.Bar;
+        int IFoo.Bar => Object.Bar;
 
         // Methods are strictly pass-through.
-        int IFoo.Baz(int qux) => _object.Baz(qux);
+        int IFoo.Baz(int qux) => Object.Baz(qux);
 
         // Properties are strictly pass-through.
-        string IFoo.Qux { get => _object.Qux; set => _object.Qux = value; }
+        string IFoo.Qux { get => Object.Qux; set => Object.Qux = value; }
 
         // Events are pass-through, but also need to capture handlers in a private field.
         private EventHandler _garply;
@@ -48,51 +34,32 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
         {
             add
             {
-                _object.Garply += value;
+                Object.Garply += value;
                 _garply += value;
             }
             remove
             {
-                _object.Garply -= value;
+                Object.Garply -= value;
                 _garply -= value;
             }
         }
 
-        // Dispose is implemented for all types.
-        void IDisposable.Dispose() => (_object as IDisposable)?.Dispose();
-
         // Implicitly implement the Object property so that tooling (e.g. LINQPad) will more
         // easily find this property for display purposes.
-        public IFoo Object => _object;
+        public IFoo Object => (IFoo)_object;
 
-        // Explicitly implement the Reloading event in the usual manner.
-        private EventHandler _reloading;
-        event EventHandler IConfigReloadingProxy<IFoo>.Reloading
-        {
-            add => _reloading += value;
-            remove => _reloading -= value;
-        }
-
-        // Explicitly implement the Reloaded event in the usual manner.
-        private EventHandler _reloaded;
-        event EventHandler IConfigReloadingProxy<IFoo>.Reloaded
-        {
-            add => _reloaded += value;
-            remove => _reloaded -= value;
-        }
-
-        private void ReloadObject()
+        protected internal override sealed void ReloadObject()
         {
             // If reloadOnChange is explicitly turned off, don't reload the object - just return.
-            if (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false"))
+            if (IsReloadOnChangeExplicitlyTurnedOff)
                 return;
 
             // Before doing anything, invoke Reloading.
-            _reloading?.Invoke(this, EventArgs.Empty);
+            OnReloading();
 
             // Capture the old object and instantiate the new one (but don't set the field).
-            IFoo oldObject = _object;
-            IFoo newObject = CreateObject();
+            IFoo oldObject = Object;
+            IFoo newObject = (IFoo)CreateObject();
 
             // Event handlers from the old object need to be copied to the new one.
             newObject.Garply += _garply;
@@ -110,39 +77,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             (oldObject as IDisposable)?.Dispose();
 
             // After doing everything, invoke Reloaded.
-            _reloaded?.Invoke(this, EventArgs.Empty);
-        }
-
-        private IFoo CreateObject()
-        {
-            // In order to create the object (and avoid infinite recursion), we need to figure out
-            // the concrete type to create and the config section that defines the value to create.
-            Type concreteType;
-            IConfiguration valueSection;
-
-            // If _section contains a type-specified value, extract the type and use the value sub-section.
-            string typeValue = _section[ConfigurationObjectFactory.TypeKey];
-            if (typeValue != null)
-            {
-                // Throw if the value does not represent a valid Type.
-                concreteType = Type.GetType(typeValue, true);
-                valueSection = _section.GetSection(ConfigurationObjectFactory.ValueKey);
-            }
-
-            // If there is a registered default type, use it, and assume _section is the value section.
-            else if (ConfigurationObjectFactory.TryGetDefaultType(_defaultTypes, typeof(IFoo), _declaringType, _memberName, out concreteType))
-            {
-                valueSection = _section;
-            }
-
-            // Throw if no type can be located.
-            else
-            {
-                throw new InvalidOperationException("Type not specified.");
-            }
-
-            // Put everything together.
-            return (IFoo)valueSection.Create(concreteType, _defaultTypes, _valueConverters);
+            OnReloaded();
         }
     }
 }
