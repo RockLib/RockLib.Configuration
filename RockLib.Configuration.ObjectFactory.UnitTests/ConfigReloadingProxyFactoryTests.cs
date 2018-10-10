@@ -203,6 +203,35 @@ namespace Tests
             Assert.Same(changedObject, reloadedFoo);
         }
 
+        [Fact]
+        public void SpecifyingReloadOnChangeInConfigCausesCreateExtensionToReturnReloadingProxy()
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["foo:type"] = typeof(Foo).AssemblyQualifiedName,
+                ["foo:value:bar"] = "123",
+                ["foo:reloadOnChange"] = "true",
+            }).Build();
+
+            var foo = config.GetSection("foo").Create<IFoo>();
+
+            Assert.IsAssignableFrom<IConfigReloadingProxy<IFoo>>(foo);
+        }
+
+        [Fact]
+        public void SpecifyingReloadOnChangeInConfigCausesCreateExtensionToReturnReloadingProxy2()
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["foo:value:bar"] = "123",
+                ["foo:reloadOnChange"] = "true",
+            }).Build();
+
+            var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
+
+            Assert.IsAssignableFrom<IConfigReloadingProxy<IFoo>>(foo);
+        }
+
         private static IConfigurationRoot GetConfig()
         {
             return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>

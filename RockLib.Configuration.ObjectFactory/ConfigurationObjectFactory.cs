@@ -110,6 +110,8 @@ namespace RockLib.Configuration.ObjectFactory
                 return BuildNonGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsValueSection(configuration, out IConfigurationSection valueSection))
                 return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
+            if (IsReloadingObject(configuration))
+                return configuration.CreateReloadingProxy(targetType, defaultTypes, valueConverters, declaringType, memberName);
             if (IsTypeSpecifiedObject(configuration))
                 return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             if (IsStringDictionary(targetType))
@@ -207,6 +209,24 @@ namespace RockLib.Configuration.ObjectFactory
                 throw Exceptions.NoMethodFound(declaringType, methodName);
             returnType = convertMethod.ReturnType;
             convertFunc = value => convertMethod.Invoke(null, new object[] { value });
+        }
+
+        private static bool IsReloadingObject(IConfiguration configuration)
+        {
+            var reloadOnChangeKeyFound = false;
+            var i = 0;
+            foreach (var child in configuration.GetChildren())
+            {
+                if (child.Key.Equals(ReloadOnChangeKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    if (child.Value?.ToLowerInvariant() != "true") return false;
+                    reloadOnChangeKeyFound = true;
+                }
+                else if (!child.Key.Equals(ValueKey, StringComparison.OrdinalIgnoreCase)
+                    && !child.Key.Equals(TypeKey, StringComparison.OrdinalIgnoreCase)) return false;
+                i++;
+            }
+            return reloadOnChangeKeyFound && i >= 1 && i <= 3;
         }
 
         private static bool IsTypeSpecifiedObject(IConfiguration configuration)
