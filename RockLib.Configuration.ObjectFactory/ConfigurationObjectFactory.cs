@@ -19,8 +19,8 @@ namespace RockLib.Configuration.ObjectFactory
         internal const string ValueKey = "value";
         internal const string ReloadOnChangeKey = "reloadOnChange";
 
-        private static readonly DefaultTypes _emptyDefaultTypes = new DefaultTypes();
-        private static readonly ValueConverters _emptyValueConverters = new ValueConverters();
+        internal static readonly DefaultTypes EmptyDefaultTypes = new DefaultTypes();
+        internal static readonly ValueConverters EmptyValueConverters = new ValueConverters();
 
         /// <summary>
         /// Create an object of type <typeparamref name="T"/> based on the specified configuration.
@@ -97,7 +97,7 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return configuration.Create(type, null, null, valueConverters ?? _emptyValueConverters, defaultTypes ?? _emptyDefaultTypes);
+            return configuration.Create(type, null, null, valueConverters ?? EmptyValueConverters, defaultTypes ?? EmptyDefaultTypes);
         }
 
         private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)

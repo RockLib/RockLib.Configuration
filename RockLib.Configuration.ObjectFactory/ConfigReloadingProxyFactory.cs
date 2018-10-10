@@ -23,13 +23,13 @@ namespace RockLib.Configuration.ObjectFactory
             new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters) });
 
         private static readonly FieldInfo _eventArgsEmptyField = typeof(EventArgs).GetTypeInfo().GetField(nameof(EventArgs.Empty), BindingFlags.Public | BindingFlags.Static);
-        private static readonly MethodInfo _eventArgsInvokeMethod = typeof(EventHandler).GetTypeInfo().GetMethod(nameof(EventHandler.Invoke));
+        private static readonly MethodInfo _eventHandlerInvokeMethod = typeof(EventHandler).GetTypeInfo().GetMethod(nameof(EventHandler.Invoke));
 
         private static readonly ConstructorInfo _objectConstructor = typeof(object).GetTypeInfo().GetConstructors()[0];
 
         private static readonly MethodInfo _getReloadTokenMethod = typeof(IConfiguration).GetTypeInfo().GetMethod(nameof(IConfiguration.GetReloadToken));
 
-        private static readonly ConcurrentDictionary<Type, Func<IConfiguration, DefaultTypes, ValueConverters, object>> _proxyFactories = new ConcurrentDictionary<Type, Func<IConfiguration, DefaultTypes, ValueConverters, object>>();
+        private static readonly ConcurrentDictionary<Type, Func<IConfiguration, DefaultTypes, ValueConverters, Type, string, object>> _proxyFactories = new ConcurrentDictionary<Type, Func<IConfiguration, DefaultTypes, ValueConverters, Type, string, object>>();
 
         private static readonly ConstructorInfo _changeTokenFuncConstructor = typeof(Func<IChangeToken>).GetTypeInfo().GetConstructors()[0];
 
@@ -37,10 +37,32 @@ namespace RockLib.Configuration.ObjectFactory
 
         private static readonly MethodInfo _changeTokenOnChangeMethod = typeof(ChangeToken).GetTypeInfo().GetMethod(nameof(ChangeToken.OnChange), new[] { typeof(Func<IChangeToken>), typeof(Action) });
 
+        private static readonly MethodInfo _configurationIndexerMethod = typeof(IConfiguration).GetTypeInfo().GetProperty("Item", typeof(string), new[] { typeof(string) }).GetMethod;
+
+        private static readonly MethodInfo _getTypeMethod = typeof(Type).GetTypeInfo().GetMethod(nameof(Type.GetType), new[] { typeof(string), typeof(bool) });
+
+        private static readonly MethodInfo _getSectionMethod = typeof(IConfiguration).GetTypeInfo().GetMethod(nameof(IConfiguration.GetSection), new[] { typeof(string) });
+
+        private static readonly MethodInfo _getTypeFromHandleMethod = typeof(Type).GetTypeInfo().GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
+
+        private static readonly MethodInfo _tryGetDefaultTypeMethod = typeof(ConfigurationObjectFactory).GetTypeInfo().GetMethod(nameof(ConfigurationObjectFactory.TryGetDefaultType));
+
+        private static readonly ConstructorInfo _invalidOperationExceptionConstructor = typeof(InvalidOperationException).GetTypeInfo().GetConstructor(new[] { typeof(string) });
+
+        private static readonly MethodInfo _createMethod = typeof(ConfigurationObjectFactory).GetTypeInfo().GetMethod(nameof(ConfigurationObjectFactory.Create),
+            new[] { typeof(IConfiguration), typeof(Type), typeof(DefaultTypes), typeof(ValueConverters) });
+
+        private static readonly MethodInfo _toLowerInvariantMethod = typeof(string).GetTypeInfo().GetMethod(nameof(string.ToLowerInvariant));
+
+        private static readonly MethodInfo _stringEqualsMethod = typeof(string).GetTypeInfo().GetMethod(nameof(string.Equals), new[] { typeof(string), typeof(string) });
+
         public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
             (TInterface)configuration.CreateReloadingProxy(typeof(TInterface), defaultTypes, valueConverters);
 
-        public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null)
+        public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
+            configuration.CreateReloadingProxy(interfaceType, defaultTypes ?? ConfigurationObjectFactory.EmptyDefaultTypes, valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters, null, null);
+
+        internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -52,10 +74,10 @@ namespace RockLib.Configuration.ObjectFactory
                 throw new ArgumentException("Cannot implement IEnumerable.", nameof(interfaceType));
 
             var createProxy = _proxyFactories.GetOrAdd(interfaceType, CreateProxyTypeFactoryMethod);
-            return createProxy(configuration, defaultTypes, valueConverters);
+            return createProxy(configuration, defaultTypes, valueConverters, declaringType, memberName);
         }
 
-        private static Func<IConfiguration, DefaultTypes, ValueConverters, object> CreateProxyTypeFactoryMethod(Type type)
+        private static Func<IConfiguration, DefaultTypes, ValueConverters, Type, string, object> CreateProxyTypeFactoryMethod(Type type)
         {
             var assemblyName = "<" + type.Name + ">a__RockLibDynamicAssembly";
             var name = "<" + type.Name + ">c__RockLibConfigReloadingProxyClass";
@@ -68,6 +90,8 @@ namespace RockLib.Configuration.ObjectFactory
             var sectionField = typeBuilder.DefineField("_section", typeof(IConfiguration), FieldAttributes.Private | FieldAttributes.InitOnly);
             var defaultTypesField = typeBuilder.DefineField("_defaultTypes", typeof(DefaultTypes), FieldAttributes.Private | FieldAttributes.InitOnly);
             var valueConvertersField = typeBuilder.DefineField("_valueConverters", typeof(ValueConverters), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var declaringTypeField = typeBuilder.DefineField("_declaringType", typeof(Type), FieldAttributes.Private | FieldAttributes.InitOnly);
+            var memberNameField = typeBuilder.DefineField("_memberName", typeof(string), FieldAttributes.Private | FieldAttributes.InitOnly);
             var objectField = typeBuilder.DefineField("_object", type, FieldAttributes.Private);
 
             var eventFields = new Dictionary<EventInfo, FieldBuilder>();
@@ -75,9 +99,11 @@ namespace RockLib.Configuration.ObjectFactory
             var reloadingField = typeBuilder.DefineField("_reloading", typeof(EventHandler), FieldAttributes.Private);
             var reloadedField = typeBuilder.DefineField("_reloaded", typeof(EventHandler), FieldAttributes.Private);
 
-            var reloadObjectMethod = GetReloadObjectMethod(typeBuilder, type, sectionField, objectField, reloadingField, reloadedField, defaultTypesField, valueConvertersField, eventFields);
+            var createObjectMethod = GetCreateObjectMethod(typeBuilder, type, sectionField, objectField, reloadingField, reloadedField, defaultTypesField, valueConvertersField, declaringTypeField, memberNameField);
 
-            AddConstructor(typeBuilder, sectionField, objectField, defaultTypesField, valueConvertersField, reloadObjectMethod, type);
+            var reloadObjectMethod = GetReloadObjectMethod(typeBuilder, type, sectionField, objectField, reloadingField, reloadedField, defaultTypesField, valueConvertersField, eventFields, createObjectMethod);
+
+            AddConstructor(typeBuilder, sectionField, objectField, defaultTypesField, valueConvertersField, reloadObjectMethod, type, createObjectMethod, declaringTypeField, memberNameField);
 
             foreach (var property in type.GetAllProperties())
                 AddProperty(typeBuilder, property, objectField);
@@ -97,15 +123,91 @@ namespace RockLib.Configuration.ObjectFactory
             var sectionParameter = Expression.Parameter(typeof(IConfiguration), "section");
             var defaultTypesParameter = Expression.Parameter(typeof(DefaultTypes), "defaultTypes");
             var valueConvertersParameter = Expression.Parameter(typeof(ValueConverters), "valueConverters");
-            var lambda = Expression.Lambda<Func<IConfiguration, DefaultTypes, ValueConverters, object>>(
-                Expression.New(proxyType.GetConstructors()[0], sectionParameter, defaultTypesParameter, valueConvertersParameter),
-                sectionParameter, defaultTypesParameter, valueConvertersParameter);
+            var declaringTypeParameter = Expression.Parameter(typeof(Type), "declaringType");
+            var memberNameParameter = Expression.Parameter(typeof(string), "memberName");
+            var lambda = Expression.Lambda<Func<IConfiguration, DefaultTypes, ValueConverters, Type, string, object>>(
+                Expression.New(proxyType.GetConstructors()[0], sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter),
+                sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter);
             return lambda.Compile();
+        }
+
+        private static MethodBuilder GetCreateObjectMethod(TypeBuilder typeBuilder, Type type, FieldBuilder sectionField, FieldBuilder objectField,
+            FieldBuilder reloadingField, FieldBuilder reloadedField, FieldBuilder defaultTypesField, FieldBuilder valueConvertersField,
+            FieldBuilder declaringTypeField, FieldBuilder memberNameField)
+        {
+            var createObjectMethod = typeBuilder.DefineMethod("CreateObject", MethodAttributes.PrivateScope | MethodAttributes.Private | MethodAttributes.HideBySig, type, Type.EmptyTypes);
+
+            var il = createObjectMethod.GetILGenerator();
+
+            var checkDefaulType = il.DefineLabel();
+            var readyToCreate = il.DefineLabel();
+            var noTypeFound = il.DefineLabel();
+
+            var concreteTypeVariable = il.DeclareLocal(typeof(Type));
+            var valueSectionVariable = il.DeclareLocal(typeof(IConfiguration));
+            var typeValueVariable = il.DeclareLocal(typeof(string));
+
+            // If _section contains a type-specified value, extract the type and use the value sub-section.
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, sectionField);
+            il.Emit(OpCodes.Ldstr, ConfigurationObjectFactory.TypeKey);
+            il.Emit(OpCodes.Callvirt, _configurationIndexerMethod);
+            il.Emit(OpCodes.Stloc, typeValueVariable);
+            il.Emit(OpCodes.Ldloc, typeValueVariable);
+            il.Emit(OpCodes.Brfalse_S, checkDefaulType);
+            il.Emit(OpCodes.Ldloc, typeValueVariable);
+            il.Emit(OpCodes.Ldc_I4_1);
+            il.Emit(OpCodes.Call, _getTypeMethod);
+            il.Emit(OpCodes.Stloc, concreteTypeVariable);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, sectionField);
+            il.Emit(OpCodes.Ldstr, ConfigurationObjectFactory.ValueKey);
+            il.Emit(OpCodes.Callvirt, _getSectionMethod);
+            il.Emit(OpCodes.Stloc, valueSectionVariable);
+            il.Emit(OpCodes.Br_S, readyToCreate);
+
+            // If there is a registered default type, use it, and assume _section is the value section.
+            il.MarkLabel(checkDefaulType);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, defaultTypesField);
+            il.Emit(OpCodes.Ldtoken, type);
+            il.Emit(OpCodes.Call, _getTypeFromHandleMethod);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, declaringTypeField);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, memberNameField);
+            il.Emit(OpCodes.Ldloca_S, concreteTypeVariable);
+            il.Emit(OpCodes.Call, _tryGetDefaultTypeMethod);
+            il.Emit(OpCodes.Brfalse_S, noTypeFound);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, sectionField);
+            il.Emit(OpCodes.Stloc, valueSectionVariable);
+            il.Emit(OpCodes.Br_S, readyToCreate);
+
+            // Throw if no type can be located.
+            il.MarkLabel(noTypeFound);
+            il.Emit(OpCodes.Ldstr, "Type not specified.");
+            il.Emit(OpCodes.Newobj, _invalidOperationExceptionConstructor);
+            il.Emit(OpCodes.Throw);
+
+            // Put everything together.
+            il.MarkLabel(readyToCreate);
+            il.Emit(OpCodes.Ldloc, valueSectionVariable);
+            il.Emit(OpCodes.Ldloc, concreteTypeVariable);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, defaultTypesField);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, valueConvertersField);
+            il.Emit(OpCodes.Call, _createMethod);
+            il.Emit(OpCodes.Castclass, type);
+            il.Emit(OpCodes.Ret);
+
+            return createObjectMethod;
         }
 
         private static MethodBuilder GetReloadObjectMethod(TypeBuilder typeBuilder, Type type, FieldBuilder sectionField, FieldBuilder objectField,
             FieldBuilder reloadingField, FieldBuilder reloadedField, FieldBuilder defaultTypesField, FieldBuilder valueConvertersField,
-            Dictionary<EventInfo, FieldBuilder> eventFields)
+            Dictionary<EventInfo, FieldBuilder> eventFields, MethodBuilder createObjectMethod)
         {
             var reloadObjectMethod = typeBuilder.DefineMethod("ReloadObject", MethodAttributes.PrivateScope | MethodAttributes.Private | MethodAttributes.HideBySig);
 
@@ -114,58 +216,56 @@ namespace RockLib.Configuration.ObjectFactory
             var oldObjectVariable = il.DeclareLocal(type);
             var newObjectVariable = il.DeclareLocal(type);
 
-            var exitLabel = il.DefineLabel();
-            var reloadingLabel1 = il.DefineLabel();
-            var reloadingLabel2 = il.DefineLabel();
-            var reloadedLabel = il.DefineLabel();
+            var hasReloadOnChangeValue = il.DefineLabel();
+            var doesNotHaveReloadOnChangeValue = il.DefineLabel();
+            var reloadOnChangeNotExplicitlyTurnedOff = il.DefineLabel();
+            var reloadingIsNotNull = il.DefineLabel();
+            var reloadingIsNull = il.DefineLabel();
+            var isDisposable = il.DefineLabel();
+            var isNotDisposable = il.DefineLabel();
+            var reloadedIsNotNull = il.DefineLabel();
 
-            // Invoke the Reloading event
+            // If reloadOnChange is explicitly turned off, don't reload the object - just return.
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldfld, sectionField);
+            il.Emit(OpCodes.Ldstr, ConfigurationObjectFactory.ReloadOnChangeKey);
+            il.Emit(OpCodes.Callvirt, _configurationIndexerMethod);
+            il.Emit(OpCodes.Dup);
+            il.Emit(OpCodes.Brtrue_S, hasReloadOnChangeValue);
+            il.Emit(OpCodes.Pop);
+            il.Emit(OpCodes.Ldnull);
+            il.Emit(OpCodes.Br_S, doesNotHaveReloadOnChangeValue);
+            il.MarkLabel(hasReloadOnChangeValue);
+            il.Emit(OpCodes.Call, _toLowerInvariantMethod);
+            il.MarkLabel(doesNotHaveReloadOnChangeValue);
+            il.Emit(OpCodes.Ldstr, "false");
+            il.Emit(OpCodes.Call, _stringEqualsMethod);
+            il.Emit(OpCodes.Brfalse_S, reloadOnChangeNotExplicitlyTurnedOff);
+            il.Emit(OpCodes.Ret);
+            il.MarkLabel(reloadOnChangeNotExplicitlyTurnedOff);
+
+            // Before doing anything, invoke the Reloading event.
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, reloadingField);
             il.Emit(OpCodes.Dup);
-            il.Emit(OpCodes.Brtrue_S, reloadingLabel1);
+            il.Emit(OpCodes.Brtrue_S, reloadingIsNotNull);
             il.Emit(OpCodes.Pop);
-            il.Emit(OpCodes.Br_S, reloadingLabel2);
-            il.MarkLabel(reloadingLabel1);
+            il.Emit(OpCodes.Br_S, reloadingIsNull);
+            il.MarkLabel(reloadingIsNotNull);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldsfld, _eventArgsEmptyField);
-            il.Emit(OpCodes.Callvirt, _eventArgsInvokeMethod);
-            il.MarkLabel(reloadingLabel2);
+            il.Emit(OpCodes.Callvirt, _eventHandlerInvokeMethod);
+            il.MarkLabel(reloadingIsNull);
 
-            // Capture the old object, instantiate the new one (but don't set the field)
+            // Capture the old object and instantiate the new one (but don't set the field).
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, objectField);
             il.Emit(OpCodes.Stloc, oldObjectVariable);
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, sectionField);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, defaultTypesField);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, valueConvertersField);
-            il.Emit(OpCodes.Call, _genericCreateMethod.MakeGenericMethod(type));
+            il.Emit(OpCodes.Call, createObjectMethod);
             il.Emit(OpCodes.Stloc, newObjectVariable);
 
-            // For each read/write property, if the new value is null and the old value is not null, copy the value over
-            foreach (var property in type.GetAllProperties().Where(p => p.CanRead && p.CanWrite && !p.PropertyType.GetTypeInfo().IsValueType))
-            {
-                var readWritePropertyLabel = il.DefineLabel();
-
-                il.Emit(OpCodes.Ldloc, newObjectVariable);
-                il.Emit(OpCodes.Callvirt, property.GetMethod);
-                il.Emit(OpCodes.Brtrue_S, readWritePropertyLabel);
-                il.Emit(OpCodes.Ldloc, oldObjectVariable);
-                il.Emit(OpCodes.Callvirt, property.GetMethod);
-
-                il.Emit(OpCodes.Brfalse_S, readWritePropertyLabel);
-                il.Emit(OpCodes.Ldloc, newObjectVariable);
-                il.Emit(OpCodes.Ldloc, oldObjectVariable);
-                il.Emit(OpCodes.Callvirt, property.GetMethod);
-                il.Emit(OpCodes.Callvirt, property.SetMethod);
-
-                il.MarkLabel(readWritePropertyLabel);
-            }
-
-            // For each event, copy handlers to the new object
+            // Event handlers from the old object need to be copied to the new one.
             foreach (var evt in type.GetAllEvents())
             {
                 eventFields.Add(evt, typeBuilder.DefineField($"_{evt.DeclaringType.FullName.Replace(".", "_")}_{evt.Name}", evt.EventHandlerType, FieldAttributes.Private));
@@ -176,30 +276,53 @@ namespace RockLib.Configuration.ObjectFactory
                 il.Emit(OpCodes.Callvirt, evt.AddMethod);
             }
 
-            // Set the _object field, then if the old object is IDisposable, dispose it
+            // Special case for when the interface has a read/write property: if the new
+            // property value is null and the old property value is not null, then copy
+            // the value from old to new.
+            foreach (var property in type.GetAllProperties().Where(p => p.CanRead && p.CanWrite && !p.PropertyType.GetTypeInfo().IsValueType))
+            {
+                var doNotCopyProperty = il.DefineLabel();
+
+                il.Emit(OpCodes.Ldloc, oldObjectVariable);
+                il.Emit(OpCodes.Callvirt, property.GetMethod);
+                il.Emit(OpCodes.Brfalse_S, doNotCopyProperty);
+                il.Emit(OpCodes.Ldloc, newObjectVariable);
+                il.Emit(OpCodes.Callvirt, property.GetMethod);
+                il.Emit(OpCodes.Brtrue_S, doNotCopyProperty);
+                il.Emit(OpCodes.Ldloc, newObjectVariable);
+                il.Emit(OpCodes.Ldloc, oldObjectVariable);
+                il.Emit(OpCodes.Callvirt, property.GetMethod);
+                il.Emit(OpCodes.Callvirt, property.SetMethod);
+                il.MarkLabel(doNotCopyProperty);
+            }
+
+            // After the new object has been fully initialized, set the backing field.
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldloc, newObjectVariable);
             il.Emit(OpCodes.Stfld, objectField);
-            il.Emit(OpCodes.Ldloc, oldObjectVariable);
-            il.Emit(OpCodes.Dup);
-            il.Emit(OpCodes.Isinst, typeof(IDisposable));
-            il.Emit(OpCodes.Brtrue_S, exitLabel);
-            il.Emit(OpCodes.Pop);
-            il.Emit(OpCodes.Ret);
-            il.MarkLabel(exitLabel);
-            il.Emit(OpCodes.Callvirt, _disposeMethod);
 
-            // Invoke the Reloaded event
+            // If the old object is disposable, dispose it after the backing field has been set.
+            il.Emit(OpCodes.Ldloc, oldObjectVariable);
+            il.Emit(OpCodes.Isinst, typeof(IDisposable));
+            il.Emit(OpCodes.Dup);
+            il.Emit(OpCodes.Brtrue_S, isDisposable);
+            il.Emit(OpCodes.Pop);
+            il.Emit(OpCodes.Br_S, isNotDisposable);
+            il.MarkLabel(isDisposable);
+            il.Emit(OpCodes.Callvirt, _disposeMethod);
+            il.MarkLabel(isNotDisposable);
+
+            // After doing everything, invoke the Reloaded event.
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, reloadedField);
             il.Emit(OpCodes.Dup);
-            il.Emit(OpCodes.Brtrue_S, reloadedLabel);
+            il.Emit(OpCodes.Brtrue_S, reloadedIsNotNull);
             il.Emit(OpCodes.Pop);
             il.Emit(OpCodes.Ret);
-            il.MarkLabel(reloadedLabel);
+            il.MarkLabel(reloadedIsNotNull);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldsfld, _eventArgsEmptyField);
-            il.Emit(OpCodes.Callvirt, _eventArgsInvokeMethod);
+            il.Emit(OpCodes.Callvirt, _eventHandlerInvokeMethod);
 
             il.Emit(OpCodes.Ret);
 
@@ -207,9 +330,10 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         private static void AddConstructor(TypeBuilder typeBuilder, FieldBuilder sectionField, FieldBuilder objectField,
-            FieldBuilder defaultTypesField, FieldBuilder valueConvertersField, MethodBuilder reloadObjectMethod, Type type)
+            FieldBuilder defaultTypesField, FieldBuilder valueConvertersField, MethodBuilder reloadObjectMethod, Type type,
+            MethodBuilder createObjectMethod, FieldBuilder declaringTypeField, FieldBuilder memberNameField)
         {
-            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters) });
+            var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters), typeof(Type), typeof(string) });
 
             var il = constructorBuilder.GetILGenerator();
 
@@ -232,12 +356,20 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_3);
             il.Emit(OpCodes.Stfld, valueConvertersField);
 
-            // Set the _object field by calling the ConfigurationObjectFactory.Create<T> method
+            // Set the _declaringType field to the parameter
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Ldarg_2);
-            il.Emit(OpCodes.Ldarg_3);
-            il.Emit(OpCodes.Call, _genericCreateMethod.MakeGenericMethod(type));
+            il.Emit(OpCodes.Ldarg_S, 4);
+            il.Emit(OpCodes.Stfld, declaringTypeField);
+
+            // Set the _memberName field to the parameter
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_S, 5);
+            il.Emit(OpCodes.Stfld, memberNameField);
+
+            // Set the _object field by calling the CreateObject method
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Ldarg_0);
+            il.Emit(OpCodes.Call, createObjectMethod);
             il.Emit(OpCodes.Stfld, objectField);
 
             // Register the section's change token to call the ReloadObject method
@@ -370,17 +502,17 @@ namespace RockLib.Configuration.ObjectFactory
             var methodBuilder = typeBuilder.DefineMethod("Dispose", ExplicitInterfaceImplementation);
 
             var il = methodBuilder.GetILGenerator();
-            var label = il.DefineLabel();
+            var isDisposable = il.DefineLabel();
 
             // If the value of the _object field is IDisposable, dispose it
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, objectField);
             il.Emit(OpCodes.Isinst, typeof(IDisposable));
             il.Emit(OpCodes.Dup);
-            il.Emit(OpCodes.Brtrue_S, label);
+            il.Emit(OpCodes.Brtrue_S, isDisposable);
             il.Emit(OpCodes.Pop);
             il.Emit(OpCodes.Ret);
-            il.MarkLabel(label);
+            il.MarkLabel(isDisposable);
             il.Emit(OpCodes.Callvirt, _disposeMethod);
             il.Emit(OpCodes.Ret);
 
@@ -408,7 +540,6 @@ namespace RockLib.Configuration.ObjectFactory
 
             methodBuilder = typeBuilder.DefineMethod("add_Reloading", ExplicitInterfaceImplementation, typeof(void), eventParameters);
             il = methodBuilder.GetILGenerator();
-
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, reloadingField);
@@ -416,9 +547,7 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Call, _delegateCombineMethod);
             il.Emit(OpCodes.Castclass, typeof(EventHandler));
             il.Emit(OpCodes.Stfld, reloadingField);
-
             il.Emit(OpCodes.Ret);
-
             eventBuilder.SetAddOnMethod(methodBuilder);
             typeBuilder.DefineMethodOverride(methodBuilder, proxyInterfaceType.GetTypeInfo().GetMethod("add_Reloading"));
 
@@ -428,7 +557,7 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, reloadingField);
             il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Call, _delegateCombineMethod);
+            il.Emit(OpCodes.Call, _delegateRemoveMethod);
             il.Emit(OpCodes.Castclass, typeof(EventHandler));
             il.Emit(OpCodes.Stfld, reloadingField);
             il.Emit(OpCodes.Ret);
@@ -457,7 +586,7 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, reloadedField);
             il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Call, _delegateCombineMethod);
+            il.Emit(OpCodes.Call, _delegateRemoveMethod);
             il.Emit(OpCodes.Castclass, typeof(EventHandler));
             il.Emit(OpCodes.Stfld, reloadedField);
             il.Emit(OpCodes.Ret);

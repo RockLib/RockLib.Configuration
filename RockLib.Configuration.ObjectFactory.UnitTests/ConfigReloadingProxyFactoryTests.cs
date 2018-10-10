@@ -192,7 +192,7 @@ namespace Tests
             IFoo reloadedFoo = null;
 
             proxyFoo.Reloading += (s, e) => { reloadingFoo = proxyFoo.Object; };
-            proxyFoo.Reloaded += (s, e) => { reloadedFoo = proxyFoo.Object; };  // This is not being invoked!
+            proxyFoo.Reloaded += (s, e) => { reloadedFoo = proxyFoo.Object; };
 
             ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
 
