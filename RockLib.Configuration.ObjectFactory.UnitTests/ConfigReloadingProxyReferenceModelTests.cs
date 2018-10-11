@@ -24,7 +24,7 @@ namespace Tests
 
             IFoo foo = new ProxyFoo(config.GetSection("foo"), new DefaultTypes(), new ValueConverters(), null, null);
 
-            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
             Foo initialFoo = (Foo)proxyFoo.Object;
 
             foo.Qux = "xyz";
@@ -77,7 +77,7 @@ namespace Tests
 
             IFoo foo = new ProxyFoo(config.GetSection("foo"), defaultTypes, new ValueConverters(), null, null);
 
-            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
             Foo initialFoo = (Foo)proxyFoo.Object;
 
             foo.Qux = "xyz";
@@ -128,7 +128,7 @@ namespace Tests
 
             IFoo foo = new ProxyFoo(config.GetSection("foo"), new DefaultTypes(), new ValueConverters(), null, null);
 
-            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
             Foo initialFoo = (Foo)proxyFoo.Object;
 
             foo.Qux = "xyz";
@@ -181,7 +181,7 @@ namespace Tests
 
             IFoo foo = new ProxyFoo(config.GetSection("foo"), defaultTypes, new ValueConverters(), null, null);
 
-            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
             Foo initialFoo = (Foo)proxyFoo.Object;
 
             foo.Qux = "xyz";
@@ -232,7 +232,7 @@ namespace Tests
 
             IFoo foo = new ProxyFoo(config.GetSection("foo"), new DefaultTypes(), new ValueConverters(), null, null);
 
-            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
             Foo initialFoo = (Foo)proxyFoo.Object;
 
             foo.Qux = "xyz";

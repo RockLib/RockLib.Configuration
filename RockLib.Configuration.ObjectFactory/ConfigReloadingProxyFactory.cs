@@ -18,15 +18,7 @@ namespace RockLib.Configuration.ObjectFactory
     {
         private const MethodAttributes ExplicitInterfaceImplementation = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final;
 
-        private static readonly FieldInfo _objectField = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetField(nameof(ConfigReloadingProxyBase._object), BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly MethodInfo _isReloadOnChangeTurnedOffGetMethod = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetProperty(nameof(ConfigReloadingProxyBase.IsReloadOnChangeExplicitlyTurnedOff), BindingFlags.NonPublic | BindingFlags.Instance).GetMethod;
-        private static readonly MethodInfo _onReloadingMethod = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetMethod(nameof(ConfigReloadingProxyBase.OnReloading), BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly MethodInfo _onReloadedMethod = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetMethod(nameof(ConfigReloadingProxyBase.OnReloaded), BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly MethodInfo _createObjectMethod = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetMethod(nameof(ConfigReloadingProxyBase.CreateObject), BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly MethodInfo _abstractReloadObjectMethod = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetMethod(nameof(ConfigReloadingProxyBase.ReloadObject), BindingFlags.NonPublic | BindingFlags.Instance);
         private static readonly MethodInfo _disposeMethod = typeof(IDisposable).GetTypeInfo().GetMethod(nameof(IDisposable.Dispose));
-        private static readonly ConstructorInfo _configReloadingProxyBaseConstructor = typeof(ConfigReloadingProxyBase).GetTypeInfo().GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
-        private static readonly MethodInfo _getTypeFromHandleMethod = typeof(Type).GetTypeInfo().GetMethod(nameof(Type.GetTypeFromHandle), new[] { typeof(RuntimeTypeHandle) });
         private static readonly MethodInfo _delegateCombineMethod = typeof(Delegate).GetTypeInfo().GetMethod(nameof(Delegate.Combine), new[] { typeof(Delegate), typeof(Delegate) });
         private static readonly MethodInfo _delegateRemoveMethod = typeof(Delegate).GetTypeInfo().GetMethod(nameof(Delegate.Remove), new[] { typeof(Delegate), typeof(Delegate) });
 
@@ -96,16 +88,17 @@ namespace RockLib.Configuration.ObjectFactory
             var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(assemblyName), AssemblyBuilderAccess.Run);
             var moduleBuilder = assemblyBuilder.DefineDynamicModule("MainModule");
 
+            var configReloadingProxyType = typeof(ConfigReloadingProxy<>).MakeGenericType(type);
             var typeBuilder = moduleBuilder.DefineType(name, TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit,
-                typeof(ConfigReloadingProxyBase), new[] { type, typeof(IConfigReloadingProxy<>).MakeGenericType(type) });
+                configReloadingProxyType, new[] { type });
+
+            var getObjectMethod = configReloadingProxyType.GetTypeInfo().GetProperty("Object").GetMethod;
 
             var eventFields = new Dictionary<EventInfo, FieldBuilder>();
 
-            MethodBuilder getObjectMethod = AddObjectProperty(typeBuilder, _objectField, type);
+            AddTransferStateMethod(typeBuilder, type, eventFields, configReloadingProxyType);
 
-            AddReloadObjectMethod(typeBuilder, type, eventFields, getObjectMethod, _objectField);
-
-            AddConstructor(typeBuilder, type);
+            AddConstructor(typeBuilder, type, configReloadingProxyType);
 
             foreach (var property in type.GetAllProperties())
                 AddProperty(typeBuilder, property, getObjectMethod);
@@ -129,53 +122,20 @@ namespace RockLib.Configuration.ObjectFactory
             return lambda.Compile();
         }
 
-        private static MethodBuilder AddObjectProperty(TypeBuilder typeBuilder, FieldInfo objectField, Type type)
+        private static void AddTransferStateMethod(TypeBuilder typeBuilder, Type type, Dictionary<EventInfo, FieldBuilder> eventFields, Type configReloadingProxyType)
         {
-            var objectProperty = typeBuilder.DefineProperty("Object", PropertyAttributes.HasDefault, type, null);
-            var getObjectMethod = typeBuilder.DefineMethod("get_Object", MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.SpecialName | MethodAttributes.Virtual | MethodAttributes.Final, type, null);
-            var il = getObjectMethod.GetILGenerator();
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldfld, objectField);
-            il.Emit(OpCodes.Castclass, type);
-            il.Emit(OpCodes.Ret);
-            objectProperty.SetGetMethod(getObjectMethod);
-            return getObjectMethod;
-        }
+            var baseTransferStateMethod = configReloadingProxyType.GetTypeInfo().GetMethod("TransferState", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        private static void AddReloadObjectMethod(TypeBuilder typeBuilder, Type type, Dictionary<EventInfo, FieldBuilder> eventFields, MethodInfo getObjectMethod, FieldInfo objectField)
-        {
-            var reloadObjectMethod = typeBuilder.DefineMethod("ReloadObject", MethodAttributes.FamORAssem | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final);
+            var transferStateMethod = typeBuilder.DefineMethod("TransferState", MethodAttributes.FamORAssem | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final, typeof(void), new[] { type, type });
 
-            var il = reloadObjectMethod.GetILGenerator();
-
-            var oldObjectVariable = il.DeclareLocal(type);
-            var newObjectVariable = il.DeclareLocal(type);
-
-            var reloadOnChangeIsNotTurnedOff = il.DefineLabel();
-            var isDisposable = il.DefineLabel();
-            var isNotDisposable = il.DefineLabel();
-
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Call, _isReloadOnChangeTurnedOffGetMethod);
-            il.Emit(OpCodes.Brfalse_S, reloadOnChangeIsNotTurnedOff);
-            il.Emit(OpCodes.Ret);
-            il.MarkLabel(reloadOnChangeIsNotTurnedOff);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Call, _onReloadingMethod);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Call, getObjectMethod);
-            il.Emit(OpCodes.Stloc, oldObjectVariable);
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Call, _createObjectMethod);
-            il.Emit(OpCodes.Castclass, type);
-            il.Emit(OpCodes.Stloc, newObjectVariable);
+            var il = transferStateMethod.GetILGenerator();
 
             // Event handlers from the old object need to be copied to the new one.
             foreach (var evt in type.GetAllEvents())
             {
                 eventFields.Add(evt, typeBuilder.DefineField($"_{evt.DeclaringType.FullName.Replace(".", "_")}_{evt.Name}", evt.EventHandlerType, FieldAttributes.Private));
 
-                il.Emit(OpCodes.Ldloc, newObjectVariable);
+                il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Ldarg_0);
                 il.Emit(OpCodes.Ldfld, eventFields[evt]);
                 il.Emit(OpCodes.Callvirt, evt.AddMethod);
@@ -188,60 +148,40 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 var doNotCopyProperty = il.DefineLabel();
 
-                il.Emit(OpCodes.Ldloc, oldObjectVariable);
+                il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Callvirt, property.GetMethod);
                 il.Emit(OpCodes.Brfalse_S, doNotCopyProperty);
-                il.Emit(OpCodes.Ldloc, newObjectVariable);
+                il.Emit(OpCodes.Ldarg_2);
                 il.Emit(OpCodes.Callvirt, property.GetMethod);
                 il.Emit(OpCodes.Brtrue_S, doNotCopyProperty);
-                il.Emit(OpCodes.Ldloc, newObjectVariable);
-                il.Emit(OpCodes.Ldloc, oldObjectVariable);
+                il.Emit(OpCodes.Ldarg_2);
+                il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Callvirt, property.GetMethod);
                 il.Emit(OpCodes.Callvirt, property.SetMethod);
                 il.MarkLabel(doNotCopyProperty);
             }
 
-            // After the new object has been fully initialized, set the backing field.
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldloc, newObjectVariable);
-            il.Emit(OpCodes.Stfld, objectField);
-
-            // If the old object is disposable, dispose it after the backing field has been set.
-            il.Emit(OpCodes.Ldloc, oldObjectVariable);
-            il.Emit(OpCodes.Isinst, typeof(IDisposable));
-            il.Emit(OpCodes.Dup);
-            il.Emit(OpCodes.Brtrue_S, isDisposable);
-            il.Emit(OpCodes.Pop);
-            il.Emit(OpCodes.Br_S, isNotDisposable);
-            il.MarkLabel(isDisposable);
-            il.Emit(OpCodes.Callvirt, _disposeMethod);
-            il.MarkLabel(isNotDisposable);
-
-            // After doing everything, invoke the Reloaded event.
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Call, _onReloadedMethod);
-
             il.Emit(OpCodes.Ret);
 
-            typeBuilder.DefineMethodOverride(reloadObjectMethod, _abstractReloadObjectMethod);
+            typeBuilder.DefineMethodOverride(transferStateMethod, baseTransferStateMethod);
         }
 
-        private static void AddConstructor(TypeBuilder typeBuilder, Type type)
+        private static void AddConstructor(TypeBuilder typeBuilder, Type type, Type configReloadingProxyType)
         {
+            var baseConstructor = configReloadingProxyType.GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+
             var constructorBuilder = typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters), typeof(Type), typeof(string) });
 
             var il = constructorBuilder.GetILGenerator();
 
             // Call base constructor
             il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldtoken, type);
-            il.Emit(OpCodes.Call, _getTypeFromHandleMethod);
             il.Emit(OpCodes.Ldarg_1);
             il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldarg_3);
             il.Emit(OpCodes.Ldarg_S, 4);
             il.Emit(OpCodes.Ldarg_S, 5);
-            il.Emit(OpCodes.Call, _configReloadingProxyBaseConstructor);
+            il.Emit(OpCodes.Call, baseConstructor);
             il.Emit(OpCodes.Ret);
         }
 

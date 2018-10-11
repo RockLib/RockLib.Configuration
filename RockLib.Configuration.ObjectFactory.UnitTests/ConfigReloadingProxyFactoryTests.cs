@@ -134,13 +134,13 @@ namespace Tests
 
             IBaz baz = configuration.GetSection("baz").CreateReloadingProxy<IBaz>();
 
-            Baz initialBaz = (Baz)((IConfigReloadingProxy<IBaz>)baz).Object;
+            Baz initialBaz = (Baz)((ConfigReloadingProxy<IBaz>)baz).Object;
 
             Assert.False(initialBaz.IsDisposed);
 
             ChangeConfig(configuration);
 
-            Baz changedBaz = (Baz)((IConfigReloadingProxy<IBaz>)baz).Object;
+            Baz changedBaz = (Baz)((ConfigReloadingProxy<IBaz>)baz).Object;
 
             Assert.False(changedBaz.IsDisposed);
             Assert.True(initialBaz.IsDisposed);
@@ -183,7 +183,7 @@ namespace Tests
 
             IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            IConfigReloadingProxy<IFoo> proxyFoo = (IConfigReloadingProxy<IFoo>)foo;
+            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
 
             var initialObject = proxyFoo.Object;
             Assert.IsType<Foo>(initialObject);
@@ -215,7 +215,7 @@ namespace Tests
 
             var foo = config.GetSection("foo").Create<IFoo>();
 
-            Assert.IsAssignableFrom<IConfigReloadingProxy<IFoo>>(foo);
+            Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
         }
 
         [Fact]
@@ -229,7 +229,7 @@ namespace Tests
 
             var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
 
-            Assert.IsAssignableFrom<IConfigReloadingProxy<IFoo>>(foo);
+            Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
         }
 
         private static IConfigurationRoot GetConfig()

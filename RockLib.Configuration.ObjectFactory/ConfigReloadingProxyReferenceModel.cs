@@ -12,10 +12,10 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
         event EventHandler Garply;
     }
 
-    public class ProxyFoo : ConfigReloadingProxyBase, IFoo, IConfigReloadingProxy<IFoo>
+    public class ProxyFoo : ConfigReloadingProxy<IFoo>, IFoo
     {
         public ProxyFoo(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
-            : base(typeof(IFoo), section, defaultTypes, valueConverters, declaringType, memberName)
+            : base(section, defaultTypes, valueConverters, declaringType, memberName)
         {
         }
 
@@ -44,23 +44,8 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             }
         }
 
-        // Implicitly implement the Object property so that tooling (e.g. LINQPad) will more
-        // easily find this property for display purposes.
-        public IFoo Object => (IFoo)_object;
-
-        protected internal override sealed void ReloadObject()
+        protected override void TransferState(IFoo oldObject, IFoo newObject)
         {
-            // If reloadOnChange is explicitly turned off, don't reload the object - just return.
-            if (IsReloadOnChangeExplicitlyTurnedOff)
-                return;
-
-            // Before doing anything, invoke Reloading.
-            OnReloading();
-
-            // Capture the old object and instantiate the new one (but don't set the field).
-            IFoo oldObject = Object;
-            IFoo newObject = (IFoo)CreateObject();
-
             // Event handlers from the old object need to be copied to the new one.
             newObject.Garply += _garply;
 
@@ -69,15 +54,6 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             // the value from old to new.
             if (oldObject.Qux != null && newObject.Qux == null)
                 newObject.Qux = oldObject.Qux;
-
-            // After the new object has been fully initialized, set the backing field.
-            _object = newObject;
-
-            // If the old object is disposable, dispose it after the backing field has been set.
-            (oldObject as IDisposable)?.Dispose();
-
-            // After doing everything, invoke Reloaded.
-            OnReloaded();
         }
     }
 }

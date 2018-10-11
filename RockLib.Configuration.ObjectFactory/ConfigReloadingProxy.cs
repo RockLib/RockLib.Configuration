@@ -6,11 +6,10 @@ using System.Reflection;
 namespace RockLib.Configuration.ObjectFactory
 {
     /// <summary>
-    /// A base class for reloading proxy classes.
+    /// The base class for reloading proxy classes.
     /// </summary>
-    public abstract class ConfigReloadingProxyBase : IDisposable
+    public abstract class ConfigReloadingProxy<TInterface> : IDisposable
     {
-        private readonly Type _interfaceType;
         private readonly IConfiguration _section;
         private readonly DefaultTypes _defaultTypes;
         private readonly ValueConverters _valueConverters;
@@ -18,14 +17,8 @@ namespace RockLib.Configuration.ObjectFactory
         private readonly string _memberName;
 
         /// <summary>
-        /// The backing field that holds the underlying object.
+        /// Initializes a new instance of the <see cref="ConfigReloadingProxy{TInterface}"/> class.
         /// </summary>
-        protected internal object _object;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigReloadingProxyBase"/> class.
-        /// </summary>
-        /// <param name="interfaceType">The type of the interface that this proxy class will implement.</param>
         /// <param name="section">The configuration section that defines the object that this class creates.</param>
         /// <param name="defaultTypes">
         /// An object that defines the default types to be used when a type is not explicitly specified by a
@@ -37,17 +30,21 @@ namespace RockLib.Configuration.ObjectFactory
         /// </param>
         /// <param name="declaringType">If present the declaring type of the member that this instance is a value of.</param>
         /// <param name="memberName">If present, the name of the member that this instance is the value of.</param>
-        protected ConfigReloadingProxyBase(Type interfaceType, IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
+        protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
         {
-            _interfaceType = interfaceType;
             _section = section;
             _defaultTypes = defaultTypes;
             _valueConverters = valueConverters;
             _declaringType = declaringType;
             _memberName = memberName;
-            _object = CreateObject();
+            Object = CreateObject();
             ChangeToken.OnChange(section.GetReloadToken, ReloadObject);
         }
+
+        /// <summary>
+        /// Gets the underlying object.
+        /// </summary>
+        public TInterface Object { get; private set; }
 
         /// <summary>
         /// Occurs immediately before the underlying object is reloaded.
@@ -60,15 +57,11 @@ namespace RockLib.Configuration.ObjectFactory
         public event EventHandler Reloaded;
 
         /// <summary>
-        /// Reload the underlying object.
+        /// Dispose the underlying object if it implements <see cref="IDisposable"/>.
         /// </summary>
-        protected internal abstract void ReloadObject();
+        public void Dispose() => (Object as IDisposable)?.Dispose();
 
-        /// <summary>
-        /// Create the underlying object using the current section.
-        /// </summary>
-        /// <returns>The underlying object.</returns>
-        protected internal object CreateObject()
+        private TInterface CreateObject()
         {
             // In order to create the object (and avoid infinite recursion), we need to figure out
             // the concrete type to create and the config section that defines the value to create.
@@ -82,14 +75,14 @@ namespace RockLib.Configuration.ObjectFactory
                 // Throw if the value does not represent a valid Type.
                 concreteType = Type.GetType(typeValue, true);
 
-                if (!_interfaceType.GetTypeInfo().IsAssignableFrom(concreteType))
-                    throw Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(_interfaceType, concreteType);
+                if (!typeof(TInterface).GetTypeInfo().IsAssignableFrom(concreteType))
+                    throw Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(typeof(TInterface), concreteType);
 
                 valueSection = _section.GetSection(ConfigurationObjectFactory.ValueKey);
             }
 
             // If there is a registered default type, use it.
-            else if (ConfigurationObjectFactory.TryGetDefaultType(_defaultTypes, _interfaceType, _declaringType, _memberName, out concreteType))
+            else if (ConfigurationObjectFactory.TryGetDefaultType(_defaultTypes, typeof(TInterface), _declaringType, _memberName, out concreteType))
             {
                 // The value section depends on whether the 'ReloadOnChange' flag is set to true.
                 if (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "true"))
@@ -105,36 +98,50 @@ namespace RockLib.Configuration.ObjectFactory
             }
 
             // Put everything together.
-            return valueSection.Create(concreteType, _defaultTypes, _valueConverters);
+            return (TInterface)valueSection.Create(concreteType, _defaultTypes, _valueConverters);
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the ReloadOnChange flag has been explicitly set to false.
-        /// </summary>
-        protected internal bool IsReloadOnChangeExplicitlyTurnedOff =>
-            string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false");
-
-        /// <summary>
-        /// Fires the <see cref="Reloading"/> event.
-        /// </summary>
-        protected internal void OnReloading() => Reloading?.Invoke(this, EventArgs.Empty);
-
-        /// <summary>
-        /// Fires the <see cref="Reloaded"/> event.
-        /// </summary>
-        protected internal void OnReloaded() => Reloaded?.Invoke(this, EventArgs.Empty);
-
-        void IDisposable.Dispose() => (_object as IDisposable)?.Dispose();
-
-        // This class doesn't seem necessary, does it? Without it, the "partial interface implementation
-        // in an abstract class" doesn't seem to work. Gluing the base class and the interface together
-        // in the library makes everything work. Without it, the Reloading/Reloaded events aren't properly
-        // implemented. So leave this class here for now, ok?
-        private class MagicGlue : ConfigReloadingProxyBase, IConfigReloadingProxy<int>
+        private void ReloadObject()
         {
-            public MagicGlue() : base(null, null, null, null, null, null) => throw new NotImplementedException();
-            public int Object => throw new NotImplementedException();
-            protected internal override void ReloadObject() => throw new NotImplementedException();
+            lock (this)
+            {
+                // If reloadOnChange is explicitly turned off, don't reload the object - just return.
+                if (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false"))
+                    return;
+
+                // Before doing anything, invoke Reloading.
+                Reloading?.Invoke(this, EventArgs.Empty);
+
+                // Capture the old object and instantiate the new one (but don't set the field).
+                TInterface oldObject = Object;
+                TInterface newObject = CreateObject();
+
+                TransferState(oldObject, newObject);
+
+                // After the new object has been fully initialized, set the backing field.
+                Object = newObject;
+
+                // If the old object is disposable, dispose it after the backing field has been set.
+                (oldObject as IDisposable)?.Dispose();
+
+                // After doing everything, invoke Reloaded.
+                Reloaded?.Invoke(this, EventArgs.Empty);
+            }
         }
+
+        /// <summary>
+        /// Transfer state from the old object to the new object, specifically event handlers
+        /// and the values of reference-type read/write properties where the new object has a
+        /// null value and the old object has a non-null value.
+        /// </summary>
+        /// <param name="oldObject">
+        /// The object that is the current value of the <see cref="Object"/> property which is about
+        /// to be replaced by <paramref name="newObject"/>.
+        /// </param>
+        /// <param name="newObject">
+        /// The object (not yet in use) that is about to replace <paramref name="oldObject"/> as the
+        /// value of the <see cref="Object"/> property.
+        /// </param>
+        protected abstract void TransferState(TInterface oldObject, TInterface newObject);
     }
 }
