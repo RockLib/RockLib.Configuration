@@ -114,15 +114,15 @@ namespace Tests
                 qux = bar.Qux;
             };
 
-            Thread.Sleep(300);
+            ((Bar)((ConfigReloadingProxy<IBar>)bar).Object).OnBaz();
 
             Assert.Equal(5, qux);
-
-            qux = -1;
             
             ChangeConfig(configuration);
 
-            Thread.Sleep(300);
+            qux = -1;
+
+            ((Bar)((ConfigReloadingProxy<IBar>)bar).Object).OnBaz();
 
             Assert.Equal(10, qux);
         }
@@ -282,29 +282,21 @@ namespace Tests
             event EventHandler Baz;
         }
 
-        public class Bar : IBar, IDisposable
+        public class Bar : IBar
         {
-            private readonly Timer _timer;
-
             public Bar(int qux)
             {
                 Qux = qux;
-                _timer = new Timer(Elapsed, null, 200, 200);
             }
 
             public int Qux { get; }
 
-            private void Elapsed(object state)
+            public event EventHandler Baz;
+
+            public void OnBaz()
             {
                 Baz?.Invoke(this, EventArgs.Empty);
             }
-
-            public void Dispose()
-            {
-                _timer.Change(-1, -1);
-            }
-
-            public event EventHandler Baz;
         }
 
         public interface IBaz
