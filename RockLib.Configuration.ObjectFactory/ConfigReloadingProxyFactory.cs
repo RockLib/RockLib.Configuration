@@ -64,7 +64,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// itself when the configuration changes.
         /// </returns>
         public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
-            configuration.CreateReloadingProxy(interfaceType, defaultTypes ?? ConfigurationObjectFactory.EmptyDefaultTypes, valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters, null, null);
+            configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null);
 
         internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
         {

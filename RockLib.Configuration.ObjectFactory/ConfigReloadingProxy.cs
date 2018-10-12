@@ -32,11 +32,11 @@ namespace RockLib.Configuration.ObjectFactory
         /// <param name="memberName">If present, the name of the member that this instance is the value of.</param>
         protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
         {
-            _section = section;
-            _defaultTypes = defaultTypes;
-            _valueConverters = valueConverters;
-            _declaringType = declaringType;
-            _memberName = memberName;
+            _section = section ?? throw new ArgumentNullException(nameof(section));
+            _defaultTypes = defaultTypes ?? ConfigurationObjectFactory.EmptyDefaultTypes;
+            _valueConverters = valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters;
+            _declaringType = declaringType; // Null is a valid value
+            _memberName = memberName; // Null is a valid value
             Object = CreateObject();
             ChangeToken.OnChange(section.GetReloadToken, ReloadObject);
         }
