@@ -2,7 +2,12 @@
 
   <PropertyGroup>    
     <TargetFramework>netcoreapp2.0</TargetFramework>    
-    <RootNamespace>Tests</RootNamespace>
+    <RootNamespace>Tests</RootNamespace>    
+    <Configurations>Debug;Release;ReferenceModel</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
+    <DefineConstants>TRACE;REFERENCE_MODEL</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>

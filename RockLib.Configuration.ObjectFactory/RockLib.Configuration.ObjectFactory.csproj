@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard1.6;net462;net451</TargetFrameworks>
+    <Configurations>Debug;Release;ReferenceModel</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -23,6 +24,14 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\RockLib.Configuration.ObjectFactory.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
+    <DefineConstants>TRACE;REFERENCE_MODEL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='net462'">
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
   </ItemGroup>
@@ -33,5 +42,9 @@
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
     <PackageReference Include="System.ComponentModel.TypeConverter" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6' Or '$(TargetFramework)'=='netstandard2.0'">
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
   </ItemGroup>
 </Project>
