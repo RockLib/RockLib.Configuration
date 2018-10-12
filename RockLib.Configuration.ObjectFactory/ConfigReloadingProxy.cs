@@ -44,8 +44,13 @@ namespace RockLib.Configuration.ObjectFactory
             _declaringType = declaringType; // Null is a valid value
             _memberName = memberName; // Null is a valid value
             Object = CreateObject();
-            ChangeToken.OnChange(section.GetReloadToken, ReloadObject);
+            ChangeToken.OnChange(section.GetReloadToken, () => ReloadObject(false));
         }
+
+        /// <summary>
+        /// Force the underlying object to reload from the current configuration.
+        /// </summary>
+        public void Reload() => ReloadObject(true);
 
         /// <summary>
         /// Gets the underlying object.
@@ -107,12 +112,12 @@ namespace RockLib.Configuration.ObjectFactory
             return (TInterface)valueSection.Create(concreteType, _defaultTypes, _valueConverters);
         }
 
-        private void ReloadObject()
+        private void ReloadObject(bool force)
         {
             lock (this)
             {
                 // If reloadOnChange is explicitly turned off, don't reload the object - just return.
-                if (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false"))
+                if (!force && string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false"))
                     return;
 
                 // Before doing anything, invoke Reloading.

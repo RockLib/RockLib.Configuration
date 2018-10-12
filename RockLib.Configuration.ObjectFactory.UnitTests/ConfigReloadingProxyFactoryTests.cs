@@ -177,6 +177,34 @@ namespace Tests
         }
 
         [Fact]
+        public void SettingReloadOnChangeToFalseCausesTheProxyToStopReloading()
+        {
+            IConfigurationRoot configuration = GetConfig();
+
+            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+
+            ChangeConfig(configuration, new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+
+            Assert.Equal(123, foo.Bar);
+        }
+
+        [Fact]
+        public void ReloadMethodForcesTheUnderlyingObjectToReload()
+        {
+            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+
+            var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+
+            var initialObject = foo.Object;
+
+            foo.Reload();
+
+            var reloadedObject = foo.Object;
+
+            Assert.NotSame(initialObject, reloadedObject);
+        }
+
+        [Fact]
         public void ReturnedObjectsImplementIConfigReloadingProxyInterface()
         {
             IConfigurationRoot configuration = GetConfig();
@@ -232,9 +260,9 @@ namespace Tests
             Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
         }
 
-        private static IConfigurationRoot GetConfig()
+        private static IConfigurationRoot GetConfig(params KeyValuePair<string, string>[] additionalSettings)
         {
-            return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            var initialData = new Dictionary<string, string>
             {
                 ["foo:type"] = typeof(Foo).AssemblyQualifiedName,
                 ["foo:value:bar"] = "123",
@@ -242,12 +270,15 @@ namespace Tests
                 ["bar:value:qux"] = "5",
                 ["baz:type"] = typeof(Baz).AssemblyQualifiedName,
                 ["baz:value:qux"] = "7",
-            }).Build();
+            };
+            foreach (var setting in additionalSettings)
+                initialData.Add(setting.Key, setting.Value);
+            return new ConfigurationBuilder().AddInMemoryCollection(initialData).Build();
         }
 
         private static void ChangeConfig(IConfigurationRoot root, params KeyValuePair<string, string>[] additionalSettings)
         {
-            MemoryConfigurationProvider provider = (MemoryConfigurationProvider)root.Providers.First();
+            var provider = (MemoryConfigurationProvider)root.Providers.First();
             provider.Set("foo:value:bar", "456");
             provider.Set("bar:value:qux", "10");
             provider.Set("baz:value:foo", "11");
