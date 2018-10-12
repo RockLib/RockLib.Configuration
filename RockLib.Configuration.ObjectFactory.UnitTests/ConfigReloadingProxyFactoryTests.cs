@@ -257,9 +257,13 @@ namespace Tests
             _onReloadMethod.Invoke(provider, null);
         }
 
-        public interface IFoo
+        public interface IFooBase
         {
             int Bar { get; }
+        }
+
+        public interface IFoo : IFooBase
+        {
             int Baz();
             string Qux { get; set; }
         }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using System;
+using System.Collections;
 using System.Reflection;
 
 namespace RockLib.Configuration.ObjectFactory
@@ -32,6 +33,11 @@ namespace RockLib.Configuration.ObjectFactory
         /// <param name="memberName">If present, the name of the member that this instance is the value of.</param>
         protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
         {
+            if (typeof(TInterface) == typeof(IEnumerable))
+                throw new InvalidOperationException("The IEnumerable interface is not supported.");
+            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(typeof(TInterface)))
+                throw new InvalidOperationException($"Interfaces that inherit from IEnumerable are not suported: '{typeof(TInterface).FullName}'");
+
             _section = section ?? throw new ArgumentNullException(nameof(section));
             _defaultTypes = defaultTypes ?? ConfigurationObjectFactory.EmptyDefaultTypes;
             _valueConverters = valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters;
