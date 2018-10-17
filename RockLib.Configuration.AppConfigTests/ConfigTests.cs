@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Primitives;
+using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Xml;
 using Xunit;
 
 namespace RockLib.Configuration.AppConfigTests
@@ -230,6 +235,45 @@ namespace RockLib.Configuration.AppConfigTests
             Assert.Equal("multiple_top_level_elements:1:bar", bar.Path);
             Assert.Equal("4567", bar.Value);
             Assert.Empty(bar.GetChildren());
+        }
+
+        [Fact]
+        public void ReloadTest()
+        {
+            // Make sure the correct value is there before we read.
+            WriteConfig("123");
+            Thread.Sleep(50);
+
+            var section = Config.Root.GetSection("element_to_reload");
+
+            Assert.Equal("123", section.Value);
+
+            var waitHandle = new AutoResetEvent(false);
+
+            ChangeToken.OnChange(section.GetReloadToken, () => waitHandle.Set());
+
+            WriteConfig("456");
+
+            waitHandle.WaitOne();
+
+            Assert.Equal("456", section.Value);
+        }
+
+        private static void WriteConfig(string value)
+        {
+            var filePath = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).FilePath;
+
+            var doc = new XmlDocument();
+
+            using (var reader = new StreamReader(filePath))
+                doc.Load(reader);
+
+            var navigator = doc.CreateNavigator();
+
+            var node = navigator.SelectSingleNode("/configuration/element_to_reload/value");
+            node.SetValue(value);
+
+            doc.Save(filePath);
         }
     }
 }
