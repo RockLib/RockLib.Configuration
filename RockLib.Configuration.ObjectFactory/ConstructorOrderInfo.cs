@@ -18,18 +18,21 @@ namespace RockLib.Configuration.ObjectFactory
                 IsInvokableWithoutDefaultParameters = true;
                 IsInvokableWithDefaultParameters = true;
                 MissingParameterNames = Enumerable.Empty<string>();
+                MatchedParameters = 0;
             }
             else
             {
                 IsInvokableWithoutDefaultParameters = parameters.Count(p => availableMembers.ContainsKey(p.Name)) == TotalParameters;
                 IsInvokableWithDefaultParameters = parameters.Count(p => availableMembers.ContainsKey(p.Name) || p.HasDefaultValue) == TotalParameters;
                 MissingParameterNames = parameters.Where(p => !availableMembers.ContainsKey(p.Name) && !p.HasDefaultValue).Select(p => p.Name);
+                MatchedParameters = parameters.Count(p => availableMembers.ContainsKey(p.Name));
             }
         }
 
         public ConstructorInfo Constructor { get; }
         public bool IsInvokableWithoutDefaultParameters { get;  }
         public bool IsInvokableWithDefaultParameters { get; }
+        public int MatchedParameters { get; }
         public int TotalParameters { get; }
         public IEnumerable<string> MissingParameterNames { get; }
 
@@ -39,6 +42,8 @@ namespace RockLib.Configuration.ObjectFactory
             if (!IsInvokableWithoutDefaultParameters && other.IsInvokableWithoutDefaultParameters) return 1;
             if (IsInvokableWithDefaultParameters && !other.IsInvokableWithDefaultParameters) return -1;
             if (!IsInvokableWithDefaultParameters && other.IsInvokableWithDefaultParameters) return 1;
+            if (MatchedParameters > other.MatchedParameters) return -1;
+            if (MatchedParameters < other.MatchedParameters) return 1;
             if (TotalParameters > other.TotalParameters) return -1;
             if (TotalParameters < other.TotalParameters) return 1;
             return 0;
