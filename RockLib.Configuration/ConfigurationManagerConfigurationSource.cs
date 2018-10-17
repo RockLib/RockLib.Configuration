@@ -3,15 +3,13 @@ using Microsoft.Extensions.Configuration;
 
 namespace RockLib.Configuration
 {
-    public class ConfigurationManagerConfigurationSource : IConfigurationSource
+    public class ConfigurationManagerConfigurationSource : FileConfigurationSource
     {
-        public ConfigurationManagerConfigurationSource(bool reloadOnChange) =>
-            ReloadOnChange = reloadOnChange;
-
-        public bool ReloadOnChange { get; }
-
-        public IConfigurationProvider Build(IConfigurationBuilder builder) =>
-            new ConfigurationManagerConfigurationProvider(ReloadOnChange);
+        public override IConfigurationProvider Build(IConfigurationBuilder builder)
+        {
+            EnsureDefaults(builder);
+            return new ConfigurationManagerConfigurationProvider(this);
+        }
     }
 }
 #endif

@@ -1,32 +1,34 @@
 ﻿#if NET451 || NET462
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web.Configuration;
 
 namespace RockLib.Configuration
 {
     public class ConfigurationManagerConfigurationProvider : ConfigurationProvider
     {
-        private readonly FileSystemWatcher _watcher;
-
-        public ConfigurationManagerConfigurationProvider(bool reloadOnChange)
+        public ConfigurationManagerConfigurationProvider(ConfigurationManagerConfigurationSource source)
         {
-            OnChange(skipReload: true);
+            Source = source ?? throw new ArgumentNullException(nameof(source));
 
-            if (reloadOnChange && Configuration?.FilePath != null)
+            if (Source.ReloadOnChange && Source.FileProvider != null)
             {
-                _watcher = new FileSystemWatcher(Path.GetDirectoryName(Configuration.FilePath))
+                ChangeToken.OnChange(() => Source.FileProvider.Watch("*.config"), delegate
                 {
-                    NotifyFilter = NotifyFilters.LastWrite
-                };
-
-                _watcher.Changed += (s, e) => OnChange(skipReload: false);
-                _watcher.EnableRaisingEvents = true;
+                    Thread.Sleep(Source.ReloadDelay);
+                    OnChange(skipReload: false);
+                });
             }
+
+            OnChange(skipReload: true);
         }
+
+        public ConfigurationManagerConfigurationSource Source { get; }
 
         private void OnChange(bool skipReload)
         {

@@ -91,7 +91,7 @@ namespace RockLib.Configuration
         /// <param name="reloadOnChange">Whether the configuration should be reloaded if the App.config file changes.</param>
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
         public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder, bool reloadOnChange) =>
-            builder.Add(new ConfigurationManagerConfigurationSource(reloadOnChange));
+            builder.Add(new ConfigurationManagerConfigurationSource() { ReloadOnChange = reloadOnChange });
 #endif
     }
 }

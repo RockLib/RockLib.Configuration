@@ -240,23 +240,26 @@ namespace RockLib.Configuration.AppConfigTests
         [Fact]
         public void ReloadTest()
         {
-            // Make sure the correct value is there before we read.
-            WriteConfig("123");
-            Thread.Sleep(50);
+            try
+            {
+                var section = Config.Root.GetSection("element_to_reload");
 
-            var section = Config.Root.GetSection("element_to_reload");
+                Assert.Equal("123", section.Value);
 
-            Assert.Equal("123", section.Value);
+                var waitHandle = new AutoResetEvent(false);
 
-            var waitHandle = new AutoResetEvent(false);
+                ChangeToken.OnChange(section.GetReloadToken, () => waitHandle.Set());
 
-            ChangeToken.OnChange(section.GetReloadToken, () => waitHandle.Set());
+                WriteConfig("456");
 
-            WriteConfig("456");
+                waitHandle.WaitOne();
 
-            waitHandle.WaitOne();
-
-            Assert.Equal("456", section.Value);
+                Assert.Equal("456", section.Value);
+            }
+            finally
+            {
+                WriteConfig("123");
+            }
         }
 
         private static void WriteConfig(string value)
