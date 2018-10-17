@@ -10,8 +10,15 @@ using System.Web.Configuration;
 
 namespace RockLib.Configuration
 {
+    /// <summary>
+    /// A <see cref="ConfigurationProvider"/> backed by the <see cref="ConfigurationManager"/> class.
+    /// </summary>
     public class ConfigurationManagerConfigurationProvider : ConfigurationProvider
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigurationManagerConfigurationProvider"/> class.
+        /// </summary>
+        /// <param name="source">The source settings.</param>
         public ConfigurationManagerConfigurationProvider(ConfigurationManagerConfigurationSource source)
         {
             Source = source ?? throw new ArgumentNullException(nameof(source));
@@ -28,6 +35,9 @@ namespace RockLib.Configuration
             OnChange(skipReload: true);
         }
 
+        /// <summary>
+        /// Gets the source settings for this provider.
+        /// </summary>
         public ConfigurationManagerConfigurationSource Source { get; }
 
         private void OnChange(bool skipReload)
