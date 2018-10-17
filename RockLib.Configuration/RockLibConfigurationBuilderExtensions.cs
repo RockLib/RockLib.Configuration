@@ -79,39 +79,19 @@ namespace RockLib.Configuration
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
-        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder)
-        {
-            var settings = new Dictionary<string, string>();
+        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder) =>
+            builder.AddConfigurationManager(DefaultReloadOnChange);
 
-            try
-            {
-                foreach (var key in ConfigurationManager.AppSettings.AllKeys)
-                    settings[$"AppSettings:{key}"] = ConfigurationManager.AppSettings[key];
-            }
-            catch
-            {
-            }
-
-            LoadConfiguration(() => ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None), settings);
-            LoadConfiguration(() => WebConfigurationManager.OpenWebConfiguration("~"), settings);
-
-            return builder.AddInMemoryCollection(settings);
-        }
-
-        private static void LoadConfiguration(Func<System.Configuration.Configuration> getConfiguration, Dictionary<string, string> settings)
-        {
-            try
-            {
-                var configuration = getConfiguration();
-                if (configuration?.Sections != null)
-                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>()
-                        .SelectMany(x => x.Settings))
-                        settings[setting.Key] = setting.Value;
-            }
-            catch
-            {
-            }
-        }
+        /// <summary>
+        /// Adds the settings from the current application's App.config or Web.config to the
+        /// specified configuration builder. Settings from <see cref="ConfigurationManager.AppSettings"/>
+        /// along with any custom sections of type <see cref="RockLibConfigurationSection"/> will be added.
+        /// </summary>
+        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <param name="reloadOnChange">Whether the configuration should be reloaded if the App.config file changes.</param>
+        /// <returns>The <see cref="IConfigurationBuilder"/></returns>
+        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder, bool reloadOnChange) =>
+            builder.Add(new ConfigurationManagerConfigurationSource(reloadOnChange));
 #endif
     }
 }

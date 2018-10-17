@@ -101,7 +101,7 @@ namespace RockLib.Configuration
 
 #if NET451 || NET462
             builder
-                .AddConfigurationManager();
+                .AddConfigurationManager(reloadOnChange: true);
 #endif
 
             builder
