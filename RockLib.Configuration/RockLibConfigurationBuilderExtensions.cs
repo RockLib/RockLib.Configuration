@@ -16,6 +16,11 @@ namespace RockLib.Configuration
     public static class RockLibConfigurationBuilderExtensions
     {
         /// <summary>
+        /// The default value for whether a configuration should be reloaded when its source changes.
+        /// </summary>
+        public const bool DefaultReloadOnChange = false;
+
+        /// <summary>
         /// Sets the value of the <see cref="Config.Root"/> property by building the specified
         /// <see cref="IConfigurationBuilder"/>.
         /// </summary>
@@ -37,12 +42,23 @@ namespace RockLib.Configuration
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddAppSettingsJson(this IConfigurationBuilder builder)
+        public static IConfigurationBuilder AddAppSettingsJson(this IConfigurationBuilder builder) =>
+            builder.AddAppSettingsJson(DefaultReloadOnChange);
+
+        /// <summary>
+        /// Adds the ASP.NET Core appsettings.json configuration provider to the builder using the configuration file "appsettings.json",
+        /// relative to the base path stored in <see cref="IConfigurationBuilder.Properties"/> of the builder.
+        /// </summary>
+        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <param name="reloadOnChange">Whether the configuration should be reloaded if the appsettings.json file changes.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="builder"/> is null.</exception>
+        /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
+        public static IConfigurationBuilder AddAppSettingsJson(this IConfigurationBuilder builder, bool reloadOnChange)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             // we want the optional value to be true so that it will not throw a runtime exception if the file is not found
-            builder = builder.AddJsonFile("appsettings.json", optional: true);
+            builder = builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: reloadOnChange);
 
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
@@ -50,7 +66,7 @@ namespace RockLib.Configuration
                 environment = Environment.GetEnvironmentVariable("ROCKLIB_ENVIRONMENT");
 
             if (!string.IsNullOrEmpty(environment))
-                builder = builder.AddJsonFile($"appsettings.{environment}.json", optional: true);
+                builder = builder.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: reloadOnChange);
 
             return builder;
         }
@@ -63,39 +79,19 @@ namespace RockLib.Configuration
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <returns>The <see cref="IConfigurationBuilder"/></returns>
-        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder)
-        {
-            var settings = new Dictionary<string, string>();
+        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder) =>
+            builder.AddConfigurationManager(DefaultReloadOnChange);
 
-            try
-            {
-                foreach (var key in ConfigurationManager.AppSettings.AllKeys)
-                    settings[$"AppSettings:{key}"] = ConfigurationManager.AppSettings[key];
-            }
-            catch
-            {
-            }
-
-            LoadConfiguration(() => ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None), settings);
-            LoadConfiguration(() => WebConfigurationManager.OpenWebConfiguration("~"), settings);
-
-            return builder.AddInMemoryCollection(settings);
-        }
-
-        private static void LoadConfiguration(Func<System.Configuration.Configuration> getConfiguration, Dictionary<string, string> settings)
-        {
-            try
-            {
-                var configuration = getConfiguration();
-                if (configuration?.Sections != null)
-                    foreach (var setting in configuration.Sections.OfType<RockLibConfigurationSection>()
-                        .SelectMany(x => x.Settings))
-                        settings[setting.Key] = setting.Value;
-            }
-            catch
-            {
-            }
-        }
+        /// <summary>
+        /// Adds the settings from the current application's App.config or Web.config to the
+        /// specified configuration builder. Settings from <see cref="ConfigurationManager.AppSettings"/>
+        /// along with any custom sections of type <see cref="RockLibConfigurationSection"/> will be added.
+        /// </summary>
+        /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
+        /// <param name="reloadOnChange">Whether the configuration should be reloaded if the App.config file changes.</param>
+        /// <returns>The <see cref="IConfigurationBuilder"/></returns>
+        public static IConfigurationBuilder AddConfigurationManager(this IConfigurationBuilder builder, bool reloadOnChange) =>
+            builder.Add(new ConfigurationManagerConfigurationSource() { ReloadOnChange = reloadOnChange });
 #endif
     }
 }

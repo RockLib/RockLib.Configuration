@@ -1,4 +1,9 @@
+using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.IO;
+using System.Threading;
 using Xunit;
 
 namespace RockLib.Configuration.AppSettingsConfigTests
@@ -60,6 +65,38 @@ namespace RockLib.Configuration.AppSettingsConfigTests
         public void AppSettingsDevelopmentJsonIsLoaded()
         {
             Assert.Equal("appsettings.development.json", Config.AppSettings["FileName"]);
+        }
+
+        [Fact]
+        public void ReloadTest()
+        {
+            try
+            {
+                var section = Config.Root.GetSection("element_to_reload");
+
+                Assert.Equal("123", section.Value);
+
+                var waitHandle = new AutoResetEvent(false);
+
+                ChangeToken.OnChange(section.GetReloadToken, () => waitHandle.Set());
+
+                WriteConfig(456);
+
+                waitHandle.WaitOne();
+
+                Assert.Equal("456", section.Value);
+            }
+            finally
+            {
+                WriteConfig(123);
+            }
+        }
+
+        private static void WriteConfig(int value)
+        {
+            var json = JObject.Parse(File.ReadAllText("appsettings.json"));
+            ((JValue)json["element_to_reload"]).Value = value;
+            File.WriteAllText("appsettings.json", json.ToString(Formatting.Indented));
         }
     }
 }
