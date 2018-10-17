@@ -96,6 +96,9 @@ namespace Tests
         [InlineData(typeof(OneParameterOneOptionalParameter), typeof(TwoParameters), 0, "bar", "baz")]
         [InlineData(typeof(TwoParameters), typeof(ThreeOptionalParameters), 1, "bar")]
         [InlineData(typeof(ThreeOptionalParameters), typeof(TwoParameters), -1, "bar")]
+
+        [InlineData(typeof(ThreeOptionalParameters), typeof(ThreeParametersOneRequired), 1, "foo")]
+        [InlineData(typeof(ThreeParametersOneRequired), typeof(ThreeOptionalParameters), -1, "foo")]
         public void CompareToReturnsTheCorrectValue(Type lhsConstructorType, Type rhsConstructorType, int expectedComparisonValue, params string[] resolvableMemberNames)
         {
             var lhsConstructor = lhsConstructorType.GetTypeInfo().GetConstructors()[0];
@@ -118,6 +121,7 @@ namespace Tests
         private class OneParameterOneOptionalParameter { public OneParameterOneOptionalParameter(int bar, int baz = -1) { } }
         private class TwoOptionalParameters { public TwoOptionalParameters(int bar = -1, int baz = -1) { } }
         private class ThreeOptionalParameters { public ThreeOptionalParameters(int bar = -1, int baz = -1, int qux = -1) { } }
+        private class ThreeParametersOneRequired { public ThreeParametersOneRequired(int foo, int baz = -1, int qux = -1) { } }
     }
 }
 #endif
