@@ -105,7 +105,7 @@ namespace RockLib.Configuration
 #endif
 
             builder
-                .AddAppSettingsJson()
+                .AddAppSettingsJson(reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             if (additionalValues != null)
