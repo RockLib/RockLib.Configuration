@@ -240,14 +240,15 @@ namespace RockLib.Configuration.ObjectFactory
                     if (string.IsNullOrEmpty(child.Value)) return false;
                     typeFound = true;
                 }
+                else if (child.Key.Equals(ReloadOnChangeKey, StringComparison.OrdinalIgnoreCase)
+                    && !string.Equals(child.Value, "false", StringComparison.OrdinalIgnoreCase)) return false;
                 else if (!child.Key.Equals(ValueKey, StringComparison.OrdinalIgnoreCase)) return false;
                 i++;
             }
-            if (i == 1) return typeFound;
-            return i == 2;
+            return typeFound && i >= 1 && i <= 3;
         }
 
-        private static object BuildTypeSpecifiedObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        internal static object BuildTypeSpecifiedObject(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
             var typeSection = configuration.GetSection(TypeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);

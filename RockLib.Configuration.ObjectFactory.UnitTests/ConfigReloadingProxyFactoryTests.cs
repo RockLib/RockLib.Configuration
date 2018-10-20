@@ -191,7 +191,7 @@ namespace Tests
         [Fact]
         public void ReloadMethodForcesTheUnderlyingObjectToReload()
         {
-            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+            IConfigurationRoot configuration = GetConfig();
 
             var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
@@ -202,6 +202,16 @@ namespace Tests
             var reloadedObject = foo.Object;
 
             Assert.NotSame(initialObject, reloadedObject);
+        }
+
+        [Fact]
+        public void AnInitialReloadOnChangeOfFalseDoesNotCreateProxy()
+        {
+            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+
+            var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+
+            Assert.IsType<Foo>(foo);
         }
 
         [Fact]
