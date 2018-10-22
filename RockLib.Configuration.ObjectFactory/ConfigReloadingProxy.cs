@@ -2,7 +2,10 @@
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections;
+using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace RockLib.Configuration.ObjectFactory
 {
@@ -11,11 +14,15 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public abstract class ConfigReloadingProxy<TInterface> : IDisposable
     {
+        private readonly HashAlgorithm _hashAlgorithm = MD5.Create();
+
         private readonly IConfiguration _section;
         private readonly DefaultTypes _defaultTypes;
         private readonly ValueConverters _valueConverters;
         private readonly Type _declaringType;
         private readonly string _memberName;
+
+        private string _hash;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigReloadingProxy{TInterface}"/> class.
@@ -43,6 +50,7 @@ namespace RockLib.Configuration.ObjectFactory
             _valueConverters = valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters;
             _declaringType = declaringType; // Null is a valid value
             _memberName = memberName; // Null is a valid value
+            _hash = GetHash();
             Object = CreateObject();
             ChangeToken.OnChange(section.GetReloadToken, () => ReloadObject(false));
         }
@@ -116,9 +124,16 @@ namespace RockLib.Configuration.ObjectFactory
         {
             lock (this)
             {
+                string newHash = GetHash();
+
                 // If reloadOnChange is explicitly turned off, don't reload the object - just return.
-                if (!force && string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey]?.ToLowerInvariant(), "false"))
+                // Also return if _section's hash hasn't changed.
+                if (!force
+                    && (string.Equals(_section[ConfigurationObjectFactory.ReloadOnChangeKey], "false", StringComparison.OrdinalIgnoreCase)
+                        || string.Equals(newHash, _hash, StringComparison.Ordinal)))
                     return;
+
+                _hash = newHash;
 
                 // Before doing anything, invoke Reloading.
                 Reloading?.Invoke(this, EventArgs.Empty);
@@ -137,6 +152,29 @@ namespace RockLib.Configuration.ObjectFactory
 
                 // After doing everything, invoke Reloaded.
                 Reloaded?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private string GetHash()
+        {
+            var settingsDump = GetSettingsDump(_section);
+            var buffer = Encoding.UTF8.GetBytes(settingsDump);
+            var hash = _hashAlgorithm.ComputeHash(buffer);
+            return Convert.ToBase64String(hash);
+
+            string GetSettingsDump(IConfiguration config)
+            {
+                var sb = new StringBuilder();
+                AddSettingsDump(config, sb);
+                return sb.ToString();
+            }
+
+            void AddSettingsDump(IConfiguration config, StringBuilder sb)
+            {
+                if (config is IConfigurationSection section && section.Value != null)
+                    sb.Append(section.Path).Append(section.Value);
+                foreach (var child in config.GetChildren())
+                    AddSettingsDump(child, sb);
             }
         }
 

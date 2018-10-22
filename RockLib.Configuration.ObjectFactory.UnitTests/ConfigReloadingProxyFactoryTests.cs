@@ -191,7 +191,7 @@ namespace Tests
         [Fact]
         public void ReloadMethodForcesTheUnderlyingObjectToReload()
         {
-            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+            IConfigurationRoot configuration = GetConfig();
 
             var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
@@ -202,6 +202,32 @@ namespace Tests
             var reloadedObject = foo.Object;
 
             Assert.NotSame(initialObject, reloadedObject);
+        }
+
+        [Fact]
+        public void AnInitialReloadOnChangeOfFalseDoesNotCreateProxy()
+        {
+            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+
+            var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+
+            Assert.IsType<Foo>(foo);
+        }
+
+        [Fact]
+        public void UnrelatedConfigChangeDoesNotCauseReload()
+        {
+            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("garply", "abc"));
+
+            var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+
+            var initialObject = foo.Object;
+
+            ChangeConfig(configuration, settings: new Dictionary<string, string> { ["garply"] = "xyz" });
+
+            var reloadedObject = foo.Object;
+
+            Assert.Same(initialObject, reloadedObject);
         }
 
         [Fact]
@@ -278,11 +304,13 @@ namespace Tests
 
         private static void ChangeConfig(IConfigurationRoot root, params KeyValuePair<string, string>[] additionalSettings)
         {
+            ChangeConfig(root, new Dictionary<string, string> { { "foo:value:bar", "456" }, { "bar:value:qux", "10" }, { "baz:value:foo", "11" } }.Concat(additionalSettings));
+        }
+
+        private static void ChangeConfig(IConfigurationRoot root, IEnumerable<KeyValuePair<string, string>> settings)
+        {
             var provider = (MemoryConfigurationProvider)root.Providers.First();
-            provider.Set("foo:value:bar", "456");
-            provider.Set("bar:value:qux", "10");
-            provider.Set("baz:value:foo", "11");
-            foreach (var setting in additionalSettings)
+            foreach (var setting in settings)
                 provider.Set(setting.Key, setting.Value);
             var _onReloadMethod = typeof(ConfigurationProvider).GetMethod("OnReload", BindingFlags.Instance | BindingFlags.NonPublic);
             _onReloadMethod.Invoke(provider, null);

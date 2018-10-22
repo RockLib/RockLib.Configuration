@@ -83,6 +83,10 @@ namespace RockLib.Configuration.ObjectFactory
             if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(interfaceType))
                 throw new ArgumentException($"Interfaces that inherit from IEnumerable are not suported: '{interfaceType.FullName}'", nameof(interfaceType));
 
+            if (!string.IsNullOrEmpty(configuration[ConfigurationObjectFactory.TypeKey])
+                && string.Equals(configuration[ConfigurationObjectFactory.ReloadOnChangeKey], "false", StringComparison.OrdinalIgnoreCase))
+                return configuration.BuildTypeSpecifiedObject(interfaceType, declaringType, memberName, valueConverters ?? new ValueConverters(), defaultTypes ?? new DefaultTypes());
+
             var createReloadingProxy = _proxyFactories.GetOrAdd(interfaceType, CreateProxyTypeFactoryMethod);
             return createReloadingProxy.Invoke(configuration, defaultTypes, valueConverters, declaringType, memberName);
         }
