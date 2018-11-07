@@ -2199,6 +2199,33 @@ namespace Tests
 
             Assert.Equal(123.45, instance.Waldo);
         }
+
+        [Fact]
+        public void ObjectFieldWithDefaultTypeOfStringDictionaryIsSupported()
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["foo:bar:a"] = "abc",
+                ["foo:bar:b"] = "xyz",
+                ["foo:baz:c"] = "123",
+                ["foo:baz:d"] = "456"
+            }).Build();
+
+            var defaultTypes = new DefaultTypes()
+                .Add(typeof(HasObjectMembersWithDefaultTypeOfStringDictionary),
+                    nameof(HasObjectMembersWithDefaultTypeOfStringDictionary.Baz),
+                    typeof(Dictionary<string, int>));
+
+            var foo = config.GetSection("foo").Create<HasObjectMembersWithDefaultTypeOfStringDictionary>(defaultTypes);
+
+            var bar = (Dictionary<string, string>)foo.Bar;
+            var baz = (Dictionary<string, int>)foo.Baz;
+
+            Assert.Equal("abc", bar["a"]);
+            Assert.Equal("xyz", bar["b"]);
+            Assert.Equal(123, baz["c"]);
+            Assert.Equal(456, baz["d"]);
+        }
     }
 
     public class HasSimpleReadWriteDictionaryProperties
@@ -2940,6 +2967,19 @@ namespace Tests
 
         private static double ConvertBar(string value) => double.Parse(value) * 7;
         private static double ConvertBaz(string value) => double.Parse(value) * 11;
+    }
+
+    public class HasObjectMembersWithDefaultTypeOfStringDictionary
+    {
+        public HasObjectMembersWithDefaultTypeOfStringDictionary([DefaultType(typeof(Dictionary<string, string>))] object bar,
+            object baz)
+        {
+            Bar = bar;
+            Baz = baz;
+        }
+
+        public object Bar { get; }
+        public object Baz { get; }
     }
 }
 
