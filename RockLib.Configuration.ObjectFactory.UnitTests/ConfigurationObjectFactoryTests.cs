@@ -2226,6 +2226,23 @@ namespace Tests
             Assert.Equal(123, baz["c"]);
             Assert.Equal(456, baz["d"]);
         }
+
+        [Fact]
+        public void ObjectFieldsWithDirectConfigurationValuesAreSupported()
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["foo:bar"] = "abc",
+                ["foo:baz:a"] = "123",
+                ["foo:baz:b"] = "xyz"
+            }).Build();
+
+            var foo = config.GetSection("foo").Create<HasObjectMembers>();
+
+            Assert.Equal("abc", foo.Bar);
+            Assert.Equal("123", foo.Baz["a"]);
+            Assert.Equal("xyz", foo.Baz["b"]);
+        }
     }
 
     public class HasSimpleReadWriteDictionaryProperties
@@ -2980,6 +2997,18 @@ namespace Tests
 
         public object Bar { get; }
         public object Baz { get; }
+    }
+
+    public class HasObjectMembers
+    {
+        public HasObjectMembers(object bar, Dictionary<string, object> baz)
+        {
+            Bar = bar;
+            Baz = baz;
+        }
+
+        public object Bar { get; }
+        public Dictionary<string, object> Baz { get; }
     }
 }
 
