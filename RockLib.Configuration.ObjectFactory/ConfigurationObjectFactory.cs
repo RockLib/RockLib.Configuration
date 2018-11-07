@@ -142,6 +142,8 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 if (convert != null)
                     return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
+                if (targetType.GetTypeInfo().IsAssignableFrom(typeof(string)))
+                    return valueSection.Value;
                 if (targetType == typeof(Encoding))
                     return Encoding.GetEncoding(valueSection.Value);
                 if (targetType == typeof(Type))
