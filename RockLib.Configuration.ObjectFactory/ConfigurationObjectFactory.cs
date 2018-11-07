@@ -114,7 +114,7 @@ namespace RockLib.Configuration.ObjectFactory
                 return configuration.CreateReloadingProxy(targetType, defaultTypes, valueConverters, declaringType, memberName);
             if (IsTypeSpecifiedObject(configuration))
                 return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            if (IsStringDictionary(targetType))
+            if (IsStringDictionary(ref targetType, declaringType, memberName, defaultTypes))
                 return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
             return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
         }
@@ -370,10 +370,25 @@ namespace RockLib.Configuration.ObjectFactory
             return includeEmptyList || i > 0;
         }
 
-        private static bool IsStringDictionary(Type type) =>
-            type.GetTypeInfo().IsGenericType
+        private static bool IsStringDictionary(ref Type targetType, Type declaringType, string memberName, DefaultTypes defaultTypes)
+        {
+            var type = targetType;
+
+            if (type == typeof(object) && TryGetDefaultType(defaultTypes, type, declaringType, memberName, out Type defaultType))
+                type = defaultType;
+
+            if (type.GetTypeInfo().IsGenericType
                 && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>) || type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
-                && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string);
+                && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string))
+            {
+                if (type != targetType)
+                    targetType = type;
+
+                return true;
+            }
+
+            return false;
+        }
 
         private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
         {
