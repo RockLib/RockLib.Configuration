@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <PackageId>RockLib.Configuration</PackageId>
-    <PackageVersion>2.3.0</PackageVersion>
+    <PackageVersion>2.3.1</PackageVersion>
     <Authors>Quicken Loans</Authors>
     <Description>Provides a central location for an instance of IConfigurationRoot to be used as the "default" configuration by .NET Standard libraries and .NET Core applications. Replaces some of the functionality of the .NET Framework System.Configuration.ConfigurationManager class.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
