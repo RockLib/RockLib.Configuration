@@ -15,7 +15,7 @@ namespace RockLib.Configuration
     /// </summary>
     public sealed class RockLibConfigurationSection : ConfigurationSection
     {
-        private static readonly IEqualityComparer<string> _ignoreCase = StringComparer.InvariantCultureIgnoreCase;
+        private static readonly IEqualityComparer<string> _ignoreCase = StringComparer.OrdinalIgnoreCase;
 
         private readonly Dictionary<string, string> _settings = new Dictionary<string, string>(_ignoreCase);
         private List<XElement> _unrecognizedElements = new List<XElement>();

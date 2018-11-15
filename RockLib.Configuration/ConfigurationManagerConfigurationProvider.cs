@@ -55,7 +55,7 @@ namespace RockLib.Configuration
 
         private IDictionary<string, string> GetNewSettings(bool skipReload)
         {
-            IDictionary<string, string> newSettings = new Dictionary<string, string>();
+            IDictionary<string, string> newSettings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
             try
             {

@@ -37,6 +37,24 @@ namespace RockLib.Configuration.AppConfigTests
         }
 
         [Fact]
+        public void MismatchedCaseWorksAsExpected()
+        {
+            var section = Config.Root.GetSection("CASE_MISMATCH");
+
+            Assert.Equal("CASE_MISMATCH", section.Key);
+            Assert.Equal("CASE_MISMATCH", section.Path);
+            
+            Assert.Null(section.Value);
+
+            var children = section.GetChildren().ToArray();
+            Assert.NotEmpty(children);
+
+            Assert.Equal("foo", children[0].Key);
+            Assert.Equal("CASE_MISMATCH:foo", children[0].Path);
+            Assert.Equal("123", children[0].Value);
+        }
+
+        [Fact]
         public void ElementWithAttributesMapsCorrectly()
         {
             var section = Config.Root.GetSection("element_with_attributes");
