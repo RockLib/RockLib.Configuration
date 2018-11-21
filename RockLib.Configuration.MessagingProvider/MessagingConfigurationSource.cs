@@ -1,19 +1,29 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Messaging;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace RockLib.Configuration.MessagingProvider
 {
-    public class MessagingConfigurationSource : IConfigurationSource
+    public sealed class MessagingConfigurationSource : IConfigurationSource
     {
+        private static readonly ConditionalWeakTable<IReceiver, MessagingConfigurationSource> _validationCache = new ConditionalWeakTable<IReceiver, MessagingConfigurationSource>();
+
+        private readonly Lazy<MessagingConfigurationProvider> _cachedProvider;
+
         public MessagingConfigurationSource(IReceiver receiver)
         {
-            Receiver = receiver ?? throw new ArgumentNullException(nameof(receiver));
+            if (receiver == null)
+                throw new ArgumentNullException(nameof(receiver));
+            if (!ReferenceEquals(this, _validationCache.GetValue(receiver, r => this)))
+                throw new ArgumentException("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.", nameof(receiver));
+
+            Receiver = receiver;
+            _cachedProvider = new Lazy<MessagingConfigurationProvider>(() => new MessagingConfigurationProvider(Receiver));
         }
 
         public IReceiver Receiver { get; }
 
-        public IConfigurationProvider Build(IConfigurationBuilder builder) =>
-            new MessagingConfigurationProvider(this);
+        public IConfigurationProvider Build(IConfigurationBuilder builder) => _cachedProvider.Value;
     }
 }

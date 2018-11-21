@@ -9,11 +9,13 @@ namespace RockLib.Configuration.MessagingProvider
 {
     public sealed class MessagingConfigurationProvider : ConfigurationProvider
     {
-        public MessagingConfigurationProvider(MessagingConfigurationSource source)
+        internal MessagingConfigurationProvider(IReceiver receiver)
         {
-            Source = source ?? throw new ArgumentNullException(nameof(source));
-            Source.Receiver.Start(OnMessageReceived);
+            Receiver = receiver;
+            Receiver.Start(OnMessageReceived);
         }
+
+        public IReceiver Receiver { get; }
 
         private void OnMessageReceived(IReceiverMessage message)
         {
@@ -64,8 +66,6 @@ namespace RockLib.Configuration.MessagingProvider
                     RevertDataAfterDelay(previousData, milliseconds);
             }
         }
-
-        public MessagingConfigurationSource Source { get; }
 
         private async void RevertDataAfterDelay(IDictionary<string, string> previousData, int milliseconds)
         {
