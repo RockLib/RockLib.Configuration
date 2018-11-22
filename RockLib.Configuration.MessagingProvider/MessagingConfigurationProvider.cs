@@ -27,6 +27,7 @@ namespace RockLib.Configuration.MessagingProvider
             }
             catch
             {
+                message.Reject();
                 return;
             }
 
@@ -65,6 +66,8 @@ namespace RockLib.Configuration.MessagingProvider
                 if (previousData != null)
                     RevertDataAfterDelay(previousData, milliseconds);
             }
+
+            message.Acknowledge();
         }
 
         private async void RevertDataAfterDelay(IDictionary<string, string> previousData, int milliseconds)
