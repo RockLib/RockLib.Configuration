@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace RockLib.Configuration.MessagingProvider
 {
+    /// <summary>
+    /// An <see cref="IConfigurationProvider"/> that reloads when it receives
+    /// a message containing configuration changes.
+    /// </summary>
     public sealed class MessagingConfigurationProvider : ConfigurationProvider
     {
         internal MessagingConfigurationProvider(IReceiver receiver)
@@ -15,6 +19,10 @@ namespace RockLib.Configuration.MessagingProvider
             Receiver.Start(OnMessageReceived);
         }
 
+        /// <summary>
+        /// Gets the <see cref="IReceiver"/> that receives messages for changing
+        /// configuration values.
+        /// </summary>
         public IReceiver Receiver { get; }
 
         private void OnMessageReceived(IReceiverMessage message)
