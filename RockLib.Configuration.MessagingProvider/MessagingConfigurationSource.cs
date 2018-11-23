@@ -17,6 +17,8 @@ namespace RockLib.Configuration.MessagingProvider
                 throw new ArgumentNullException(nameof(receiver));
             if (!ReferenceEquals(this, _validationCache.GetValue(receiver, r => this)))
                 throw new ArgumentException("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.", nameof(receiver));
+            if (receiver.MessageHandler != null)
+                throw new ArgumentException("The receiver is already started.", nameof(receiver));
 
             Receiver = receiver;
             _cachedProvider = new Lazy<MessagingConfigurationProvider>(() => new MessagingConfigurationProvider(Receiver));
