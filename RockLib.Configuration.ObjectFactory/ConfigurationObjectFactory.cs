@@ -725,18 +725,18 @@ namespace RockLib.Configuration.ObjectFactory
 
                         for (int i = 0; i < identifier.Length; i++)
                         {
-                            if (IsUpperCaseAbbreviation(i))
-                                words.Add(GetUpperCaseAbbreviation(ref i));
+                            if (IsUpperCaseWord(i))
+                                words.Add(GetUpperCaseWord(ref i));
                             else
                                 words.Add(GetWord(ref i));
                         }
 
-                        bool IsUpperCaseAbbreviation(int index) =>
+                        bool IsUpperCaseWord(int index) =>
                                 index <= identifier.Length - 2
                                 && char.IsUpper(identifier[index])
                                 && char.IsUpper(identifier[index + 1]);
 
-                        string GetUpperCaseAbbreviation(ref int index)
+                        string GetUpperCaseWord(ref int index)
                         {
                             var sb = new StringBuilder();
                             while (index < identifier.Length)

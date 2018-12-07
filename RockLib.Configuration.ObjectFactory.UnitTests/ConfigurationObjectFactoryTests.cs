@@ -48,6 +48,14 @@ namespace Tests
             public string thingfive { get; set; }
         }
 
+        public class UPPERCaseWORDS
+        {
+            public string THINGOne {get; set; }
+            public string ThingTWO { get; set; }
+            public string Thing_Three { get; set; }
+            public string Thing_Four { get; set; }
+        }
+
         [Fact]
         public void CanMixAndMatchIdentifierCasing()
         {
@@ -95,6 +103,30 @@ namespace Tests
             Assert.Equal("c", none.thingthree);
             Assert.Equal("d", none.thingfour);
             Assert.Equal("e", none.thingfive);
+        }
+
+
+        [Fact]
+        public void CanHandleUPPERCasedWORDS()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:thing-one", "a" },
+                    { "foo:thing-two", "b" },
+                    { "foo:thingTHREE", "c" },
+                    { "foo:THINGFour", "d" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+
+            var pascal = fooSection.Create<UPPERCaseWORDS>();
+
+            Assert.Equal("a", pascal.THINGOne);
+            Assert.Equal("b", pascal.ThingTWO);
+            Assert.Equal("c", pascal.Thing_Three);
+            Assert.Equal("d", pascal.Thing_Four);
         }
 
         [Fact]
