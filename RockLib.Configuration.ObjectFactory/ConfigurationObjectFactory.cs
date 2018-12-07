@@ -557,7 +557,7 @@ namespace RockLib.Configuration.ObjectFactory
 
         private class ObjectBuilder
         {
-            private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(StringComparer.OrdinalIgnoreCase);
+            private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(new IdentifierComparer());
 
             public ObjectBuilder(Type type, IConfiguration configuration)
             {
@@ -674,6 +674,100 @@ namespace RockLib.Configuration.ObjectFactory
 
             private IEnumerable<PropertyInfo> ReadonlyDictionaryProperties =>
                 Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyDictionary());
+
+            private class IdentifierComparer : IEqualityComparer<string>
+            {
+                private static readonly StringComparer _comparer = StringComparer.OrdinalIgnoreCase;
+
+                public bool Equals(string x, string y)
+                {
+                    if (_comparer.Equals(x, y))
+                        return true;
+
+                    var xWords = SplitIntoWords(x);
+                    var yWords = SplitIntoWords(y);
+
+                    if (xWords.Count == yWords.Count)
+                    {
+                        for (int i = 0; i < xWords.Count; i++)
+                            if (!_comparer.Equals(xWords[i], yWords[i]))
+                                return false;
+
+                        return true;
+                    }
+                    else if (xWords.Count == 1 && _comparer.Equals(xWords[0], string.Join("", yWords)))
+                        return true;
+                    else if (yWords.Count == 1 && _comparer.Equals(yWords[0], string.Join("", xWords)))
+                        return true;
+
+                    return false;
+                }
+
+                /// <summary>
+                /// It is impossible to calculate a hash that identifies a both case-insensitive overall
+                /// match and a word-separated case-insensitive match. For example "Foo-Bar" needs to have
+                /// the same hash as "foobar", but there is no way of knowing how to split a value with
+                /// no separators and no variation in casing. Returning a constant hash ensures that a
+                /// dictionary will handle all identifier casing variations correctly, albeit without
+                /// the optimization of a well-partitioned hash.
+                /// </summary>
+                public int GetHashCode(string obj) => 0;
+
+                private static IReadOnlyList<string> SplitIntoWords(string identifier)
+                {
+                    if (identifier.Contains('_'))
+                        return identifier.Split('_');
+                    else if (identifier.Contains('-'))
+                        return identifier.Split('-');
+                    else
+                    {
+                        var words = new List<string>();
+
+                        for (int i = 0; i < identifier.Length; i++)
+                        {
+                            if (IsUpperCaseWord(i))
+                                words.Add(GetUpperCaseWord(ref i));
+                            else
+                                words.Add(GetWord(ref i));
+                        }
+
+                        bool IsUpperCaseWord(int index) =>
+                                index <= identifier.Length - 2
+                                && char.IsUpper(identifier[index])
+                                && char.IsUpper(identifier[index + 1]);
+
+                        string GetUpperCaseWord(ref int index)
+                        {
+                            var sb = new StringBuilder();
+                            while (index < identifier.Length)
+                            {
+                                if (char.IsUpper(identifier[index]))
+                                    sb.Append(identifier[index]);
+                                else
+                                {
+                                    sb.Remove(sb.Length - 1, 1);
+                                    index -= 2;
+                                    break;
+                                }
+                                index++;
+                            }
+                            return sb.ToString();
+                        }
+
+                        string GetWord(ref int index)
+                        {
+                            var sb = new StringBuilder();
+                            sb.Append(identifier[index]);
+                            while (++index < identifier.Length && !char.IsUpper(identifier[index]))
+                                sb.Append(identifier[index]);
+                            index--;
+                            return sb.ToString();
+                        }
+
+                        return words;
+                    }
+                }
+            }
         }
     }
 }

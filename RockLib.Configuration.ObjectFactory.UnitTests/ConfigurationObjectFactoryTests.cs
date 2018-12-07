@@ -12,6 +12,123 @@ namespace Tests
 {
     public class ConfigurationObjectFactoryTests
     {
+        public class PascalCase
+        {
+            public string ThingOne { get; set; }
+            public string ThingTwo { get; set; }
+            public string ThingThree { get; set; }
+            public string ThingFour { get; set; }
+            public string ThingFive { get; set; }
+        }
+
+        public class camelCase
+        {
+            public string thingOne { get; set; }
+            public string thingTwo { get; set; }
+            public string thingThree { get; set; }
+            public string thingFour { get; set; }
+            public string thingFive { get; set; }
+        }
+
+        public class Snake_Case
+        {
+            public string Thing_One { get; set; }
+            public string Thing_Two { get; set; }
+            public string Thing_Three { get; set; }
+            public string Thing_Four { get; set; }
+            public string Thing_Five { get; set; }
+        }
+
+        public class nocase
+        {
+            public string thingone { get; set; }
+            public string thingtwo { get; set; }
+            public string thingthree { get; set; }
+            public string thingfour { get; set; }
+            public string thingfive { get; set; }
+        }
+
+        public class UPPERCaseWORDS
+        {
+            public string THINGOne {get; set; }
+            public string ThingTWO { get; set; }
+            public string Thing_Three { get; set; }
+            public string Thing_Four { get; set; }
+        }
+
+        [Fact]
+        public void CanMixAndMatchIdentifierCasing()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:ThingOne", "a" },    // Pascal
+                    { "foo:thingTwo", "b" },    // Camel
+                    { "foo:thing-three", "c" }, // Kebab
+                    { "foo:thing_four", "d" },  // Snake
+                    { "foo:thingfive", "e" },   // None
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+
+            var pascal = fooSection.Create<PascalCase>();
+
+            Assert.Equal("a", pascal.ThingOne);
+            Assert.Equal("b", pascal.ThingTwo);
+            Assert.Equal("c", pascal.ThingThree);
+            Assert.Equal("d", pascal.ThingFour);
+            Assert.Equal("e", pascal.ThingFive);
+
+            var camel = fooSection.Create<camelCase>();
+
+            Assert.Equal("a", camel.thingOne);
+            Assert.Equal("b", camel.thingTwo);
+            Assert.Equal("c", camel.thingThree);
+            Assert.Equal("d", camel.thingFour);
+            Assert.Equal("e", camel.thingFive);
+
+            var snake = fooSection.Create<Snake_Case>();
+
+            Assert.Equal("a", snake.Thing_One);
+            Assert.Equal("b", snake.Thing_Two);
+            Assert.Equal("c", snake.Thing_Three);
+            Assert.Equal("d", snake.Thing_Four);
+            Assert.Equal("e", snake.Thing_Five);
+
+            var none = fooSection.Create<nocase>();
+
+            Assert.Equal("a", none.thingone);
+            Assert.Equal("b", none.thingtwo);
+            Assert.Equal("c", none.thingthree);
+            Assert.Equal("d", none.thingfour);
+            Assert.Equal("e", none.thingfive);
+        }
+
+
+        [Fact]
+        public void CanHandleUPPERCasedWORDS()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:thing-one", "a" },
+                    { "foo:thing-two", "b" },
+                    { "foo:thingTHREE", "c" },
+                    { "foo:THINGFour", "d" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+
+            var pascal = fooSection.Create<UPPERCaseWORDS>();
+
+            Assert.Equal("a", pascal.THINGOne);
+            Assert.Equal("b", pascal.ThingTWO);
+            Assert.Equal("c", pascal.Thing_Three);
+            Assert.Equal("d", pascal.Thing_Four);
+        }
+
         [Fact]
         public void CanSpecifyConvertMethodWithConvertMethodAttribute()
         {
