@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -25,6 +26,7 @@ namespace RockLib.Configuration.ObjectFactory
         private static readonly MethodInfo _disposeMethod = typeof(IDisposable).GetTypeInfo().GetMethod(nameof(IDisposable.Dispose));
         private static readonly MethodInfo _delegateCombineMethod = typeof(Delegate).GetTypeInfo().GetMethod(nameof(Delegate.Combine), new[] { typeof(Delegate), typeof(Delegate) });
         private static readonly MethodInfo _delegateRemoveMethod = typeof(Delegate).GetTypeInfo().GetMethod(nameof(Delegate.Remove), new[] { typeof(Delegate), typeof(Delegate) });
+        private static readonly CustomAttributeBuilder _debuggerBrowsableNeverAttribute = new CustomAttributeBuilder(typeof(DebuggerBrowsableAttribute).GetTypeInfo().GetConstructor(new[] { typeof(DebuggerBrowsableState) }), new object[] { DebuggerBrowsableState.Never });
 
         private static readonly ConcurrentDictionary<Type, CreateProxyDelegate> _proxyFactories = new ConcurrentDictionary<Type, CreateProxyDelegate>();
 
@@ -177,6 +179,7 @@ namespace RockLib.Configuration.ObjectFactory
                 il.Emit(OpCodes.Callvirt, interfaceProperty.GetMethod);
                 il.Emit(OpCodes.Ret);
 
+                propertyBuilder.SetCustomAttribute(_debuggerBrowsableNeverAttribute);
                 propertyBuilder.SetGetMethod(getMethodBuilder);
                 proxyTypeBuilder.DefineMethodOverride(getMethodBuilder, interfaceProperty.GetMethod);
                 implementedMethods.Add(interfaceProperty.GetMethod);
@@ -204,6 +207,7 @@ namespace RockLib.Configuration.ObjectFactory
         private static void AddEvent(TypeBuilder proxyTypeBuilder, EventInfo interfaceEvent, MethodInfo baseGetObjectMethod, IDictionary<EventInfo, FieldBuilder> eventFields, ICollection<MethodInfo> implementedMethods)
         {
             var eventField = proxyTypeBuilder.DefineField($"_{interfaceEvent.DeclaringType.FullName.Replace(".", "_")}_{interfaceEvent.Name}", interfaceEvent.EventHandlerType, FieldAttributes.Private);
+            eventField.SetCustomAttribute(_debuggerBrowsableNeverAttribute);
             eventFields.Add(interfaceEvent, eventField);
 
             var parameters = new[] { interfaceEvent.EventHandlerType };

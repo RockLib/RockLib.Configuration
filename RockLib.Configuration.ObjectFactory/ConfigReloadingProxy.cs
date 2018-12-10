@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,17 +12,18 @@ namespace RockLib.Configuration.ObjectFactory
     /// <summary>
     /// The base class for reloading proxy classes.
     /// </summary>
+    [DebuggerDisplay("{" + nameof(Object) + "}")]
     public abstract class ConfigReloadingProxy<TInterface> : IDisposable
     {
-        private readonly HashAlgorithm _hashAlgorithm = MD5.Create();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly HashAlgorithm _hashAlgorithm = MD5.Create();
 
-        private readonly IConfiguration _section;
-        private readonly DefaultTypes _defaultTypes;
-        private readonly ValueConverters _valueConverters;
-        private readonly Type _declaringType;
-        private readonly string _memberName;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly IConfiguration _section;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly DefaultTypes _defaultTypes;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly ValueConverters _valueConverters;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly Type _declaringType;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly string _memberName;
 
-        private string _hash;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private string _hash;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigReloadingProxy{TInterface}"/> class.
@@ -63,6 +64,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// <summary>
         /// Gets the underlying object.
         /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public TInterface Object { get; private set; }
 
         /// <summary>
