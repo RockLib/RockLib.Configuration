@@ -207,6 +207,7 @@ namespace RockLib.Configuration.ObjectFactory
         private static void AddEvent(TypeBuilder proxyTypeBuilder, EventInfo interfaceEvent, MethodInfo baseGetObjectMethod, IDictionary<EventInfo, FieldBuilder> eventFields, ICollection<MethodInfo> implementedMethods)
         {
             var eventField = proxyTypeBuilder.DefineField($"_{interfaceEvent.DeclaringType.FullName.Replace(".", "_")}_{interfaceEvent.Name}", interfaceEvent.EventHandlerType, FieldAttributes.Private);
+            eventField.SetCustomAttribute(_debuggerBrowsableNeverAttribute);
             eventFields.Add(interfaceEvent, eventField);
 
             var parameters = new[] { interfaceEvent.EventHandlerType };

@@ -12,7 +12,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// <summary>
     /// The base class for reloading proxy classes.
     /// </summary>
-    [DebuggerDisplay("{" + nameof(Object) + ",nq}")]
+    [DebuggerDisplay("{" + nameof(Object) + "}")]
     public abstract class ConfigReloadingProxy<TInterface> : IDisposable
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly HashAlgorithm _hashAlgorithm = MD5.Create();
