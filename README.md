@@ -8,6 +8,6 @@ This repository contains the source code for three nuget packages:
 
 An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-default constructors and other features commonly found in JSON and XML serializers.
 
-### [RockLib.Configuration.ProxyFactory](RockLib.Configuration.ProxyFactory) [![Build status](https://ci.appveyor.com/api/projects/status/ogf4axfokbklh638?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-fe27m)
+### [RockLib.Configuration.ProxyFactory](RockLib.Configuration.ProxyFactory) [![Build status](https://ci.appveyor.com/api/projects/status/kc7repd7vjplu7ls?svg=true)](https://ci.appveyor.com/project/RockLib/rocklib-configuration-u6yve)
 
 A factory that creates instances of property-only interfaces, defined at run-time, and populated with values defined in an instance of `IConfiguration`.
