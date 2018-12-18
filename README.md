@@ -1,6 +1,6 @@
 This repository contains the source code for three nuget packages:
 
-### [RockLib.Configuration](RockLib.Configuration) [![Build status](https://ci.appveyor.com/api/projects/status/0qxs1k1bw36cn8ly?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration)
+### [RockLib.Configuration](RockLib.Configuration) [![Build status](https://ci.appveyor.com/api/projects/status/cqxs63x57368a08w?svg=true)](https://ci.appveyor.com/project/RockLib/rocklib-configuration-9b1x8)
   
   Defines a static `Config` class as a general replacement for the old .NET Framework `ConfigurationManager` class.
 
