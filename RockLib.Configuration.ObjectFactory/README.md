@@ -1,4 +1,4 @@
-# RockLib.Configuration.ObjectFactory [![Build status](https://ci.appveyor.com/api/projects/status/ox9velgud5ljj8d0?svg=true)](https://ci.appveyor.com/project/bfriesen/rocklib-configuration-owv0n)
+# RockLib.Configuration.ObjectFactory [![Build status](https://ci.appveyor.com/api/projects/status/0hb1lqus37ny3tep?svg=true)](https://ci.appveyor.com/project/RockLib/rocklib-configuration-qcxxq)
 
 An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-default constructors and other features commonly found in JSON and XML serializers.
 
