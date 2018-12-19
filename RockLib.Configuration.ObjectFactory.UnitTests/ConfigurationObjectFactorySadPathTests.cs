@@ -422,7 +422,8 @@ namespace Tests
 #if DEBUG
             var constructorOrderInfo = new ConstructorOrderInfo(
                 typeof(TwoArgConstructor).GetTypeInfo().GetConstructors()[0],
-                new Dictionary<string, IConfigurationSection> { { "bar", null } });
+                new Dictionary<string, IConfigurationSection> { { "bar", null } },
+                Resolver.Empty);
             var expected = Exceptions.MissingRequiredConstructorParameters(fooSection, constructorOrderInfo);
             Assert.Equal(expected.Message, actual.Message);
 #endif
