@@ -72,6 +72,12 @@ namespace RockLib.Configuration.ObjectFactory
         /// An object that defines custom converter functions that are used to convert string configuration
         /// values to a target type.
         /// </param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
         /// <returns>An object of type <typeparamref name="T"/> with values set from the configuration.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is null.</exception>
         /// <exception cref="InvalidOperationException">
@@ -145,6 +151,12 @@ namespace RockLib.Configuration.ObjectFactory
         /// <param name="valueConverters">
         /// An object that defines custom converter functions that are used to convert string configuration
         /// values to a target type.
+        /// </param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
         /// </param>
         /// <returns>An object with values set from the configuration.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> or <paramref name="type"/> is null.</exception>

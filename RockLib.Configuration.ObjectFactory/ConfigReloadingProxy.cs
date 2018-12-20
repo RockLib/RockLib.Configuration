@@ -40,6 +40,12 @@ namespace RockLib.Configuration.ObjectFactory
         /// </param>
         /// <param name="declaringType">If present the declaring type of the member that this instance is a value of.</param>
         /// <param name="memberName">If present, the name of the member that this instance is the value of.</param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
         protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver)
         {
             if (typeof(TInterface) == typeof(IEnumerable))
