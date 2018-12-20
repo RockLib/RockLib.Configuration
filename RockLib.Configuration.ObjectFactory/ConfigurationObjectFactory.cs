@@ -56,8 +56,51 @@ namespace RockLib.Configuration.ObjectFactory
         /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
         /// that has a value that is not assignable to the property or constructor parameter.
         /// </exception>
-        public static T Create<T>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
-            (T)configuration.Create(typeof(T), defaultTypes, valueConverters);
+        public static T Create<T>(this IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters) =>
+            configuration.Create<T>(defaultTypes, valueConverters, null);
+
+        /// <summary>
+        /// Create an object of type <typeparamref name="T"/> based on the specified configuration.
+        /// </summary>
+        /// <typeparam name="T">The type of object to create.</typeparam>
+        /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
+        /// <returns>An object of type <typeparamref name="T"/> with values set from the configuration.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// - If the specified convert func returns an object that is not assignable to the target type.
+        /// - If a configuration value is not assignable to the target type.
+        /// - If the type specified by configuration is not assignable to its target type.
+        /// - If the target type is an array but the type specified by configuration does not represent a list.
+        /// - If the target type is an array with a rank greater than one.
+        /// - If the target type is a list type but the type specified by configuration does not represent a list.
+        /// - If the target type is abstract.
+        /// - If the target type is System.Object.
+        /// - If the target type is an unsupported collection type.
+        /// - If the target type is not a supported collection type but the configuration represents a list.
+        /// - If multiple properties or constructor parameters that match a member are decorated with a [DefaultType] attribute and the attribute values don't all match.
+        /// - If the target type has no public constructors.
+        /// - If the target has ambiguous constructors.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
+        /// that has a value that is not assignable to the property or constructor parameter.
+        /// </exception>
+        public static T Create<T>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null, IResolver resolver = null) =>
+            (T)configuration.Create(typeof(T), defaultTypes, valueConverters, resolver);
 
         /// <summary>
         /// Create an object of the specified type based on the specified configuration.
@@ -93,30 +136,73 @@ namespace RockLib.Configuration.ObjectFactory
         /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
         /// that has a value that is not assignable to the property or constructor parameter.
         /// </exception>
-        public static object Create(this IConfiguration configuration, Type type, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null)
+        public static object Create(this IConfiguration configuration, Type type, DefaultTypes defaultTypes, ValueConverters valueConverters) =>
+            configuration.Create(type, defaultTypes, valueConverters, null);
+
+        /// <summary>
+        /// Create an object of the specified type based on the specified configuration.
+        /// </summary>
+        /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="type">The type of object to create.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
+        /// <returns>An object with values set from the configuration.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> or <paramref name="type"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// - If the specified convert func returns an object that is not assignable to the target type.
+        /// - If a configuration value is not assignable to the target type.
+        /// - If the type specified by configuration is not assignable to its target type.
+        /// - If the target type is an array but the type specified by configuration does not represent a list.
+        /// - If the target type is an array with a rank greater than one.
+        /// - If the target type is a list type but the type specified by configuration does not represent a list.
+        /// - If the target type is abstract.
+        /// - If the target type is System.Object.
+        /// - If the target type is an unsupported collection type.
+        /// - If the target type is not a supported collection type but the configuration represents a list.
+        /// - If multiple properties or constructor parameters that match a member are decorated with a [DefaultType] attribute and the attribute values don't all match.
+        /// - If the target type has no public constructors.
+        /// - If the target has ambiguous constructors.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If a property or constructor parameter is decorated with a <see cref="DefaultTypeAttribute"/>
+        /// that has a value that is not assignable to the property or constructor parameter.
+        /// </exception>
+        public static object Create(this IConfiguration configuration, Type type, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null, IResolver resolver = null)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return configuration.Create(type, null, null, valueConverters ?? EmptyValueConverters, defaultTypes ?? EmptyDefaultTypes);
+            return configuration.Create(type, null, null, valueConverters ?? EmptyValueConverters, defaultTypes ?? EmptyDefaultTypes, resolver ?? Resolver.Empty);
         }
 
-        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             if (targetType.IsArray)
-                return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+                return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsGenericList(targetType))
-                return BuildGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+                return BuildGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsNonGenericList(targetType, true))
-                return BuildNonGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+                return BuildNonGenericList(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsValueSection(configuration, out IConfigurationSection valueSection))
-                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes);
+                return ConvertToType(valueSection, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsReloadingObject(configuration))
-                return configuration.CreateReloadingProxy(targetType, defaultTypes, valueConverters, declaringType, memberName);
+                return configuration.CreateReloadingProxy(targetType, defaultTypes, valueConverters, declaringType, memberName, resolver);
             if (IsTypeSpecifiedObject(configuration))
-                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+                return BuildTypeSpecifiedObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsStringDictionary(ref targetType, declaringType, memberName, defaultTypes))
-                return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
-            return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes);
+                return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
+            return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
         }
 
         private static bool IsValueSection(IConfiguration configuration)
@@ -135,7 +221,7 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         private static object ConvertToType(
-            IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+            IConfigurationSection valueSection, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             var convert = GetConvertFunc(targetType, declaringType, memberName, valueConverters);
             try
@@ -160,7 +246,7 @@ namespace RockLib.Configuration.ObjectFactory
                     return typeConverter.ConvertFromInvariantString(value);
                 }
                 if (valueSection.Value == "")
-                    return new ObjectBuilder(targetType, valueSection).Build(valueConverters, defaultTypes);
+                    return new ObjectBuilder(targetType, valueSection, resolver).Build(valueConverters, defaultTypes);
             }
             catch (Exception ex)
             {
@@ -250,16 +336,16 @@ namespace RockLib.Configuration.ObjectFactory
             return typeFound && i >= 1 && i <= 3;
         }
 
-        internal static object BuildTypeSpecifiedObject(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        internal static object BuildTypeSpecifiedObject(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             var typeSection = configuration.GetSection(TypeKey);
             var specifiedType = Type.GetType(typeSection.Value, throwOnError: true);
             if (!targetType.GetTypeInfo().IsAssignableFrom(specifiedType))
                 throw Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(targetType, specifiedType);
-            return BuildObject(configuration.GetSection(ValueKey), specifiedType, declaringType, memberName, valueConverters, defaultTypes, true);
+            return BuildObject(configuration.GetSection(ValueKey), specifiedType, declaringType, memberName, valueConverters, defaultTypes, resolver, true);
         }
 
-        private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        private static object BuildArray(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             if (targetType.GetArrayRank() > 1) throw Exceptions.ArrayRankGreaterThanOneIsNotSupported(targetType);
 
@@ -269,19 +355,19 @@ namespace RockLib.Configuration.ObjectFactory
             Array array;
             if (isValueSection && elementType == typeof(byte))
             {
-                var item = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes);
+                var item = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes, resolver);
                 array = Convert.FromBase64String(item);
             }
             else if (isValueSection || !IsList(configuration))
             {
-                var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes);
+                var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes, resolver);
                 array = Array.CreateInstance(elementType, 1);
                 array.SetValue(item, 0);
             }
             else
             {
                 var items = configuration.GetChildren().Select(child =>
-                    child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes)).ToList();
+                    child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes, resolver)).ToList();
                 array = Array.CreateInstance(elementType, items.Count);
                 for (int i = 0; i < array.Length; i++)
                     array.SetValue(items[i], i);
@@ -298,7 +384,7 @@ namespace RockLib.Configuration.ObjectFactory
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyCollection<>)
                     || type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>));
 
-        private static object BuildGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        private static object BuildGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
             var listType = typeof(List<>).MakeGenericType(tType);
@@ -308,15 +394,15 @@ namespace RockLib.Configuration.ObjectFactory
 
             if (isValueSection && tType == typeof(byte))
             {
-                var base64String = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes);
+                var base64String = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes, resolver);
                 var byteArray = Convert.FromBase64String(base64String);
                 foreach (var item in byteArray)
                     addMethod.Invoke(list, new object[] { item });
             }
             else if (isValueSection || !IsList(configuration))
-                addMethod.Invoke(list, new[] { configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes) });
+                addMethod.Invoke(list, new[] { configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes, resolver) });
             else
-                foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes)))
+                foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes, resolver)))
                     addMethod.Invoke(list, new[] { item });
             return list;
         }
@@ -348,7 +434,7 @@ namespace RockLib.Configuration.ObjectFactory
             return null;
         }
 
-        private static object BuildNonGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        private static object BuildNonGenericList(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             var itemType = GetNonGenericListItemType(targetType);
             var addMethod = GetListAddMethod(null);
@@ -356,9 +442,9 @@ namespace RockLib.Configuration.ObjectFactory
             var isValueSection = IsValueSection(configuration);
 
             if (isValueSection || !IsList(configuration))
-                addMethod.Invoke(list, new[] { configuration.Create(itemType, declaringType, memberName, valueConverters, defaultTypes) });
+                addMethod.Invoke(list, new[] { configuration.Create(itemType, declaringType, memberName, valueConverters, defaultTypes, resolver) });
             else
-                foreach (var item in configuration.GetChildren().Select(child => child.Create(itemType, declaringType, memberName, valueConverters, defaultTypes)))
+                foreach (var item in configuration.GetChildren().Select(child => child.Create(itemType, declaringType, memberName, valueConverters, defaultTypes, resolver)))
                     addMethod.Invoke(list, new[] { item });
             return list;
         }
@@ -392,18 +478,18 @@ namespace RockLib.Configuration.ObjectFactory
             return false;
         }
 
-        private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes)
+        private static object BuildStringDictionary(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             var tValueType = targetType.GetTypeInfo().GetGenericArguments()[1];
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), tValueType);
             var addMethod = dictionaryType.GetTypeInfo().GetMethod("Add", new[] { typeof(string), tValueType });
             var dictionary = Activator.CreateInstance(dictionaryType);
-            foreach (var x in configuration.GetChildren().Select(c => new { c.Key, Value = c.Create(tValueType, declaringType, memberName, valueConverters, defaultTypes) }))
+            foreach (var x in configuration.GetChildren().Select(c => new { c.Key, Value = c.Create(tValueType, declaringType, memberName, valueConverters, defaultTypes, resolver) }))
                 addMethod.Invoke(dictionary, new object[] { x.Key, x.Value });
             return dictionary;
         }
 
-        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, bool skipDefaultTypes = false)
+        private static object BuildObject(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver, bool skipDefaultTypes = false)
         {
             if (!skipDefaultTypes && TryGetDefaultType(defaultTypes, targetType, declaringType, memberName, out Type defaultType))
                 targetType = defaultType;
@@ -417,7 +503,7 @@ namespace RockLib.Configuration.ObjectFactory
                 throw Exceptions.UnsupportedCollectionType(targetType);
             if (IsList(configuration, includeEmptyList: false))
                 throw Exceptions.ConfigurationIsAList(configuration, targetType);
-            return new ObjectBuilder(targetType, configuration).Build(valueConverters, defaultTypes);
+            return new ObjectBuilder(targetType, configuration, resolver).Build(valueConverters, defaultTypes);
         }
 
         private static bool IsSimpleType(Type targetType, Type declaringType, string memberName, ValueConverters valueConverters)
@@ -559,16 +645,18 @@ namespace RockLib.Configuration.ObjectFactory
         {
             private readonly Dictionary<string, IConfigurationSection> _members = new Dictionary<string, IConfigurationSection>(new IdentifierComparer());
 
-            public ObjectBuilder(Type type, IConfiguration configuration)
+            public ObjectBuilder(Type type, IConfiguration configuration, IResolver resolver)
             {
                 Type = type;
                 Configuration = configuration;
+                Resolver = resolver;
                 foreach (var childSection in configuration.GetChildren())
                     _members.Add(childSection.Key, childSection);
             }
 
             public Type Type { get; }
             public IConfiguration Configuration { get; }
+            public IResolver Resolver { get; }
 
             public object Build(ValueConverters valueConverters, DefaultTypes defaultTypes)
             {
@@ -588,7 +676,7 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                 {
-                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
                     property.SetValue(obj, propertyValue);
                 }
             }
@@ -607,7 +695,7 @@ namespace RockLib.Configuration.ObjectFactory
                     var targetType = property.PropertyType;
                     if (tType == null)
                         targetType = typeof(List<>).MakeGenericType(GetNonGenericListItemType(targetType));
-                    var propertyValue = section.Create(targetType, Type, property.Name, valueConverters, defaultTypes);
+                    var propertyValue = section.Create(targetType, Type, property.Name, valueConverters, defaultTypes, Resolver);
                     clearMethod.Invoke(list, null);
                     foreach (var item in (IEnumerable)propertyValue)
                         addMethod.Invoke(list, new[] { item });
@@ -623,7 +711,7 @@ namespace RockLib.Configuration.ObjectFactory
                     var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
                     var addMethod = GetDictionaryAddMethod(tValueType);
                     var clearMethod = GetDictionaryClearMethod(tValueType);
-                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes);
+                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
                     clearMethod.Invoke(dictionary, null);
                     foreach (var item in (IEnumerable)propertyValue)
                         addMethod.Invoke(dictionary, new[] { item });
@@ -635,7 +723,7 @@ namespace RockLib.Configuration.ObjectFactory
                 var constructors = Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
                 if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
                 var orderedConstructors = constructors
-                    .Select(ctor => new ConstructorOrderInfo(ctor, _members))
+                    .Select(ctor => new ConstructorOrderInfo(ctor, _members, Resolver))
                     .OrderBy(x => x)
                     .ToList();
                 if (orderedConstructors.Count > 1 && orderedConstructors[0].CompareTo(orderedConstructors[1]) == 0)
@@ -653,13 +741,15 @@ namespace RockLib.Configuration.ObjectFactory
                 {
                     if (_members.TryGetValue(parameters[i].Name, out IConfigurationSection section))
                     {
-                        var arg = section.Create(parameters[i].ParameterType, Type, parameters[i].Name, valueConverters, defaultTypes);
+                        var arg = section.Create(parameters[i].ParameterType, Type, parameters[i].Name, valueConverters, defaultTypes, Resolver);
                         if (parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
                         {
                             args[i] = arg;
                             _members.Remove(parameters[i].Name);
                         }
                     }
+                    else if (Resolver.TryResolve(parameters[i], out object arg))
+                        args[i] = arg;
                     else if (parameters[i].HasDefaultValue)
                         args[i] = parameters[i].DefaultValue;
                 }

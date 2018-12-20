@@ -17,7 +17,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public static class ConfigReloadingProxyFactory
     {
-        private delegate object CreateProxyDelegate(IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName);
+        private delegate object CreateProxyDelegate(IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver);
 
         private const TypeAttributes ProxyClassAttributes = TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit;
         private const MethodAttributes ExplicitInterfaceMethodAttributes = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final;
@@ -48,8 +48,35 @@ namespace RockLib.Configuration.ObjectFactory
         /// An object of type <typeparamref name="TInterface"/> with values set from the configuration that reloads
         /// itself when the configuration changes.
         /// </returns>
-        public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
-            (TInterface)configuration.CreateReloadingProxy(typeof(TInterface), defaultTypes, valueConverters);
+        public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters) =>
+            configuration.CreateReloadingProxy<TInterface>(defaultTypes, valueConverters, null);
+
+        /// <summary>
+        /// Create an object of type <typeparamref name="TInterface"/> based on the specified configuration. The returned
+        /// object delegates its functionality to a backing field that is reloaded when the configuration changes.
+        /// </summary>
+        /// <typeparam name="TInterface">The interface type to create.</typeparam>
+        /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
+        /// <returns>
+        /// An object of type <typeparamref name="TInterface"/> with values set from the configuration that reloads
+        /// itself when the configuration changes.
+        /// </returns>
+        public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null, IResolver resolver = null) =>
+            (TInterface)configuration.CreateReloadingProxy(typeof(TInterface), defaultTypes, valueConverters, resolver);
 
         /// <summary>
         /// Create an object of type <paramref name="interfaceType"/> based on the specified configuration. The returned
@@ -69,10 +96,37 @@ namespace RockLib.Configuration.ObjectFactory
         /// An object of type <paramref name="interfaceType"/> with values set from the configuration that reloads
         /// itself when the configuration changes.
         /// </returns>
-        public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
-            configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null);
+        public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes, ValueConverters valueConverters) =>
+            configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null);
 
-        internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
+        /// <summary>
+        /// Create an object of type <paramref name="interfaceType"/> based on the specified configuration. The returned
+        /// object delegates its functionality to a backing field that is reloaded when the configuration changes.
+        /// </summary>
+        /// <param name="configuration">The configuration to create the object from.</param>
+        /// <param name="interfaceType">The interface type to create.</param>
+        /// <param name="defaultTypes">
+        /// An object that defines the default types to be used when a type is not explicitly specified by a
+        /// configuration section.
+        /// </param>
+        /// <param name="valueConverters">
+        /// An object that defines custom converter functions that are used to convert string configuration
+        /// values to a target type.
+        /// </param>
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
+        /// <returns>
+        /// An object of type <paramref name="interfaceType"/> with values set from the configuration that reloads
+        /// itself when the configuration changes.
+        /// </returns>
+        public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null, IResolver resolver = null) =>
+            configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null, resolver ?? Resolver.Empty);
+
+        internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -87,10 +141,10 @@ namespace RockLib.Configuration.ObjectFactory
 
             if (!string.IsNullOrEmpty(configuration[ConfigurationObjectFactory.TypeKey])
                 && string.Equals(configuration[ConfigurationObjectFactory.ReloadOnChangeKey], "false", StringComparison.OrdinalIgnoreCase))
-                return configuration.BuildTypeSpecifiedObject(interfaceType, declaringType, memberName, valueConverters ?? new ValueConverters(), defaultTypes ?? new DefaultTypes());
+                return configuration.BuildTypeSpecifiedObject(interfaceType, declaringType, memberName, valueConverters ?? new ValueConverters(), defaultTypes ?? new DefaultTypes(), resolver);
 
             var createReloadingProxy = _proxyFactories.GetOrAdd(interfaceType, CreateProxyTypeFactoryMethod);
-            return createReloadingProxy.Invoke(configuration, defaultTypes, valueConverters, declaringType, memberName);
+            return createReloadingProxy.Invoke(configuration, defaultTypes, valueConverters, declaringType, memberName, resolver);
         }
 
         private static CreateProxyDelegate CreateProxyTypeFactoryMethod(Type interfaceType)
@@ -147,7 +201,7 @@ namespace RockLib.Configuration.ObjectFactory
         private static void AddConstructor(TypeBuilder proxyTypeBuilder, ConstructorInfo baseConstructor)
         {
             var constructorBuilder = proxyTypeBuilder.DefineConstructor(ConstructorAttributes, baseConstructor.CallingConvention,
-                new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters), typeof(Type), typeof(string) });
+                new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters), typeof(Type), typeof(string), typeof(IResolver) });
 
             var il = constructorBuilder.GetILGenerator();
 
@@ -157,6 +211,7 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_3);
             il.Emit(OpCodes.Ldarg_S, 4);
             il.Emit(OpCodes.Ldarg_S, 5);
+            il.Emit(OpCodes.Ldarg_S, 6);
             il.Emit(OpCodes.Call, baseConstructor);
             il.Emit(OpCodes.Ret);
         }
@@ -329,10 +384,11 @@ namespace RockLib.Configuration.ObjectFactory
             var valueConvertersParameter = Expression.Parameter(typeof(ValueConverters), "valueConverters");
             var declaringTypeParameter = Expression.Parameter(typeof(Type), "declaringType");
             var memberNameParameter = Expression.Parameter(typeof(string), "memberName");
+            var resolverParameter = Expression.Parameter(typeof(IResolver), "resolver");
 
             var lambda = Expression.Lambda<CreateProxyDelegate>(
-                Expression.New(constructor, sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter),
-                sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter);
+                Expression.New(constructor, sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter, resolverParameter),
+                sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter, resolverParameter);
 
             return lambda.Compile();
         }

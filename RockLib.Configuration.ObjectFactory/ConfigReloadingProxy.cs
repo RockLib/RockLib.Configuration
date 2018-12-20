@@ -22,6 +22,7 @@ namespace RockLib.Configuration.ObjectFactory
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly ValueConverters _valueConverters;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly Type _declaringType;
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly string _memberName;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly IResolver _resolver;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] private string _hash;
 
@@ -39,7 +40,13 @@ namespace RockLib.Configuration.ObjectFactory
         /// </param>
         /// <param name="declaringType">If present the declaring type of the member that this instance is a value of.</param>
         /// <param name="memberName">If present, the name of the member that this instance is the value of.</param>
-        protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
+        /// <param name="resolver">
+        /// An object that can retrieve constructor parameter values that are not found in configuration. This
+        /// object is an adapter for dependency injection containers, such as Ninject, Unity, Autofac, or
+        /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
+        /// most depenedency injection containers.
+        /// </param>
+        protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver)
         {
             if (typeof(TInterface) == typeof(IEnumerable))
                 throw new InvalidOperationException("The IEnumerable interface is not supported.");
@@ -51,6 +58,7 @@ namespace RockLib.Configuration.ObjectFactory
             _valueConverters = valueConverters ?? ConfigurationObjectFactory.EmptyValueConverters;
             _declaringType = declaringType; // Null is a valid value
             _memberName = memberName; // Null is a valid value
+            _resolver = resolver ?? Resolver.Empty;
             _hash = GetHash();
             Object = CreateObject();
             ChangeToken.OnChange(section.GetReloadToken, () => ReloadObject(false));
@@ -119,7 +127,7 @@ namespace RockLib.Configuration.ObjectFactory
             }
 
             // Put everything together.
-            return (TInterface)valueSection.Create(concreteType, _defaultTypes, _valueConverters);
+            return (TInterface)valueSection.Create(concreteType, _defaultTypes, _valueConverters, _resolver);
         }
 
         private void ReloadObject(bool force)

@@ -12,6 +12,29 @@ namespace Tests
 {
     public class ConfigurationObjectFactoryTests
     {
+        [Fact]
+        public void MissingConstructorParametersAreSuppliedByTheResolver()
+        {
+            var config = new ConfigurationBuilder().Build(); // empty config!
+
+            var bar = new Bar();
+            var resolver = new Resolver(t => bar, t => t == typeof(IBar));
+
+            var foo = config.Create<Foo>(resolver: resolver);
+
+            Assert.Same(bar, foo.Bar);
+        }
+
+        public class Foo
+        {
+            public Foo(IBar bar) => Bar = bar;
+            public IBar Bar { get; }
+        }
+
+        public interface IBar { }
+
+        public class Bar : IBar { }
+
         public class PascalCase
         {
             public string ThingOne { get; set; }

@@ -21,7 +21,7 @@ namespace Tests
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = new Dictionary<string, IConfigurationSection>();
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members);
+            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
             Assert.Same(constructor, orderInfo.Constructor);
             Assert.Equal(expectedTotalParameters, orderInfo.TotalParameters);
@@ -50,7 +50,7 @@ namespace Tests
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members);
+            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
             Assert.Same(constructor, orderInfo.Constructor);
             Assert.Equal(expectedIsInvokableWithoutDefaultParameters, orderInfo.IsInvokableWithoutDefaultParameters);
@@ -79,7 +79,7 @@ namespace Tests
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members);
+            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
             Assert.Same(constructor, orderInfo.Constructor);
             Assert.Equal(expectedIsInvokableWithDefaultParameters, orderInfo.IsInvokableWithDefaultParameters);
@@ -106,8 +106,8 @@ namespace Tests
 
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
 
-            var lhs = new ConstructorOrderInfo(lhsConstructor, members);
-            var rhs = new ConstructorOrderInfo(rhsConstructor, members);
+            var lhs = new ConstructorOrderInfo(lhsConstructor, members, Resolver.Empty);
+            var rhs = new ConstructorOrderInfo(rhsConstructor, members, Resolver.Empty);
 
             var actual = lhs.CompareTo(rhs);
 

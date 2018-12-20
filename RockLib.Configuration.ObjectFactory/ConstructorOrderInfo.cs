@@ -8,7 +8,7 @@ namespace RockLib.Configuration.ObjectFactory
 {
     internal class ConstructorOrderInfo : IComparable<ConstructorOrderInfo>
     {
-        public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers)
+        public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers, IResolver resolver)
         {
             Constructor = constructor;
             var parameters = constructor.GetParameters();
@@ -22,10 +22,13 @@ namespace RockLib.Configuration.ObjectFactory
             }
             else
             {
-                IsInvokableWithoutDefaultParameters = parameters.Count(p => availableMembers.ContainsKey(p.Name)) == TotalParameters;
-                IsInvokableWithDefaultParameters = parameters.Count(p => availableMembers.ContainsKey(p.Name) || p.HasDefaultValue) == TotalParameters;
-                MissingParameterNames = parameters.Where(p => !availableMembers.ContainsKey(p.Name) && !p.HasDefaultValue).Select(p => p.Name);
-                MatchedParameters = parameters.Count(p => availableMembers.ContainsKey(p.Name));
+                bool HasAvailableValue(ParameterInfo p) =>
+                    availableMembers.ContainsKey(p.Name) || resolver.CanResolve(p);
+
+                IsInvokableWithoutDefaultParameters = parameters.Count(HasAvailableValue) == TotalParameters;
+                IsInvokableWithDefaultParameters = parameters.Count(p => HasAvailableValue(p) || p.HasDefaultValue) == TotalParameters;
+                MissingParameterNames = parameters.Where(p => !HasAvailableValue(p) && !p.HasDefaultValue).Select(p => p.Name);
+                MatchedParameters = parameters.Count(HasAvailableValue);
             }
         }
 
