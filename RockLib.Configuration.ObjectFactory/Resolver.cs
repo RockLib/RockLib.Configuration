@@ -22,10 +22,10 @@ namespace RockLib.Configuration.ObjectFactory
             };
         }
 
-        public Resolver(Func<Type, bool> canResolve, Func<Type, object> resolve)
+        public Resolver(Func<Type, object> resolve, Func<Type, bool> canResolve)
         {
-            if (canResolve == null) throw new ArgumentNullException(nameof(canResolve));
             if (resolve == null) throw new ArgumentNullException(nameof(resolve));
+            if (canResolve == null) throw new ArgumentNullException(nameof(canResolve));
 
             CanResolve = p =>
             {
@@ -73,13 +73,13 @@ namespace RockLib.Configuration.ObjectFactory
             };
         }
 
-        public Resolver(Func<Type, bool> canResolve, Func<Type, string, bool> canResolveNamed,
-            Func<Type, object> resolve, Func<Type, string, object> resolveNamed)
+        public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed,
+            Func<Type, bool> canResolve, Func<Type, string, bool> canResolveNamed)
         {
-            if (canResolve == null) throw new ArgumentNullException(nameof(canResolve));
-            if (canResolveNamed == null) throw new ArgumentNullException(nameof(canResolveNamed));
             if (resolve == null) throw new ArgumentNullException(nameof(resolve));
             if (resolveNamed == null) throw new ArgumentNullException(nameof(resolveNamed));
+            if (canResolve == null) throw new ArgumentNullException(nameof(canResolve));
+            if (canResolveNamed == null) throw new ArgumentNullException(nameof(canResolveNamed));
 
             CanResolve = p =>
             {
@@ -109,7 +109,7 @@ namespace RockLib.Configuration.ObjectFactory
             };
         }
 
-        public static Resolver Empty { get; } = new Resolver(t => false, t => null);
+        public static Resolver Empty { get; } = new Resolver(t => null, t => false);
 
         public Func<ParameterInfo, bool> CanResolve { get; }
 
