@@ -12,6 +12,29 @@ namespace Tests
     public class ConfigReloadingProxyFactoryTests
     {
         [Fact]
+        public void MissingConstructorParametersAreSuppliedByTheResolver()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string> { { "waldo", "123" } })
+                .Build();
+
+            var garply = new Garply();
+
+            var defaultTypes = new DefaultTypes().Add(typeof(IGrault), typeof(Grault));
+            var resolver = new Resolver(t => garply, t => t == typeof(IGarply));
+
+            var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
+
+            Assert.Same(garply, grault.Garply);
+            Assert.Equal(123, grault.Waldo);
+
+            ChangeConfig(config, new KeyValuePair<string, string>("waldo", "456"));
+
+            Assert.Same(garply, grault.Garply);
+            Assert.Equal(456, grault.Waldo);
+        }
+
+        [Fact]
         public void NullConfigurationThrowsArgumentNullException()
         {
             IConfiguration configuration = null;
@@ -377,5 +400,27 @@ namespace Tests
                 IsDisposed = true;
             }
         }
+
+        public interface IGrault
+        {
+            int Waldo { get; }
+            IGarply Garply { get; }
+        }
+
+        public class Grault : IGrault
+        {
+            public Grault(int waldo, IGarply garply)
+            {
+                Waldo = waldo;
+                Garply = garply;
+            }
+
+            public int Waldo { get; }
+            public IGarply Garply { get; }
+        }
+
+        public interface IGarply { }
+
+        public class Garply : IGarply { }
     }
 }

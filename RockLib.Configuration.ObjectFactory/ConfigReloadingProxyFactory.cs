@@ -17,7 +17,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public static class ConfigReloadingProxyFactory
     {
-        private delegate object CreateProxyDelegate(IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName);
+        private delegate object CreateProxyDelegate(IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver);
 
         private const TypeAttributes ProxyClassAttributes = TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit;
         private const MethodAttributes ExplicitInterfaceMethodAttributes = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final;
@@ -132,7 +132,7 @@ namespace RockLib.Configuration.ObjectFactory
                 return configuration.BuildTypeSpecifiedObject(interfaceType, declaringType, memberName, valueConverters ?? new ValueConverters(), defaultTypes ?? new DefaultTypes(), resolver);
 
             var createReloadingProxy = _proxyFactories.GetOrAdd(interfaceType, CreateProxyTypeFactoryMethod);
-            return createReloadingProxy.Invoke(configuration, defaultTypes, valueConverters, declaringType, memberName);
+            return createReloadingProxy.Invoke(configuration, defaultTypes, valueConverters, declaringType, memberName, resolver);
         }
 
         private static CreateProxyDelegate CreateProxyTypeFactoryMethod(Type interfaceType)
@@ -189,7 +189,7 @@ namespace RockLib.Configuration.ObjectFactory
         private static void AddConstructor(TypeBuilder proxyTypeBuilder, ConstructorInfo baseConstructor)
         {
             var constructorBuilder = proxyTypeBuilder.DefineConstructor(ConstructorAttributes, baseConstructor.CallingConvention,
-                new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters), typeof(Type), typeof(string) });
+                new[] { typeof(IConfiguration), typeof(DefaultTypes), typeof(ValueConverters), typeof(Type), typeof(string), typeof(IResolver) });
 
             var il = constructorBuilder.GetILGenerator();
 
@@ -199,6 +199,7 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_3);
             il.Emit(OpCodes.Ldarg_S, 4);
             il.Emit(OpCodes.Ldarg_S, 5);
+            il.Emit(OpCodes.Ldarg_S, 6);
             il.Emit(OpCodes.Call, baseConstructor);
             il.Emit(OpCodes.Ret);
         }
@@ -371,10 +372,11 @@ namespace RockLib.Configuration.ObjectFactory
             var valueConvertersParameter = Expression.Parameter(typeof(ValueConverters), "valueConverters");
             var declaringTypeParameter = Expression.Parameter(typeof(Type), "declaringType");
             var memberNameParameter = Expression.Parameter(typeof(string), "memberName");
+            var resolverParameter = Expression.Parameter(typeof(IResolver), "resolver");
 
             var lambda = Expression.Lambda<CreateProxyDelegate>(
-                Expression.New(constructor, sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter),
-                sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter);
+                Expression.New(constructor, sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter, resolverParameter),
+                sectionParameter, defaultTypesParameter, valueConvertersParameter, declaringTypeParameter, memberNameParameter, resolverParameter);
 
             return lambda.Compile();
         }
