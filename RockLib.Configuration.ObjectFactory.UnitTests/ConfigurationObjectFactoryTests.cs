@@ -13,6 +13,39 @@ namespace Tests
     public class ConfigurationObjectFactoryTests
     {
         [Fact]
+        public void SupportsMembersOfTypeFuncOfT()
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> {
+                { "baz:foo", "123"},
+                { "baz:bar:type", typeof(AnotherBar).AssemblyQualifiedName },
+                { "baz:bar:value:garply", "abc" } })
+                .Build();
+
+            var baz = config.GetSection("baz").Create<Baz>();
+
+            Assert.Equal(123, baz.GetFoo());
+            var bar = baz.GetBar();
+            Assert.IsType<AnotherBar>(bar);
+            var anotherBar = (AnotherBar)bar;
+            Assert.Equal("abc", anotherBar.Garply);
+        }
+
+        public class Baz
+        {
+            private readonly Func<int> _foo;
+            private readonly Func<IBar> _bar;
+
+            public Baz(Func<int> foo, Func<IBar> bar)
+            {
+                _foo = foo;
+                _bar = bar;
+            }
+
+            public int GetFoo() => _foo();
+            public IBar GetBar() => _bar();
+        }
+
+        [Fact]
         public void MissingConstructorParametersAreSuppliedByTheResolver()
         {
             var config = new ConfigurationBuilder().Build(); // empty config!
@@ -34,6 +67,12 @@ namespace Tests
         public interface IBar { }
 
         public class Bar : IBar { }
+
+        public class AnotherBar : IBar
+        {
+            public AnotherBar(string garply) => Garply = garply;
+            public string Garply { get; }
+        }
 
         public class PascalCase
         {
@@ -73,7 +112,7 @@ namespace Tests
 
         public class UPPERCaseWORDS
         {
-            public string THINGOne {get; set; }
+            public string THINGOne { get; set; }
             public string ThingTWO { get; set; }
             public string Thing_Three { get; set; }
             public string Thing_Four { get; set; }

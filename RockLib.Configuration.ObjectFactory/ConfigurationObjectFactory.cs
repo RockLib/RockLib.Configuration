@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,6 +16,8 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public static class ConfigurationObjectFactory
     {
+        private static readonly MethodInfo CreateValueMethod = typeof(ConfigurationObjectFactory).GetTypeInfo().GetMethod(nameof(CreateValue), BindingFlags.Static | BindingFlags.NonPublic);
+
         internal const string TypeKey = "type";
         internal const string ValueKey = "value";
         internal const string ReloadOnChangeKey = "reloadOnChange";
@@ -183,11 +186,13 @@ namespace RockLib.Configuration.ObjectFactory
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
             if (type == null) throw new ArgumentNullException(nameof(type));
-            return configuration.Create(type, null, null, valueConverters ?? EmptyValueConverters, defaultTypes ?? EmptyDefaultTypes, resolver ?? Resolver.Empty);
+            return configuration.CreateValue(type, null, null, valueConverters ?? EmptyValueConverters, defaultTypes ?? EmptyDefaultTypes, resolver ?? Resolver.Empty);
         }
 
-        private static object Create(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
+        private static object CreateValue(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
+            if (IsFuncOfT(targetType))
+                return BuildFuncOfT(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (targetType.IsArray)
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsGenericList(targetType))
@@ -203,6 +208,31 @@ namespace RockLib.Configuration.ObjectFactory
             if (IsStringDictionary(ref targetType, declaringType, memberName, defaultTypes))
                 return BuildStringDictionary(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             return BuildObject(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
+        }
+
+        private static bool IsFuncOfT(Type targetType)
+        {
+            return targetType.GetTypeInfo().IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Func<>);
+        }
+
+        private static object BuildFuncOfT(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
+        {
+            var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
+
+            Expression body =
+                Expression.Convert(
+                    Expression.Call(CreateValueMethod,
+                        Expression.Constant(configuration),
+                        Expression.Constant(tType),
+                        Expression.Constant(declaringType),
+                        Expression.Constant(memberName),
+                        Expression.Constant(valueConverters),
+                        Expression.Constant(defaultTypes),
+                        Expression.Constant(resolver)),
+                    tType);
+
+            var lambda = Expression.Lambda(targetType, body);
+            return lambda.Compile();
         }
 
         private static bool IsValueSection(IConfiguration configuration)
@@ -355,19 +385,19 @@ namespace RockLib.Configuration.ObjectFactory
             Array array;
             if (isValueSection && elementType == typeof(byte))
             {
-                var item = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes, resolver);
+                var item = (string)configuration.CreateValue(typeof(string), declaringType, memberName, valueConverters, defaultTypes, resolver);
                 array = Convert.FromBase64String(item);
             }
             else if (isValueSection || !IsList(configuration))
             {
-                var item = configuration.Create(elementType, declaringType, memberName, valueConverters, defaultTypes, resolver);
+                var item = configuration.CreateValue(elementType, declaringType, memberName, valueConverters, defaultTypes, resolver);
                 array = Array.CreateInstance(elementType, 1);
                 array.SetValue(item, 0);
             }
             else
             {
                 var items = configuration.GetChildren().Select(child =>
-                    child.Create(elementType, declaringType, memberName, valueConverters, defaultTypes, resolver)).ToList();
+                    child.CreateValue(elementType, declaringType, memberName, valueConverters, defaultTypes, resolver)).ToList();
                 array = Array.CreateInstance(elementType, items.Count);
                 for (int i = 0; i < array.Length; i++)
                     array.SetValue(items[i], i);
@@ -394,15 +424,15 @@ namespace RockLib.Configuration.ObjectFactory
 
             if (isValueSection && tType == typeof(byte))
             {
-                var base64String = (string)configuration.Create(typeof(string), declaringType, memberName, valueConverters, defaultTypes, resolver);
+                var base64String = (string)configuration.CreateValue(typeof(string), declaringType, memberName, valueConverters, defaultTypes, resolver);
                 var byteArray = Convert.FromBase64String(base64String);
                 foreach (var item in byteArray)
                     addMethod.Invoke(list, new object[] { item });
             }
             else if (isValueSection || !IsList(configuration))
-                addMethod.Invoke(list, new[] { configuration.Create(tType, declaringType, memberName, valueConverters, defaultTypes, resolver) });
+                addMethod.Invoke(list, new[] { configuration.CreateValue(tType, declaringType, memberName, valueConverters, defaultTypes, resolver) });
             else
-                foreach (var item in configuration.GetChildren().Select(child => child.Create(tType, declaringType, memberName, valueConverters, defaultTypes, resolver)))
+                foreach (var item in configuration.GetChildren().Select(child => child.CreateValue(tType, declaringType, memberName, valueConverters, defaultTypes, resolver)))
                     addMethod.Invoke(list, new[] { item });
             return list;
         }
@@ -442,9 +472,9 @@ namespace RockLib.Configuration.ObjectFactory
             var isValueSection = IsValueSection(configuration);
 
             if (isValueSection || !IsList(configuration))
-                addMethod.Invoke(list, new[] { configuration.Create(itemType, declaringType, memberName, valueConverters, defaultTypes, resolver) });
+                addMethod.Invoke(list, new[] { configuration.CreateValue(itemType, declaringType, memberName, valueConverters, defaultTypes, resolver) });
             else
-                foreach (var item in configuration.GetChildren().Select(child => child.Create(itemType, declaringType, memberName, valueConverters, defaultTypes, resolver)))
+                foreach (var item in configuration.GetChildren().Select(child => child.CreateValue(itemType, declaringType, memberName, valueConverters, defaultTypes, resolver)))
                     addMethod.Invoke(list, new[] { item });
             return list;
         }
@@ -484,7 +514,7 @@ namespace RockLib.Configuration.ObjectFactory
             var dictionaryType = typeof(Dictionary<,>).MakeGenericType(typeof(string), tValueType);
             var addMethod = dictionaryType.GetTypeInfo().GetMethod("Add", new[] { typeof(string), tValueType });
             var dictionary = Activator.CreateInstance(dictionaryType);
-            foreach (var x in configuration.GetChildren().Select(c => new { c.Key, Value = c.Create(tValueType, declaringType, memberName, valueConverters, defaultTypes, resolver) }))
+            foreach (var x in configuration.GetChildren().Select(c => new { c.Key, Value = c.CreateValue(tValueType, declaringType, memberName, valueConverters, defaultTypes, resolver) }))
                 addMethod.Invoke(dictionary, new object[] { x.Key, x.Value });
             return dictionary;
         }
@@ -676,7 +706,7 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 if (_members.TryGetValue(property.Name, out IConfigurationSection section))
                 {
-                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
+                    var propertyValue = section.CreateValue(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
                     property.SetValue(obj, propertyValue);
                 }
             }
@@ -695,7 +725,7 @@ namespace RockLib.Configuration.ObjectFactory
                     var targetType = property.PropertyType;
                     if (tType == null)
                         targetType = typeof(List<>).MakeGenericType(GetNonGenericListItemType(targetType));
-                    var propertyValue = section.Create(targetType, Type, property.Name, valueConverters, defaultTypes, Resolver);
+                    var propertyValue = section.CreateValue(targetType, Type, property.Name, valueConverters, defaultTypes, Resolver);
                     clearMethod.Invoke(list, null);
                     foreach (var item in (IEnumerable)propertyValue)
                         addMethod.Invoke(list, new[] { item });
@@ -711,7 +741,7 @@ namespace RockLib.Configuration.ObjectFactory
                     var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
                     var addMethod = GetDictionaryAddMethod(tValueType);
                     var clearMethod = GetDictionaryClearMethod(tValueType);
-                    var propertyValue = section.Create(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
+                    var propertyValue = section.CreateValue(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
                     clearMethod.Invoke(dictionary, null);
                     foreach (var item in (IEnumerable)propertyValue)
                         addMethod.Invoke(dictionary, new[] { item });
@@ -741,7 +771,7 @@ namespace RockLib.Configuration.ObjectFactory
                 {
                     if (_members.TryGetValue(parameters[i].Name, out IConfigurationSection section))
                     {
-                        var arg = section.Create(parameters[i].ParameterType, Type, parameters[i].Name, valueConverters, defaultTypes, Resolver);
+                        var arg = section.CreateValue(parameters[i].ParameterType, Type, parameters[i].Name, valueConverters, defaultTypes, Resolver);
                         if (parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
                         {
                             args[i] = arg;
