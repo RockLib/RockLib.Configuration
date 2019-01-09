@@ -216,8 +216,6 @@ namespace RockLib.Configuration.ObjectFactory
         {
             protected Delegate Value;
 
-            private FuncOfT() {}
-
             public static Delegate Create(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
             {
                 var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
