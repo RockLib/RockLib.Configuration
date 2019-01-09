@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -16,8 +15,6 @@ namespace RockLib.Configuration.ObjectFactory
     /// </summary>
     public static class ConfigurationObjectFactory
     {
-        private static readonly MethodInfo CreateValueMethod = typeof(ConfigurationObjectFactory).GetTypeInfo().GetMethod(nameof(CreateValue), BindingFlags.Static | BindingFlags.NonPublic);
-
         internal const string TypeKey = "type";
         internal const string ValueKey = "value";
         internal const string ReloadOnChangeKey = "reloadOnChange";
@@ -192,7 +189,7 @@ namespace RockLib.Configuration.ObjectFactory
         private static object CreateValue(this IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
         {
             if (IsFuncOfT(targetType))
-                return BuildFuncOfT(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
+                return FuncOfT.Create(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (targetType.IsArray)
                 return BuildArray(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver);
             if (IsGenericList(targetType))
@@ -215,24 +212,25 @@ namespace RockLib.Configuration.ObjectFactory
             return targetType.GetTypeInfo().IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Func<>);
         }
 
-        private static object BuildFuncOfT(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
+        private abstract class FuncOfT
         {
-            var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
+            protected Delegate Value;
 
-            Expression body =
-                Expression.Convert(
-                    Expression.Call(CreateValueMethod,
-                        Expression.Constant(configuration),
-                        Expression.Constant(tType),
-                        Expression.Constant(declaringType),
-                        Expression.Constant(memberName),
-                        Expression.Constant(valueConverters),
-                        Expression.Constant(defaultTypes),
-                        Expression.Constant(resolver)),
-                    tType);
+            public static Delegate Create(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
+            {
+                var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
+                var funcOfT = (FuncOfT)Activator.CreateInstance(typeof(FuncOf<>).MakeGenericType(tType),
+                    configuration, tType, declaringType, memberName, valueConverters, defaultTypes, resolver);
+                return funcOfT.Value;
+            }
 
-            var lambda = Expression.Lambda(targetType, body);
-            return lambda.Compile();
+            private class FuncOf<T> : FuncOfT
+            {
+                public FuncOf(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
+                {
+                    Value = (Func<T>)(() => (T)configuration.CreateValue(targetType, declaringType, memberName, valueConverters, defaultTypes, resolver));
+                }
+            }
         }
 
         private static bool IsValueSection(IConfiguration configuration)
