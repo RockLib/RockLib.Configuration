@@ -221,9 +221,8 @@ namespace RockLib.Configuration.ObjectFactory
             public static Delegate Create(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
             {
                 var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
-                var funcOfTType = typeof(FuncOf<>).MakeGenericType(tType);
-                var funcOfT = (FuncOfT)Activator.CreateInstance(
-                    funcOfTType, configuration, tType, declaringType, memberName, valueConverters, defaultTypes, resolver);
+                var funcOfT = (FuncOfT)Activator.CreateInstance(typeof(FuncOf<>).MakeGenericType(tType),
+                    configuration, tType, declaringType, memberName, valueConverters, defaultTypes, resolver);
                 return funcOfT.Value;
             }
 
@@ -231,7 +230,7 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 public FuncOf(IConfiguration configuration, Type targetType, Type declaringType, string memberName, ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver resolver)
                 {
-                    Value = (Func<T>)(() => (T)CreateValue(configuration, targetType, declaringType, memberName, valueConverters, defaultTypes, resolver));
+                    Value = (Func<T>)(() => (T)configuration.CreateValue(targetType, declaringType, memberName, valueConverters, defaultTypes, resolver));
                 }
             }
         }
