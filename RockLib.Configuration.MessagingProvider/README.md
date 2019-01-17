@@ -64,13 +64,13 @@ IConfigurationRoot configuration = builder.Build();
 To make a configuration change, send a message to the receiver with a JSON payload that describes the configuration changes. In this example, we want to change the values of `AppSettings:Foo` and `AppSettings:Bar` to `"xyz"` and `456` respectively. Note that the JSON is flattened into key/value pairs.
 
 ```c#
-using (ISender sender = new NamedPipeSender(name: "example_receiver", pipeName: "example-pipe-name"))
-{
-    string configChange = @"{
+string configChange = @"{
   ""AppSettings:Foo"": ""xyz"",
   ""AppSettings:Bar"": 456
 }";
 
+using (ISender sender = new NamedPipeSender(name: "example_receiver", pipeName: "example-pipe-name"))
+{
     await sender.SendAsync(configChange);
 }
 ```
@@ -82,12 +82,7 @@ If a configuration change needs to be made, and then reverted after a set amount
 ```c#
 using (ISender sender = new NamedPipeSender(name: "example_receiver", pipeName: "example-pipe-name"))
 {
-    string configChange = @"{
-  ""AppSettings:Foo"": ""xyz"",
-  ""AppSettings:Bar"": 456
-}";
-
-    var message = new SenderMessage(configChange);
+    var message = new SenderMessage(configChange); // same configChange as above
     message.Headers.Add("RevertAfterMilliseconds", 30000);
     
     await sender.SendAsync(message);
