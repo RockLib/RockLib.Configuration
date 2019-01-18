@@ -16,7 +16,7 @@ namespace RockLib.Configuration.MessagingProvider
         internal MessagingConfigurationProvider(IReceiver receiver)
         {
             Receiver = receiver;
-            Receiver.Start(OnMessageReceived);
+            Receiver.Start(OnMessageReceivedAsync);
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace RockLib.Configuration.MessagingProvider
         /// </summary>
         public IReceiver Receiver { get; }
 
-        private void OnMessageReceived(IReceiverMessage message)
+        private async Task OnMessageReceivedAsync(IReceiverMessage message)
         {
             var newSettings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -35,7 +35,7 @@ namespace RockLib.Configuration.MessagingProvider
             }
             catch
             {
-                message.Reject();
+                await message.RejectAsync().ConfigureAwait(false);
                 return;
             }
 
@@ -72,13 +72,17 @@ namespace RockLib.Configuration.MessagingProvider
                 OnReload();
 
                 if (previousData != null)
-                    RevertDataAfterDelay(previousData, milliseconds);
+                {
+                    await message.AcknowledgeAsync().ConfigureAwait(false);
+                    await RevertDataAfterDelay(previousData, milliseconds).ConfigureAwait(false);
+                    return;
+                }
             }
 
-            message.Acknowledge();
+            await message.AcknowledgeAsync().ConfigureAwait(false);
         }
 
-        private async void RevertDataAfterDelay(IDictionary<string, string> previousData, int milliseconds)
+        private async Task RevertDataAfterDelay(IDictionary<string, string> previousData, int milliseconds)
         {
             await Task.Delay(milliseconds).ConfigureAwait(false);
             Data = previousData;
