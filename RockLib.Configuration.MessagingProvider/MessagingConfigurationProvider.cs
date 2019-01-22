@@ -63,30 +63,11 @@ namespace RockLib.Configuration.MessagingProvider
 
             if (changed)
             {
-                IDictionary<string, string> previousData = null;
-
-                if (message.Headers.TryGetValue("RevertAfterMilliseconds", out int milliseconds) && milliseconds > 0)
-                    previousData = Data;
-
                 Data = newSettings;
                 OnReload();
-
-                if (previousData != null)
-                {
-                    await message.AcknowledgeAsync().ConfigureAwait(false);
-                    await RevertDataAfterDelay(previousData, milliseconds).ConfigureAwait(false);
-                    return;
-                }
             }
 
             await message.AcknowledgeAsync().ConfigureAwait(false);
-        }
-
-        private async Task RevertDataAfterDelay(IDictionary<string, string> previousData, int milliseconds)
-        {
-            await Task.Delay(milliseconds).ConfigureAwait(false);
-            Data = previousData;
-            OnReload();
         }
     }
 }
