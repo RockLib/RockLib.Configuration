@@ -25,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Proxy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory.UnitTests", "RockLib.Configuration.ProxyFactory.UnitTests\RockLib.Configuration.ProxyFactory.UnitTests.csproj", "{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.MessagingProvider", "RockLib.Configuration.MessagingProvider\RockLib.Configuration.MessagingProvider.csproj", "{781069C8-8177-49FB-AC0C-F53AF9DB0553}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.MessagingProvider", "RockLib.Configuration.MessagingProvider\RockLib.Configuration.MessagingProvider.csproj", "{781069C8-8177-49FB-AC0C-F53AF9DB0553}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.MessagingProvider.Tests", "RockLib.Configuration.MessagingProvider.Tests\RockLib.Configuration.MessagingProvider.Tests.csproj", "{4A401E7F-F80C-466F-91ED-0B727841AF8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,6 +83,10 @@ Global
 		{781069C8-8177-49FB-AC0C-F53AF9DB0553}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{781069C8-8177-49FB-AC0C-F53AF9DB0553}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{781069C8-8177-49FB-AC0C-F53AF9DB0553}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A401E7F-F80C-466F-91ED-0B727841AF8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A401E7F-F80C-466F-91ED-0B727841AF8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A401E7F-F80C-466F-91ED-0B727841AF8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A401E7F-F80C-466F-91ED-0B727841AF8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
