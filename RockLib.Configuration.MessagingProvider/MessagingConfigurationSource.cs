@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Messaging;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace RockLib.Configuration.MessagingProvider
@@ -22,7 +23,11 @@ namespace RockLib.Configuration.MessagingProvider
         /// The <see cref="IReceiver"/> that will receive messages in order to change
         /// configuration values.
         /// </param>
-        public MessagingConfigurationSource(IReceiver receiver)
+        /// <param name="settingFilter">
+        /// The <see cref="ISettingFilter"/> that is applied to each setting of each
+        /// received message.
+        /// </param>
+        public MessagingConfigurationSource(IReceiver receiver, ISettingFilter settingFilter = null)
         {
             if (receiver == null)
                 throw new ArgumentNullException(nameof(receiver));
@@ -32,7 +37,8 @@ namespace RockLib.Configuration.MessagingProvider
                 throw new ArgumentException("The receiver is already started.", nameof(receiver));
 
             Receiver = receiver;
-            _cachedProvider = new Lazy<MessagingConfigurationProvider>(() => new MessagingConfigurationProvider(Receiver));
+            SettingFilter = settingFilter;
+            _cachedProvider = new Lazy<MessagingConfigurationProvider>(() => new MessagingConfigurationProvider(Receiver, SettingFilter));
         }
 
         /// <summary>
@@ -40,6 +46,12 @@ namespace RockLib.Configuration.MessagingProvider
         /// configuration values.
         /// </summary>
         public IReceiver Receiver { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ISettingFilter"/> that is applied to each setting of each
+        /// received message.
+        /// </summary>
+        public ISettingFilter SettingFilter { get; }
 
         /// <summary>
         /// Builds the <see cref="MessagingConfigurationProvider"/> for this source.
