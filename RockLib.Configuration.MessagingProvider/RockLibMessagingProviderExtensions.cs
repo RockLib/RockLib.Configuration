@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Messaging;
+using System.Collections.Generic;
 
 namespace RockLib.Configuration.MessagingProvider
 {
@@ -16,6 +17,10 @@ namespace RockLib.Configuration.MessagingProvider
         /// </summary>
         /// <param name="builder">The <see cref="IConfigurationBuilder"/> to add to.</param>
         /// <param name="receiverName">The name of the receiver.</param>
+        /// <param name="settingFilter">
+        /// The <see cref="ISettingFilter"/> that is applied to each setting of each
+        /// received message.
+        /// </param>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         /// <remarks>
         /// This is how the <see cref="IReceiver"/> is created:
@@ -23,8 +28,8 @@ namespace RockLib.Configuration.MessagingProvider
         /// builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName)
         /// </code>
         /// </remarks>
-        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, string receiverName) =>
-            builder.AddRockLibMessagingProvider(builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName));
+        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, string receiverName, ISettingFilter settingFilter = null) =>
+            builder.AddRockLibMessagingProvider(builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName), settingFilter);
 
         /// <summary>
         /// Adds an <see cref="IConfigurationProvider"/> that reloads with changes
@@ -34,8 +39,12 @@ namespace RockLib.Configuration.MessagingProvider
         /// <param name="receiver">
         /// The object that listens for messages that update configuration values.
         /// </param>
+        /// <param name="settingFilter">
+        /// The <see cref="ISettingFilter"/> that is applied to each setting of each
+        /// received message.
+        /// </param>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, IReceiver receiver) =>
-            builder.Add(new MessagingConfigurationSource(receiver));
+        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, IReceiver receiver, ISettingFilter settingFilter = null) =>
+            builder.Add(new MessagingConfigurationSource(receiver, settingFilter));
     }
 }
