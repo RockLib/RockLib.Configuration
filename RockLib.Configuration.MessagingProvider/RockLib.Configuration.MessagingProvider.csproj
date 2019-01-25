@@ -8,7 +8,7 @@
     <PackageId>RockLib.Configuration.MessagingProvider</PackageId>
     <PackageVersion>1.0.0-alpha01</PackageVersion>
     <Authors>Quicken Loans</Authors>
-    <Description>A configuration provider that reloads when it receives a message from a RockLib.Messaging IReceiver that specifies configuration changes to apply.</Description>
+    <Description>A configuration provider that reloads when it receives a message containing configuration changes from a RockLib.Messaging IReceiver.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.MessagingProvider</PackageProjectUrl>
