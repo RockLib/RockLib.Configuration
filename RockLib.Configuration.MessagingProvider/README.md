@@ -1,6 +1,6 @@
 # RockLib.Configuration.MessagingProvider [![Build status](https://ci.appveyor.com/api/projects/status/qoufisw8y904oawa?svg=true)](https://ci.appveyor.com/project/RockLib/rocklib-configuration)
 
-A configuration provider that reloads when it receives a message from a `RockLib.Messaging.IReceiver` that specifies configuration changes to apply.
+A configuration provider that reloads when it receives a message containing configuration changes from a `RockLib.Messaging.IReceiver`.
 
 ### Setup
 
@@ -75,16 +75,28 @@ using (ISender sender = new NamedPipeSender(name: "example_receiver", pipeName: 
 }
 ```
 
-After the message is receiver, the `configuration` object will have the new values.
+After the message is received, the `configuration` object will have the new values for "AppSettings:Foo" and "AppSettings:Bar".
 
-If a configuration change needs to be made, and then reverted after a set amount of time, send a message with a `RevertAfterMilliseconds` header. In this example we want the configuration change to last for 30 seconds:
+### Filters
+
+The messaging configuration provider can be protected by passing a instance of the `ISettingFilter` instance to the extension methods. For reference, this is the definition of that interface:
 
 ```c#
-using (ISender sender = new NamedPipeSender(name: "example_receiver", pipeName: "example-pipe-name"))
+public interface ISettingFilter
 {
-    var message = new SenderMessage(configChange); // same configChange as above
-    message.Headers.Add("RevertAfterMilliseconds", 30000);
-    
-    await sender.SendAsync(message);
+    bool ShouldProcessSettingChange(string setting, IReadOnlyDictionary<string, object> receivedMessageHeaders);
 }
 ```
+
+When a message is received, each setting is passed to the `ShouldProcessSettingChange` method along with the `Headers` property of the received message. If the method returns true, the setting is changed. Otherwise, the setting is not changed.
+
+RockLib.Configuration.MessagingProvider has three implementations of the `ISettingFilter` interface:
+
+- `BlocklistSettingFilter`
+  - Blocks specified settings, including child settings.
+  - Has an optional inner filter.
+- `SafelistSettingFilter`
+  - Blocks any settings, including child settings, that are *not* specified.
+  - Has an optional inner filter.
+- `NullSettingFilter`
+  - Doesn't block any settings.
