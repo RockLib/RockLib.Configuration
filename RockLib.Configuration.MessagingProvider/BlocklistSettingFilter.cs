@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace RockLib.Configuration.MessagingProvider
 {
@@ -10,7 +9,7 @@ namespace RockLib.Configuration.MessagingProvider
     /// </summary>
     public sealed class BlocklistSettingFilter : ISettingFilter
     {
-        private readonly Dictionary<string, string> _blockedSettings;
+        private readonly HashSet<string> _blockedSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BlocklistSettingFilter"/> class.
@@ -24,20 +23,22 @@ namespace RockLib.Configuration.MessagingProvider
         /// </param>
         public BlocklistSettingFilter(IEnumerable<string> blockedSettings, ISettingFilter innerFilter = null)
         {
-            _blockedSettings = blockedSettings?.ToDictionary(s => s) ?? throw new ArgumentNullException(nameof(blockedSettings));
+            if (blockedSettings == null)
+                throw new ArgumentNullException(nameof(blockedSettings));
+            _blockedSettings = new HashSet<string>(blockedSettings, StringComparer.OrdinalIgnoreCase);
             InnerFilter = innerFilter ?? NullSettingFilter.Instance;
         }
 
         /// <summary>
         /// Gets the collection of settings (and their child settings) that will be blocked.
         /// </summary>
-        public IEnumerable<string> BlockedSettings => _blockedSettings.Keys;
+        public IEnumerable<string> BlockedSettings => _blockedSettings;
 
         /// <summary>
         /// Gets the inner setting filter that is applied if a setting is not a
         /// member of <see cref="BlockedSettings"/>.
         /// </summary>
-        public ISettingFilter InnerFilter { get;  }
+        public ISettingFilter InnerFilter { get; }
 
         /// <summary>
         /// Returns whether the specified setting should be allowed to be changed.

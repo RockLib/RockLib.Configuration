@@ -1,0 +1,90 @@
+﻿using FluentAssertions;
+using Moq;
+using System;
+using System.Collections.Generic;
+using Xunit;
+
+namespace RockLib.Configuration.MessagingProvider.Tests
+{
+    public class SafelistSettingFilterTests
+    {
+        [Fact]
+        public void ConstructorThrowsIfSafeSettingsIsNull()
+        {
+            Action action = () => new SafelistSettingFilter(null);
+            action.Should().ThrowExactly<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void ConstructorSetsSafeSettings()
+        {
+            string[] safeSettings = new[] { "foo" };
+
+            var filter = new SafelistSettingFilter(safeSettings);
+
+            filter.SafeSettings.Should().BeEquivalentTo(safeSettings);
+        }
+
+        [Fact]
+        public void ConstructorSetsInnerFilter()
+        {
+            var innerFilter = new FakeSettingFilter();
+
+            var filter = new SafelistSettingFilter(new[] { "foo" }, innerFilter);
+
+            filter.InnerFilter.Should().BeSameAs(innerFilter);
+        }
+
+        [Fact]
+        public void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsInTheSafelist()
+        {
+            var mockInnerFilter = new Mock<ISettingFilter>();
+            mockInnerFilter
+                .Setup(m => m.ShouldProcessSettingChange(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object>>()))
+                .Returns(false);
+
+            var filter = new SafelistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+
+            var receivedMessageHeaders = new Dictionary<string, object>();
+
+            filter.ShouldProcessSettingChange("foo", receivedMessageHeaders)
+                .Should().Be(false);
+
+            mockInnerFilter.Verify(m => m.ShouldProcessSettingChange(
+                It.Is<string>(s => s == "foo"), It.Is<IReadOnlyDictionary<string, object>>(headers => headers == receivedMessageHeaders)));
+        }
+
+        [Fact]
+        public void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsAChildOfAnItemInTheAllowlist()
+        {
+            var mockInnerFilter = new Mock<ISettingFilter>();
+            mockInnerFilter
+                .Setup(m => m.ShouldProcessSettingChange(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object>>()))
+                .Returns(false);
+
+            var filter = new SafelistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+
+            var receivedMessageHeaders = new Dictionary<string, object>();
+
+            filter.ShouldProcessSettingChange("foo:bar", receivedMessageHeaders)
+                .Should().Be(false);
+
+            mockInnerFilter.Verify(m => m.ShouldProcessSettingChange(
+                It.Is<string>(s => s == "foo:bar"), It.Is<IReadOnlyDictionary<string, object>>(headers => headers == receivedMessageHeaders)));
+        }
+
+        [Fact]
+        public void ReturnsFalseWhenTheSettingIsNotInTheSafelist()
+        {
+            var mockInnerFilter = new Mock<ISettingFilter>();
+
+            var filter = new SafelistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+
+            filter.ShouldProcessSettingChange("bar", new Dictionary<string, object>())
+                .Should().Be(false);
+
+            mockInnerFilter.Verify(m => m.ShouldProcessSettingChange(
+                It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object>>()), Times.Never);
+        }
+    }
+}

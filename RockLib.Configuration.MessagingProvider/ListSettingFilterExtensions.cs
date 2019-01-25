@@ -4,10 +4,10 @@ namespace RockLib.Configuration.MessagingProvider
 {
     internal static class ListSettingFilterExtensions
     {
-        internal static bool HasSetting(this Dictionary<string, string> settings, string setting)
+        internal static bool HasSetting(this HashSet<string> settings, string setting)
         {
             foreach (var key in SelfAndAncestors(setting))
-                if (settings.ContainsKey(key))
+                if (settings.Contains(key))
                     return true;
             return false;
         }

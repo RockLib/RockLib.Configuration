@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace RockLib.Configuration.MessagingProvider
 {
@@ -10,7 +9,7 @@ namespace RockLib.Configuration.MessagingProvider
     /// </summary>
     public sealed class SafelistSettingFilter : ISettingFilter
     {
-        private readonly Dictionary<string, string> _safeSettings;
+        private readonly HashSet<string> _safeSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SafelistSettingFilter"/> class.
@@ -25,7 +24,9 @@ namespace RockLib.Configuration.MessagingProvider
         /// </param>
         public SafelistSettingFilter(IEnumerable<string> safeSettings, ISettingFilter innerFilter = null)
         {
-            _safeSettings = safeSettings?.ToDictionary(s => s) ?? throw new ArgumentNullException(nameof(safeSettings));
+            if (safeSettings == null)
+                throw new ArgumentNullException(nameof(safeSettings));
+            _safeSettings = new HashSet<string>(safeSettings, StringComparer.OrdinalIgnoreCase);
             InnerFilter = innerFilter ?? NullSettingFilter.Instance;
         }
 
@@ -33,7 +34,7 @@ namespace RockLib.Configuration.MessagingProvider
         /// Gets the collection of settings (and their child settings) that are safe - all
         /// other settings will be blocked.
         /// </summary>
-        public IEnumerable<string> SafeSettings => _safeSettings.Keys;
+        public IEnumerable<string> SafeSettings => _safeSettings;
 
         /// <summary>
         /// Gets the inner setting filter that is applied if a setting is a
