@@ -33,7 +33,7 @@ The other overload creates a new instance of `IReceiver` by name from the config
 ```c#
 ConfigurationBuilder builder = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json") // Assume appsettings.json contains the above JSON
-    .AddRockLibMessagingProvider("configuration_messaging_provider"); // Add the messaging provider last
+    .AddRockLibMessagingProvider("example_receiver"); // Add the messaging provider last
 ```
 
 Each of these example adds an equivalent messaging provider to the configuration builder. All `IConfigurationRoot` objects built by the configuration builder will listen to the same `IReceiver` for configuration changes.
