@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Messaging;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace RockLib.Configuration.MessagingProvider
