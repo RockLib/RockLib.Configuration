@@ -634,6 +634,31 @@ namespace RockLib.Configuration.ObjectFactory
             }
         }
 
+        /// <summary>
+        /// Gets the name of the <see cref="ParameterInfo"/>, along with its alternate names (as described by
+        /// one or more [AlternateName("MyAlternateName")] attributes decorating it).
+        /// </summary>
+        internal static IEnumerable<string> GetNames(this ParameterInfo parameter) =>
+            GetNames(parameter.Name, parameter.CustomAttributes);
+
+        /// <summary>
+        /// Gets the name of the <see cref="PropertyInfo"/>, along with its alternate names (as described by
+        /// one or more [AlternateName("MyAlternateName")] attributes decorating it).
+        /// </summary>
+        private static IEnumerable<string> GetNames(this PropertyInfo property) =>
+            GetNames(property.Name, property.CustomAttributes);
+
+        private static IEnumerable<string> GetNames(string name, IEnumerable<CustomAttributeData> customAttributes)
+        {
+            yield return name;
+
+            var alternateNames = GetAllFirstParameterValuesFromCustomAttributes<string>(
+                customAttributes, nameof(AlternateNameAttribute));
+
+            foreach (var alternateName in alternateNames)
+                yield return alternateName;
+        }
+
         /// <summary>Gets the default type, or null if not found.</summary>
         private static Type GetDefaultTypeFromCustomAttributes(IEnumerable<CustomAttributeData> customAttributes) =>
             GetFirstParameterValueFromCustomAttributes<Type>(customAttributes, nameof(DefaultTypeAttribute));
@@ -645,13 +670,18 @@ namespace RockLib.Configuration.ObjectFactory
         /// <summary>Gets the value of the first parameter, or null if not found.</summary>
         private static T GetFirstParameterValueFromCustomAttributes<T>(
             IEnumerable<CustomAttributeData> customAttributes, string attributeTypeName) =>
+                GetAllFirstParameterValuesFromCustomAttributes<T>(customAttributes, attributeTypeName)
+                .FirstOrDefault();
+
+        /// <summary>Gets the values of the first parameter for each attribute with the specified name.</summary>
+        private static IEnumerable<T> GetAllFirstParameterValuesFromCustomAttributes<T>(
+            IEnumerable<CustomAttributeData> customAttributes, string attributeTypeName) =>
             customAttributes.Where(attribute =>
                 attribute.AttributeType.Name == attributeTypeName
                     && attribute.ConstructorArguments.Count == 1
                     && attribute.ConstructorArguments[0].ArgumentType == typeof(T)
                     && attribute.ConstructorArguments[0].Value != null)
-                .Select(attribute => (T)attribute.ConstructorArguments[0].Value)
-                .FirstOrDefault();
+                .Select(attribute => (T)attribute.ConstructorArguments[0].Value);
 
         private static MethodInfo GetListAddMethod(Type tType) =>
             (tType != null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList))
@@ -702,47 +732,59 @@ namespace RockLib.Configuration.ObjectFactory
 
             private void SetWritableProperty(object obj, PropertyInfo property, DefaultTypes defaultTypes, ValueConverters valueConverters)
             {
-                if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                foreach (var name in property.GetNames())
                 {
-                    var propertyValue = section.CreateValue(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
-                    property.SetValue(obj, propertyValue);
+                    if (_members.TryGetValue(name, out IConfigurationSection section))
+                    {
+                        var propertyValue = section.CreateValue(property.PropertyType, Type, name, valueConverters, defaultTypes, Resolver);
+                        property.SetValue(obj, propertyValue);
+                        break;
+                    }
                 }
             }
 
             private void SetReadonlyListProperty(object obj, PropertyInfo property, DefaultTypes defaultTypes, ValueConverters valueConverters)
             {
-                if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                foreach (var name in property.GetNames())
                 {
-                    var list = property.GetValue(obj);
-                    if (list == null) return;
-                    var tType = IsGenericList(property.PropertyType)
-                        ? property.PropertyType.GetTypeInfo().GetGenericArguments()[0]
-                        : null;
-                    var addMethod = GetListAddMethod(tType);
-                    var clearMethod = GetListClearMethod(tType);
-                    var targetType = property.PropertyType;
-                    if (tType == null)
-                        targetType = typeof(List<>).MakeGenericType(GetNonGenericListItemType(targetType));
-                    var propertyValue = section.CreateValue(targetType, Type, property.Name, valueConverters, defaultTypes, Resolver);
-                    clearMethod.Invoke(list, null);
-                    foreach (var item in (IEnumerable)propertyValue)
-                        addMethod.Invoke(list, new[] { item });
+                    if (_members.TryGetValue(name, out IConfigurationSection section))
+                    {
+                        var list = property.GetValue(obj);
+                        if (list == null) return;
+                        var tType = IsGenericList(property.PropertyType)
+                            ? property.PropertyType.GetTypeInfo().GetGenericArguments()[0]
+                            : null;
+                        var addMethod = GetListAddMethod(tType);
+                        var clearMethod = GetListClearMethod(tType);
+                        var targetType = property.PropertyType;
+                        if (tType == null)
+                            targetType = typeof(List<>).MakeGenericType(GetNonGenericListItemType(targetType));
+                        var propertyValue = section.CreateValue(targetType, Type, name, valueConverters, defaultTypes, Resolver);
+                        clearMethod.Invoke(list, null);
+                        foreach (var item in (IEnumerable)propertyValue)
+                            addMethod.Invoke(list, new[] { item });
+                        break;
+                    }
                 }
             }
 
             private void SetReadonlyDictionaryProperty(object obj, PropertyInfo property, DefaultTypes defaultTypes, ValueConverters valueConverters)
             {
-                if (_members.TryGetValue(property.Name, out IConfigurationSection section))
+                foreach (var name in property.GetNames())
                 {
-                    var dictionary = property.GetValue(obj);
-                    if (dictionary == null) return;
-                    var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
-                    var addMethod = GetDictionaryAddMethod(tValueType);
-                    var clearMethod = GetDictionaryClearMethod(tValueType);
-                    var propertyValue = section.CreateValue(property.PropertyType, Type, property.Name, valueConverters, defaultTypes, Resolver);
-                    clearMethod.Invoke(dictionary, null);
-                    foreach (var item in (IEnumerable)propertyValue)
-                        addMethod.Invoke(dictionary, new[] { item });
+                    if (_members.TryGetValue(name, out IConfigurationSection section))
+                    {
+                        var dictionary = property.GetValue(obj);
+                        if (dictionary == null) return;
+                        var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
+                        var addMethod = GetDictionaryAddMethod(tValueType);
+                        var clearMethod = GetDictionaryClearMethod(tValueType);
+                        var propertyValue = section.CreateValue(property.PropertyType, Type, name, valueConverters, defaultTypes, Resolver);
+                        clearMethod.Invoke(dictionary, null);
+                        foreach (var item in (IEnumerable)propertyValue)
+                            addMethod.Invoke(dictionary, new[] { item });
+                        break;
+                    }
                 }
             }
 
@@ -767,19 +809,28 @@ namespace RockLib.Configuration.ObjectFactory
                 var args = new object[parameters.Length];
                 for (int i = 0; i < args.Length; i++)
                 {
-                    if (_members.TryGetValue(parameters[i].Name, out IConfigurationSection section))
+                    var found = false;
+                    foreach (var name in parameters[i].GetNames())
                     {
-                        var arg = section.CreateValue(parameters[i].ParameterType, Type, parameters[i].Name, valueConverters, defaultTypes, Resolver);
-                        if (parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
+                        if (_members.TryGetValue(name, out IConfigurationSection section))
                         {
-                            args[i] = arg;
-                            _members.Remove(parameters[i].Name);
+                            var arg = section.CreateValue(parameters[i].ParameterType, Type, name, valueConverters, defaultTypes, Resolver);
+                            if (parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
+                            {
+                                found = true;
+                                args[i] = arg;
+                                _members.Remove(name);
+                                break;
+                            }
                         }
                     }
-                    else if (Resolver.TryResolve(parameters[i], out object arg))
-                        args[i] = arg;
-                    else if (parameters[i].HasDefaultValue)
-                        args[i] = parameters[i].DefaultValue;
+                    if (!found)
+                    {
+                        if (Resolver.TryResolve(parameters[i], out object arg))
+                            args[i] = arg;
+                        else if (parameters[i].HasDefaultValue)
+                            args[i] = parameters[i].DefaultValue;
+                    }
                 }
                 return args;
             }

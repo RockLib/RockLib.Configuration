@@ -23,7 +23,7 @@ namespace RockLib.Configuration.ObjectFactory
             else
             {
                 bool HasAvailableValue(ParameterInfo p) =>
-                    availableMembers.ContainsKey(p.Name) || resolver.CanResolve(p);
+                    p.GetNames().Any(name => availableMembers.ContainsKey(name)) || resolver.CanResolve(p);
 
                 IsInvokableWithoutDefaultParameters = parameters.Count(HasAvailableValue) == TotalParameters;
                 IsInvokableWithDefaultParameters = parameters.Count(p => HasAvailableValue(p) || p.HasDefaultValue) == TotalParameters;

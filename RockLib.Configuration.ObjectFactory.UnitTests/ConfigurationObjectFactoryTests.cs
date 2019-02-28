@@ -2422,6 +2422,102 @@ namespace Tests
             Assert.Equal("123", foo.Baz["a"]);
             Assert.Equal("xyz", foo.Baz["b"]);
         }
+
+        [Theory]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "foo")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "foo1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "foo")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "foo1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "foo2")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "foo")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "foo1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "foo")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "foo1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "foo2")]
+        public void Constructors(Type type, string configurationKey)
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                [configurationKey] = "abc"
+            }).Build();
+
+            var item = (IHasMembers)config.Create(type);
+
+            Assert.Equal("abc", item.Foo);
+        }
+
+        [Theory]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "bar")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "bar1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "bar")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "bar1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "bar2")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "bar")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "bar1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "bar")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "bar1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "bar2")]
+        public void ReadWriteProperties(Type type, string configurationKey)
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                [configurationKey] = "abc"
+            }).Build();
+
+            var item = (IHasMembers)config.Create(type);
+
+            Assert.Equal("abc", item.Bar);
+        }
+
+        [Theory]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "baz")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "baz1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "baz")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "baz1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "baz2")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "baz")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "baz1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "baz")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "baz1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "baz2")]
+        public void ReadonlyListProperties(Type type, string configurationKey)
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                [configurationKey] = "abc"
+            }).Build();
+
+            var item = (IHasMembers)config.Create(type);
+
+            Assert.Single(item.Baz);
+            Assert.Equal("abc", item.Baz[0]);
+        }
+
+        [Theory]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "qux")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleAlternateNameAttribute), "qux1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "qux")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "qux1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleAlternateNameAttributes), "qux2")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "qux")]
+        [InlineData(typeof(HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute), "qux1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "qux")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "qux1")]
+        [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "qux2")]
+        public void ReadonlyDictionaryProperties(Type type, string configurationKey)
+        {
+            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+            {
+                [$"{configurationKey}:garply"] = "abc"
+            }).Build();
+
+            var item = (IHasMembers)config.Create(type);
+
+            Assert.Single(item.Qux);
+            var dictionaryItem = item.Qux.Single();
+            Assert.Equal("garply", dictionaryItem.Key);
+            Assert.Equal("abc", dictionaryItem.Value);
+        }
     }
 
     public class HasSimpleReadWriteDictionaryProperties
@@ -3165,6 +3261,50 @@ namespace Tests
         private static double ConvertBaz(string value) => double.Parse(value) * 11;
     }
 
+    public interface IHasMembers
+    {
+        string Foo { get; }
+        string Bar { get; }
+        List<string> Baz { get; }
+        Dictionary<string, string> Qux { get; }
+    }
+
+    public class HasMembersDecoratedWithSingleAlternateNameAttribute : IHasMembers
+    {
+        public HasMembersDecoratedWithSingleAlternateNameAttribute([AlternateName("foo1")] string foo = null) => Foo = foo;
+        public string Foo { get; }
+        [AlternateName("bar1")] public string Bar { get; set; }
+        [AlternateName("baz1")] public List<string> Baz { get; } = new List<string>();
+        [AlternateName("qux1")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
+    }
+
+    public class HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute : IHasMembers
+    {
+        public HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute([LocallyDefined.AlternateName("foo1")] string foo = null) => Foo = foo;
+        public string Foo { get; }
+        [LocallyDefined.AlternateName("bar1")] public string Bar { get; set; }
+        [LocallyDefined.AlternateName("baz1")] public List<string> Baz { get; } = new List<string>();
+        [LocallyDefined.AlternateName("qux1")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
+    }
+
+    public class HasMembersDecoratedWithMultipleAlternateNameAttributes : IHasMembers
+    {
+        public HasMembersDecoratedWithMultipleAlternateNameAttributes([AlternateName("foo1"), AlternateName("foo2")] string foo = null) => Foo = foo;
+        public string Foo { get; }
+        [AlternateName("bar1"), AlternateName("bar2")] public string Bar { get; set; }
+        [AlternateName("baz1"), AlternateName("baz2")] public List<string> Baz { get; } = new List<string>();
+        [AlternateName("qux1"), AlternateName("qux2")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
+    }
+
+    public class HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes : IHasMembers
+    {
+        public HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes([LocallyDefined.AlternateName("foo1"), LocallyDefined.AlternateName("foo2")] string foo = null) => Foo = foo;
+        public string Foo { get; }
+        [LocallyDefined.AlternateName("bar1"), LocallyDefined.AlternateName("bar2")] public string Bar { get; set; }
+        [LocallyDefined.AlternateName("baz1"), LocallyDefined.AlternateName("baz2")] public List<string> Baz { get; } = new List<string>();
+        [LocallyDefined.AlternateName("qux1"), LocallyDefined.AlternateName("qux2")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
+    }
+
     public class HasObjectMembersWithDefaultTypeOfStringDictionary
     {
         public HasObjectMembersWithDefaultTypeOfStringDictionary([DefaultType(typeof(Dictionary<string, string>))] object bar,
@@ -3203,5 +3343,12 @@ namespace LocallyDefined
     {
         public ConvertMethodAttribute(string convertMethodName) => ConvertMethodName = convertMethodName;
         public string ConvertMethodName { get; }
+    }
+
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = true)]
+    internal class AlternateNameAttribute : Attribute
+    {
+        public AlternateNameAttribute(string name) => Name = name;
+        public string Name { get; }
     }
 }
