@@ -114,6 +114,25 @@ namespace Tests
             Assert.Equal(expectedComparisonValue, actual);
         }
 
+        [Theory]
+        [InlineData(typeof(OneAlternateName), "foo")]
+        [InlineData(typeof(OneAlternateName), "bar")]
+        [InlineData(typeof(MultipleAlternateNames), "foo")]
+        [InlineData(typeof(MultipleAlternateNames), "bar")]
+        [InlineData(typeof(MultipleAlternateNames), "baz")]
+        public void AlternateNameIsUsed(Type type, string configurationMemberName)
+        {
+            var constructor = type.GetConstructors()[0];
+            var members = new Dictionary<string, IConfigurationSection>() { { configurationMemberName, null } };
+
+            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
+
+            Assert.True(orderInfo.IsInvokableWithoutDefaultParameters);
+            Assert.True(orderInfo.IsInvokableWithDefaultParameters);
+            Assert.Equal(1, orderInfo.MatchedParameters);
+            Assert.Empty(orderInfo.MissingParameterNames);
+        }
+
         private class DefaultConstructor { }
         private class OneParameter { public OneParameter(int bar) { } }
         private class OneOptionalParameter { public OneOptionalParameter(int bar = -1) { } }
@@ -122,6 +141,18 @@ namespace Tests
         private class TwoOptionalParameters { public TwoOptionalParameters(int bar = -1, int baz = -1) { } }
         private class ThreeOptionalParameters { public ThreeOptionalParameters(int bar = -1, int baz = -1, int qux = -1) { } }
         private class ThreeParametersOneRequired { public ThreeParametersOneRequired(int foo, int baz = -1, int qux = -1) { } }
+
+        private class OneAlternateName
+        {
+            public OneAlternateName([AlternateName("bar")] int foo) => Foo = foo;
+            public int Foo { get; }
+        }
+
+        private class MultipleAlternateNames
+        {
+            public MultipleAlternateNames([AlternateName("bar"), AlternateName("baz")] int foo) => Foo = foo;
+            public int Foo { get; }
+        }
     }
 }
 #endif

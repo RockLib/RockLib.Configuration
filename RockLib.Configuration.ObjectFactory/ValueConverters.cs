@@ -40,11 +40,11 @@ namespace RockLib.Configuration.ObjectFactory
 
         /// <summary>
         /// Configures a converter for the specified target type. Use this method when you want all
-        /// members (properties or constructor parameters) of the target type to use the same converter.
-        /// If you need different members of a target type to each use a different converter, use
+        /// instances of the target type to use the same converter. If you need instances of the target
+        /// type to each use a different converter depending on which member is being populated, use
         /// the other <see cref="Add{T}(Type, string, Func{string, T})"/> method.
         /// </summary>
-        /// <param name="targetType">A type that needs a default type.</param>
+        /// <param name="targetType">A type that needs a converter.</param>
         /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
         /// <returns>This instance of <see cref="ValueConverters"/>.</returns>
         /// <exception cref="ArgumentNullException">
