@@ -2434,7 +2434,7 @@ namespace Tests
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "foo")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "foo1")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "foo2")]
-        public void Constructors(Type type, string configurationKey)
+        public void ConstructorsUseAlternateNameAttribute(Type type, string configurationKey)
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
             {
@@ -2457,7 +2457,7 @@ namespace Tests
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "bar")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "bar1")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "bar2")]
-        public void ReadWriteProperties(Type type, string configurationKey)
+        public void ReadWritePropertiesUseAlternateNameAttribute(Type type, string configurationKey)
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
             {
@@ -2480,7 +2480,7 @@ namespace Tests
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "baz")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "baz1")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "baz2")]
-        public void ReadonlyListProperties(Type type, string configurationKey)
+        public void ReadonlyListPropertiesUseAlternateNameAttribute(Type type, string configurationKey)
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
             {
@@ -2504,7 +2504,7 @@ namespace Tests
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "qux")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "qux1")]
         [InlineData(typeof(HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes), "qux2")]
-        public void ReadonlyDictionaryProperties(Type type, string configurationKey)
+        public void ReadonlyDictionaryPropertiesUseAlternateNameAttribute(Type type, string configurationKey)
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
             {
