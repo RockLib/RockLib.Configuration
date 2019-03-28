@@ -11,7 +11,7 @@
     <Description>Provides a central location for an instance of IConfigurationRoot to be used as the "default" configuration by .NET Standard libraries and .NET Core applications. Replaces some of the functionality of the .NET Framework System.Configuration.ConfigurationManager class.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/RockLib/RockLib.Configuration/blob/master/LICENSE</PackageLicenseUrl>
     <Copyright>Copyright 2017-2018 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration ConfigurationRoot IConfigurationRoot ConfigurationManager AppSettings</PackageTags>
