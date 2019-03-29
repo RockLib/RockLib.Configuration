@@ -71,16 +71,17 @@ namespace RockLib.Configuration
                 var xIsInt = uint.TryParse(x, out var xValue);
                 var yIsInt = uint.TryParse(y, out var yValue);
 
+                // Do not change order when neither key is numeric.
+                if (!xIsInt && !yIsInt)
+                    return 0;
+
                 // Put numeric keys in ascending order.
                 if (xIsInt && yIsInt)
                     return xValue.CompareTo(yValue);
 
-                // Put numeric keys before non-numeric keys.
-                if (xIsInt) return -1;
-                if (yIsInt) return 1;
-
-                // Do not change order when neither key is numeric.
-                return 0;
+                // Put numeric keys after non-numeric keys.
+                if (xIsInt) return 1;
+                /*if (yIsInt)*/ return -1;
             }
         }
     }
