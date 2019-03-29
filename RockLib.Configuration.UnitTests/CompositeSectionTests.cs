@@ -55,5 +55,23 @@ namespace RockLib.Configuration.UnitTests
             children.Count.Should().Be(1);
             children[0]["baz"].Should().Be("123");
         }
+
+        [Fact]
+        public void GetChildrenMaintainsOrderWhenTheChildAreListItemsAndTheSecondItemComesFromTheFirstSectionOfTheCompositeSection()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "second_section:0:baz", "abc" },
+                    { "first_section:1:baz", "xyz" },
+                }).Build();
+
+            var foobarSection = config.GetCompositeSection("first_section", "second_section");
+
+            var children = foobarSection.GetChildren().ToList();
+            children.Count.Should().Be(2);
+            children[0]["baz"].Should().Be("abc");
+            children[1]["baz"].Should().Be("xyz");
+        }
     }
 }
