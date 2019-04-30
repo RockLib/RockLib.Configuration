@@ -319,25 +319,25 @@ public class DefaultBar : IBar
 
 We would like to be able to define the `DefaultBar` type as the default type - if the type is not otherwise specified, create an instance of `DefaultBar`. There are two ways of specifying the default type: by property or by type. When specified by property, we want to say: "when setting the `Foo.Bar` property, if the configuration is *not* type-specified, set the property to an instance of `DefaultBar`." When specified by type we want to say: "whenever creating an instance of `IBar`, if the configuration is *not* type-specified, create an instance of `DefaultBar`.
 
-To programmatically set `DefaultBar` as the default type for the `Foo.Bar`, call the `Create` extension method as follows:
+To programmatically set `DefaultBar` as the default type for the `Foo.Bar` property, call the `Create` extension method as follows:
 
 ```c#
-DefaultValues defaultValues =
-    new DefaultValues().Add(typeof(Foo), nameof(Foo.Bar), typeof(DefaultBar));
+DefaultTypes defaultTypes =
+    new DefaultTypes().Add(typeof(Foo), nameof(Foo.Bar), typeof(DefaultBar));
     
-Foo foo = configuration.Create<Foo>(defaultValues: defaultValues);
+Foo foo = configuration.Create<Foo>(defaultTypes: defaultTypes);
 ```
 
 To programmatically set `DefaultBar` as the default type for the `IBar`, call the `Create` extension method as follows:
 
 ```c#
-DefaultValues defaultValues =
-    new DefaultValues().Add(typeof(IBar), typeof(DefaultBar));
+DefaultTypes defaultTypes =
+    new DefaultTypes().Add(typeof(IBar), typeof(DefaultBar));
 
-var foo = configuration.Create<Foo>(defaultValues: defaultValues);
+var foo = configuration.Create<Foo>(defaultTypes: defaultTypes);
 ```
 
-Default values can also be specified via attributes, so that the extra parameter when in the `Create` extension method can be omitted. 
+Default types can also be specified via attributes, so that the `defaultTypes` parameter in the `Create` extension method can be omitted. 
 
 ```c#
 public class Foo
@@ -381,7 +381,7 @@ public class Foo
 }
 ```
 
-The `BigInteger.Parse` method meets the criteria for a convert function - it has an overload with one string parameter and return our target type. To do this programmatically for all `BigInteger` values:
+The `BigInteger.Parse` method meets the criteria for a convert function - it has an overload with one string parameter and returns our target type. To do this programmatically for all `BigInteger` values:
 
 ```c#
 ValueConverters valueConverters =
