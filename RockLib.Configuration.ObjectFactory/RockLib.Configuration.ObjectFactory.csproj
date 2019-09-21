@@ -8,7 +8,7 @@
   <PropertyGroup>
     <PackageId>RockLib.Configuration.ObjectFactory</PackageId>
     <PackageVersion>1.6.1</PackageVersion>
-    <Authors>Quicken Loans</Authors>
+    <Authors>Brian Friesen</Authors>
     <Description>Creates objects from IConfiguration and IConfigurationSection objects. A replacement for some of the functionality of Microsoft.Extensions.Configuration.Binder.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
