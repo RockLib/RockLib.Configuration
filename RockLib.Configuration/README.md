@@ -42,7 +42,7 @@ If the configuration root is not explicitly set, it will load configuration sett
 
 1) If the application is a .NET Framework app, from `ConfigurationManager` (see [.NET Framework Application Usage](#net-framework-application-usage) for details);
 2) A `'appsettings.json'` file, relative to the current working directory;
-3) A `'appsettings.{environment}.json file'`, relative to the corrent working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable;
+3) A `'appsettings.{environment}.json file'`, relative to the current working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable;
 4) Environment variables.
 
 **Note that ASP.NET Core applications do not automatically load settings from `'appsettings.json'` - the configuration root must be set explicitly as described above.**
@@ -165,6 +165,6 @@ That example uses attributes. The following equivalent example uses elements.
 
 The RockLib.Configuration library defines extension methods for `IConfigurationBuilder` that configure the builder the same way that the default `Config.Root` is configured.
 
-The `AddAppSettingsJson` extension method adds settings from an `'appsettings.json'` file, relative to the current working directory, then addes settings from an `'appsettings.{environment}.json file'`, relative to the corrent working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable. Both of these files are optional.
+The `AddAppSettingsJson` extension method adds settings from an `'appsettings.json'` file, relative to the current working directory, then adds settings from an `'appsettings.{environment}.json'` file, relative to the current working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable. Both of these files are optional.
 
 The `AddConfigurationManager` extension method (only available from .NET Framework applications) adds settings from the `ConfigurationManager` class to the configuration builder (see [.NET Framework Application Usage](#net-framework-application-usage) for details).
