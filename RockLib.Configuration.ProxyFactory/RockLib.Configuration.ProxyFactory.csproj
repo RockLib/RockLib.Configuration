@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <PackageId>RockLib.Configuration.ProxyFactory</PackageId>
-    <PackageVersion>1.0.2</PackageVersion>
+    <PackageVersion>1.0.3</PackageVersion>
     <Authors>RockLib</Authors>
     <Description>Creates proxy objects from interfaces using IConfiguration and IConfigurationSection objects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RockLib.Configuration.ObjectFactory" Version="1.1.4" />
+    <PackageReference Include="RockLib.Configuration.ObjectFactory" Version="1.6.2" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6' Or '$(TargetFramework)'=='netstandard2.0'">
