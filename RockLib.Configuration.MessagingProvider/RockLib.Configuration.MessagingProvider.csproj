@@ -7,13 +7,13 @@
   <PropertyGroup>
     <PackageId>RockLib.Configuration.MessagingProvider</PackageId>
     <PackageVersion>1.0.0</PackageVersion>
-    <Authors>Brian Friesen</Authors>
+    <Authors>RockLib</Authors>
     <Description>A configuration provider that reloads when it receives a message containing configuration changes from a RockLib.Messaging IReceiver.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.MessagingProvider</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Copyright>Copyright 2018 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <Copyright>Copyright 2018-2020 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration Messaging</PackageTags>
     <Version>1.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

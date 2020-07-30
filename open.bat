@@ -1,1 +1,0 @@
-start .\RockLib.Configuration.sln

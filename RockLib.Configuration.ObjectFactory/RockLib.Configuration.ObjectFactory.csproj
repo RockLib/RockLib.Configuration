@@ -8,13 +8,13 @@
   <PropertyGroup>
     <PackageId>RockLib.Configuration.ObjectFactory</PackageId>
     <PackageVersion>1.6.1</PackageVersion>
-    <Authors>Brian Friesen</Authors>
+    <Authors>RockLib</Authors>
     <Description>Creates objects from IConfiguration and IConfigurationSection objects. A replacement for some of the functionality of Microsoft.Extensions.Configuration.Binder.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ObjectFactory</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Copyright>Copyright 2017 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <Copyright>Copyright 2017-2020 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration Factory Binder IConfiguration IConfigurationSection</PackageTags>
     <Version>1.1.2</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">

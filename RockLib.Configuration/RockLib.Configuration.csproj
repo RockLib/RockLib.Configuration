@@ -7,13 +7,13 @@
   <PropertyGroup>
     <PackageId>RockLib.Configuration</PackageId>
     <PackageVersion>2.4.1</PackageVersion>
-    <Authors>Brian Friesen</Authors>
+    <Authors>RockLib</Authors>
     <Description>Provides a central location for an instance of IConfigurationRoot to be used as the "default" configuration by .NET Standard libraries and .NET Core applications. Replaces some of the functionality of the .NET Framework System.Configuration.ConfigurationManager class.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <Copyright>Copyright 2017-2018 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <Copyright>Copyright 2017-2020 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration ConfigurationRoot IConfigurationRoot ConfigurationManager AppSettings</PackageTags>
     <Version>2.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\LICENSE" Pack="true" PackagePath="" />
+    <None Include="..\LICENSE.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
