@@ -13,6 +13,7 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ProxyFactory</PackageProjectUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageIcon>icon.png</PackageIcon>
     <Copyright>Copyright 2017-2020 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
     <PackageTags>Configuration Factory Proxy IConfiguration IConfigurationSection</PackageTags>
     <Version>1.0.0</Version>
@@ -21,6 +22,7 @@
 
   <ItemGroup>
     <None Include="..\LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="..\icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>
