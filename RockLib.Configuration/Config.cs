@@ -2,6 +2,7 @@
 using RockLib.Immutable;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace RockLib.Configuration
@@ -12,6 +13,8 @@ namespace RockLib.Configuration
     public static class Config
     {
         private static readonly Semimutable<IConfiguration> _root = new Semimutable<IConfiguration>(() => GetDefaultRoot(null));
+
+        private static string _basePath;
 
         /// <summary>
         /// Gets an object that retrieves settings from the "AppSettings" section of the
@@ -95,9 +98,27 @@ namespace RockLib.Configuration
                 SetRoot(() => GetDefaultRoot(additionalValues));
         }
 
+        /// <summary>
+        /// When the <c>SetRoot</c> method is <em>not</em> called (i.e. the default root is used),
+        /// sets the base path of the <see cref="ConfigurationBuilder"/> to the specified value.
+        /// If <paramref name="basePath"/> is null, then the value returned by the <see cref=
+        /// "Directory.GetCurrentDirectory"/> method is used as the base path.
+        /// </summary>
+        /// <param name="basePath">
+        /// The base path for the <see cref="ConfigurationBuilder"/>, or null to use the value
+        /// returned by the <see cref="Directory.GetCurrentDirectory"/> method.
+        /// </param>
+        public static void SetBasePath(string basePath = null)
+        {
+            _basePath = basePath ?? Directory.GetCurrentDirectory();
+        }
+
         private static IConfiguration GetDefaultRoot(IEnumerable<KeyValuePair<string, string>> additionalValues)
         {
             var builder = new ConfigurationBuilder();
+
+            if (_basePath != null)
+                builder.SetBasePath(_basePath);
 
 #if NET451 || NET462
             builder
