@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RockLib.Configuration.MessagingProvider\RockLib.Configuration.MessagingProvider.csproj" />
+    <ProjectReference Include="..\..\RockLib.Configuration.MessagingProvider\RockLib.Configuration.MessagingProvider.csproj" />
   </ItemGroup>
 
 </Project>

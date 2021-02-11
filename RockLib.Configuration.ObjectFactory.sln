@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory", "RockLib.Configuration.ObjectFactory\RockLib.Configuration.ObjectFactory.csproj", "{1A866445-42C8-4A9B-82C5-D3B34EBF9147}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory.UnitTests", "RockLib.Configuration.ObjectFactory.UnitTests\RockLib.Configuration.ObjectFactory.UnitTests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory.UnitTests", "Tests\RockLib.Configuration.ObjectFactory.UnitTests\RockLib.Configuration.ObjectFactory.UnitTests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

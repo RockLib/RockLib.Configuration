@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RockLib.Configuration.AspNetCore\RockLib.Configuration.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\RockLib.Configuration.AspNetCore\RockLib.Configuration.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

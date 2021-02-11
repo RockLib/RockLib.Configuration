@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RockLib.Configuration\RockLib.Configuration.csproj" />
+    <ProjectReference Include="..\..\RockLib.Configuration\RockLib.Configuration.csproj" />
   </ItemGroup>
 
   <ItemGroup>
