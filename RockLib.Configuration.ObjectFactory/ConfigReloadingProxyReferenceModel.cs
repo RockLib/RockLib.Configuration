@@ -15,7 +15,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
     public class ProxyFoo : ConfigReloadingProxy<IFoo>, IFoo
     {
         public ProxyFoo(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName)
-            : base(section, defaultTypes, valueConverters, declaringType, memberName)
+            : base(section, defaultTypes, valueConverters, declaringType, memberName, null)
         {
         }
 
