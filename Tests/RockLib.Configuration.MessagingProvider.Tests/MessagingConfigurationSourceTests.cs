@@ -24,7 +24,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
 
             // Passing the same receiver to another source causes it to throw.
             Action action = () => new MessagingConfigurationSource(receiver);
-            action.Should().ThrowExactly<ArgumentException>().WithMessage("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.*receiver");
+            action.Should().ThrowExactly<ArgumentException>().WithMessage("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.*receiver*");
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             receiver.Start(m => m.AcknowledgeAsync());
 
             Action action = () => new MessagingConfigurationSource(receiver);
-            action.Should().ThrowExactly<ArgumentException>().WithMessage("The receiver is already started.*receiver");
+            action.Should().ThrowExactly<ArgumentException>().WithMessage("The receiver is already started.*receiver*");
         }
 
         [Fact]
