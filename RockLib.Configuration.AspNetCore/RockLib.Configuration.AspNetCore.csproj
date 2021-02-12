@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <PackageId>RockLib.Configuration.AspNetCore</PackageId>
-    <PackageVersion>1.0.2</PackageVersion>
+    <PackageVersion>1.0.3</PackageVersion>
     <Authors>RockLib</Authors>
     <Description>Extension methods for RockLib.Configuration and ASP.NET Core.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
