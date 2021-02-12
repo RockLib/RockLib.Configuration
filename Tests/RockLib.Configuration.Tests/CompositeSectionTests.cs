@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace RockLib.Configuration.UnitTests
+namespace RockLib.Configuration.Tests
 {
     public class CompositeSectionTests
     {

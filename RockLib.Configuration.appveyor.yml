@@ -7,7 +7,7 @@ only_commits:
   - Tests/RockLib.Configuration.AppConfigTests/
   - Tests/RockLib.Configuration.AppSettingsConfigTests/
   - Tests/RockLib.Configuration.CustomConfigTests/
-  - Tests/RockLib.Configuration.UnitTests/
+  - Tests/RockLib.Configuration.Tests/
   - RockLib.Configuration.sln
   - RockLib.Configuration.appveyor.yml
 before_build:
