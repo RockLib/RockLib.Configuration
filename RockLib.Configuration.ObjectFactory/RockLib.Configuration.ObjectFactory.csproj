@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.6;net462;net451</TargetFrameworks>
+    <TargetFrameworks>net5.0;netstandard2.0;netstandard1.6;net462;net451</TargetFrameworks>
     <Configurations>Debug;Release;ReferenceModel</Configurations>
   </PropertyGroup>
 
@@ -37,6 +37,10 @@
   <PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
     <Optimize>true</Optimize>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
+  </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0' Or '$(TargetFramework)'=='net462'">
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.0" />
