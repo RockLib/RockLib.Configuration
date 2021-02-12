@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <PackageId>RockLib.Configuration.ProxyFactory</PackageId>
-    <PackageVersion>1.0.4</PackageVersion>
+    <PackageVersion>1.0.5</PackageVersion>
     <Authors>RockLib</Authors>
     <Description>Creates proxy objects from interfaces using IConfiguration and IConfigurationSection objects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
