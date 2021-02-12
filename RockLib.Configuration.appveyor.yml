@@ -4,10 +4,10 @@ configuration: Release
 only_commits:
   files:
   - RockLib.Configuration/
-  - RockLib.Configuration.AppConfigTests/
-  - RockLib.Configuration.AppSettingsConfigTests/
-  - RockLib.Configuration.CustomConfigTests/
-  - RockLib.Configuration.UnitTests/
+  - Tests/RockLib.Configuration.AppConfigTests/
+  - Tests/RockLib.Configuration.AppSettingsConfigTests/
+  - Tests/RockLib.Configuration.CustomConfigTests/
+  - Tests/RockLib.Configuration.UnitTests/
   - RockLib.Configuration.sln
   - RockLib.Configuration.appveyor.yml
 before_build:

@@ -4,7 +4,7 @@ configuration: Release
 only_commits:
   files:
   - RockLib.Configuration.AspNetCore/
-  - RockLib.Configuration.AspNetCore.Tests/
+  - Tests/RockLib.Configuration.AspNetCore.Tests/
   - RockLib.Configuration.AspNetCore.sln
   - RockLib.Configuration.AspNetCore.appveyor.yml
 before_build:

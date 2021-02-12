@@ -4,7 +4,7 @@ configuration: Release
 only_commits:
   files:
   - RockLib.Configuration.ProxyFactory/
-  - RockLib.Configuration.ProxyFactory.Tests/
+  - Tests/RockLib.Configuration.ProxyFactory.Tests/
   - RockLib.Configuration.ProxyFactory.sln
   - RockLib.Configuration.ProxyFactory.appveyor.yml
 before_build:
