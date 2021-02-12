@@ -1,5 +1,5 @@
 ﻿#if DEBUG
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("RockLib.Configuration.ObjectFactory.UnitTests")]
+[assembly: InternalsVisibleTo("RockLib.Configuration.ObjectFactory.Tests")]
 #endif

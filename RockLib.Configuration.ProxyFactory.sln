@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory", "RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj", "{668E5809-C181-4FFD-AF2B-29D342FD6909}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory.UnitTests", "Tests\RockLib.Configuration.ProxyFactory.UnitTests\RockLib.Configuration.ProxyFactory.UnitTests.csproj", "{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory.Tests", "Tests\RockLib.Configuration.ProxyFactory.Tests\RockLib.Configuration.ProxyFactory.Tests.csproj", "{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

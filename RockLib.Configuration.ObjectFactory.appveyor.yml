@@ -4,7 +4,7 @@ configuration: Release
 only_commits:
   files:
   - RockLib.Configuration.ObjectFactory/
-  - Tests/RockLib.Configuration.ObjectFactory.UnitTests/
+  - Tests/RockLib.Configuration.ObjectFactory.Tests/
   - RockLib.Configuration.ObjectFactory.sln
   - RockLib.Configuration.ObjectFactory.appveyor.yml
 before_build:

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AppSe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.AppConfigTests", "Tests\RockLib.Configuration.AppConfigTests\RockLib.Configuration.AppConfigTests.csproj", "{CC13FE1F-8A8F-4FFC-BF56-315295BAE7BD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.UnitTests", "Tests\RockLib.Configuration.UnitTests\RockLib.Configuration.UnitTests.csproj", "{1FC97D1E-0A4B-446D-A605-18A5BC3ED207}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Tests", "Tests\RockLib.Configuration.Tests\RockLib.Configuration.Tests.csproj", "{1FC97D1E-0A4B-446D-A605-18A5BC3ED207}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
