@@ -527,7 +527,7 @@ namespace RockLib.Configuration.ObjectFactory
                 throw Exceptions.CannotCreateAbstractType(configuration, targetType);
             if (targetType == typeof(object))
                 throw Exceptions.CannotCreateObjectType;
-            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType))
+            if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType) && targetType.FullName.StartsWith("System.Collections."))
                 throw Exceptions.UnsupportedCollectionType(targetType);
             if (IsList(configuration, includeEmptyList: false))
                 throw Exceptions.ConfigurationIsAList(configuration, targetType);

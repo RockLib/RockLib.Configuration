@@ -13,6 +13,21 @@ namespace Tests
     public class ConfigurationObjectFactoryTests
     {
         [Fact]
+        public void SupportsCustomTypeImplementingIEnumerable()
+        {
+            var config = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "foo:bar:baz", "123.45" },
+                })
+                .Build();
+
+            var fooSection = config.GetSection("foo");
+            var foo = fooSection.Create<CustomEnumerablePropertyClass>();
+            Assert.Equal(123.45M, foo.Bar.Baz);
+        }
+
+        [Fact]
         public void SupportsMembersOfTypeFuncOfT()
         {
             var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string> {
@@ -3356,6 +3371,20 @@ namespace Tests
 
         public object Bar { get; }
         public Dictionary<string, object> Baz { get; }
+    }
+
+    public class CustomEnumerablePropertyClass
+    {
+        public CustomEnumerable Bar { get; set; }
+    }
+
+    public class CustomEnumerable : IEnumerable<char>
+    {
+        public decimal Baz { get; set; }
+
+        public IEnumerator<char> GetEnumerator() => Baz.ToString().GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => Baz.ToString().GetEnumerator();
     }
 }
 
