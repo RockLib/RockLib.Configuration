@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore", "RockLib.Configuration.AspNetCore\RockLib.Configuration.AspNetCore.csproj", "{CFD500EF-CB3D-4381-8F0F-D62B4FE36080}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore", "RockLib.Configuration.AspNetCore.csproj", "{CFD500EF-CB3D-4381-8F0F-D62B4FE36080}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore.Tests", "Tests\RockLib.Configuration.AspNetCore.Tests\RockLib.Configuration.AspNetCore.Tests.csproj", "{E94CEE70-6820-46C5-B2A7-9FBF8D406000}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore.Tests", "..\Tests\RockLib.Configuration.AspNetCore.Tests\RockLib.Configuration.AspNetCore.Tests.csproj", "{E94CEE70-6820-46C5-B2A7-9FBF8D406000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

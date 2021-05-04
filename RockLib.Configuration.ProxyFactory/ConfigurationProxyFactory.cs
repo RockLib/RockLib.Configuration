@@ -38,7 +38,7 @@ namespace RockLib.Configuration.ProxyFactory
         /// values to a target type.
         /// </param>
         /// <returns>
-        /// An object that implements the interface specified by the <paramref name="type"/> parameter containing values from the
+        /// An object that implements the interface specified by the <typeparamref name="T"/> type containing values from the
         /// <paramref name="configuration"/> parameter.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="configuration"/> is null.</exception>
