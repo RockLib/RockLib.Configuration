@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds SourceLink to nuget package.
 
+#### Changed
+
+- Updates System.Reflection.Emit package to latest version.
+
 ----
 
 **Note:** Release notes in the above format are not available for earlier versions of
