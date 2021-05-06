@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds SourceLink to nuget package.
 
+#### Changed
+
+- Updates RockLib.Configuration package to latest version, which includes SourceLink.
+- Updates Microsoft.AspNetCore.Hosting.Abstractions package to latest version.
+- For net5.0, use framework reference instead of package reference.
+
 ----
 
 **Note:** Release notes in the above format are not available for earlier versions of
