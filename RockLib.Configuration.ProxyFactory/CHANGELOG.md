@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Adds SourceLink to nuget package.
 
+#### Changed
+
+- Updates RockLib.Configuration.ObjectFactory package to latest version, which includes SourceLink.
+- Updates System.Reflection.Emit and System.ValueTuple packages to latest versions.
+
 ----
 
 **Note:** Release notes in the above format are not available for earlier versions of
