@@ -15,7 +15,7 @@
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ObjectFactory</PackageProjectUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
-    <Copyright>Copyright 2017-2021 (c) Quicken Loans Corporation. All rights reserved.</Copyright>
+    <Copyright>Copyright 2017-2021 (c) Rocket Mortgage. All rights reserved.</Copyright>
     <PackageTags>Configuration Factory Binder IConfiguration IConfigurationSection</PackageTags>
     <Version>1.1.2</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
