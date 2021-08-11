@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Changed
 
 - Changes "Quicken Loans" to "Rocket Mortgage".
-- Updates RockLib.Immutable to latest version, [1.0.7](https://github.com/RockLib/RockLib.Immutable/blob/main/RockLib.Immutable/CHANGELOG.md#107---2021-10-08).
+- Updates RockLib.Immutable to latest version, [1.0.7](https://github.com/RockLib/RockLib.Immutable/blob/main/RockLib.Immutable/CHANGELOG.md#107---2021-08-10).
 
 ## 2.5.2 - 2021-05-06
 
