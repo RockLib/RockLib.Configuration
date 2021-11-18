@@ -24,11 +24,14 @@ namespace RockLib.Configuration.ObjectFactory
             {
                 bool HasAvailableValue(ParameterInfo p) =>
                     p.GetNames().Any(name => availableMembers.ContainsKey(name)) || resolver.CanResolve(p);
+                bool HasAvailableNamedValue(ParameterInfo p) =>
+                    p.GetNames().Any(name => availableMembers.ContainsKey(name));
 
                 IsInvokableWithoutDefaultParameters = parameters.Count(HasAvailableValue) == TotalParameters;
                 IsInvokableWithDefaultParameters = parameters.Count(p => HasAvailableValue(p) || p.HasDefaultValue) == TotalParameters;
                 MissingParameterNames = parameters.Where(p => !HasAvailableValue(p) && !p.HasDefaultValue).Select(p => p.Name);
                 MatchedParameters = parameters.Count(HasAvailableValue);
+                MatchedNamedParameters = parameters.Count(HasAvailableNamedValue);
             }
         }
 
@@ -36,6 +39,7 @@ namespace RockLib.Configuration.ObjectFactory
         public bool IsInvokableWithoutDefaultParameters { get;  }
         public bool IsInvokableWithDefaultParameters { get; }
         public int MatchedParameters { get; }
+        public int MatchedNamedParameters { get; }
         public int TotalParameters { get; }
         public IEnumerable<string> MissingParameterNames { get; }
 
@@ -49,6 +53,8 @@ namespace RockLib.Configuration.ObjectFactory
             if (MatchedParameters < other.MatchedParameters) return 1;
             if (TotalParameters > other.TotalParameters) return -1;
             if (TotalParameters < other.TotalParameters) return 1;
+            if (MatchedNamedParameters > other.MatchedNamedParameters) return -1;
+            if (MatchedNamedParameters < other.MatchedNamedParameters) return 1;
             return 0;
         }
     }

@@ -1,6 +1,6 @@
-﻿#if DEBUG
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration.ObjectFactory;
+using RockLib.Dynamic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,13 @@ namespace Tests
 {
     public class ConstructorOrderInfoTests
     {
+        private static Type _constructorOrderInfoType;
+
+        static ConstructorOrderInfoTests()
+        {
+            _constructorOrderInfoType = Type.GetType("RockLib.Configuration.ObjectFactory.ConstructorOrderInfo, RockLib.Configuration.ObjectFactory");
+        }
+
         [Theory]
         [InlineData(typeof(DefaultConstructor), 0)]
         [InlineData(typeof(OneParameter), 1)]
@@ -21,9 +28,9 @@ namespace Tests
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = new Dictionary<string, IConfigurationSection>();
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
+            var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
 
-            Assert.Same(constructor, orderInfo.Constructor);
+            Assert.Same(constructor, orderInfo.Constructor.Object);
             Assert.Equal(expectedTotalParameters, orderInfo.TotalParameters);
         }
 
@@ -50,9 +57,9 @@ namespace Tests
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
+            var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
 
-            Assert.Same(constructor, orderInfo.Constructor);
+            Assert.Same(constructor, orderInfo.Constructor.Object);
             Assert.Equal(expectedIsInvokableWithoutDefaultParameters, orderInfo.IsInvokableWithoutDefaultParameters);
         }
 
@@ -79,9 +86,9 @@ namespace Tests
             var constructor = type.GetTypeInfo().GetConstructors()[0];
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
+            var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
 
-            Assert.Same(constructor, orderInfo.Constructor);
+            Assert.Same(constructor, orderInfo.Constructor.Object);
             Assert.Equal(expectedIsInvokableWithDefaultParameters, orderInfo.IsInvokableWithDefaultParameters);
         }
 
@@ -96,7 +103,6 @@ namespace Tests
         [InlineData(typeof(OneParameterOneOptionalParameter), typeof(TwoParameters), 0, "bar", "baz")]
         [InlineData(typeof(TwoParameters), typeof(ThreeOptionalParameters), 1, "bar")]
         [InlineData(typeof(ThreeOptionalParameters), typeof(TwoParameters), -1, "bar")]
-
         [InlineData(typeof(ThreeOptionalParameters), typeof(ThreeParametersOneRequired), 1, "foo")]
         [InlineData(typeof(ThreeParametersOneRequired), typeof(ThreeOptionalParameters), -1, "foo")]
         public void CompareToReturnsTheCorrectValue(Type lhsConstructorType, Type rhsConstructorType, int expectedComparisonValue, params string[] resolvableMemberNames)
@@ -106,8 +112,8 @@ namespace Tests
 
             var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null);
 
-            var lhs = new ConstructorOrderInfo(lhsConstructor, members, Resolver.Empty);
-            var rhs = new ConstructorOrderInfo(rhsConstructor, members, Resolver.Empty);
+            var lhs = _constructorOrderInfoType.New(lhsConstructor, members, Resolver.Empty);
+            var rhs = _constructorOrderInfoType.New(rhsConstructor, members, Resolver.Empty);
 
             var actual = lhs.CompareTo(rhs);
 
@@ -125,12 +131,36 @@ namespace Tests
             var constructor = type.GetConstructors()[0];
             var members = new Dictionary<string, IConfigurationSection>() { { configurationMemberName, null } };
 
-            var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
+            var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
 
             Assert.True(orderInfo.IsInvokableWithoutDefaultParameters);
             Assert.True(orderInfo.IsInvokableWithDefaultParameters);
             Assert.Equal(1, orderInfo.MatchedParameters);
-            Assert.Empty(orderInfo.MissingParameterNames);
+            Assert.Empty(orderInfo.MissingParameterNames.Object);
+        }
+
+        [Fact]
+        public void MatchedNamesAreHigherPriorityThanResolvedTypes()
+        {
+            var constructors = typeof(ConstructorsWithMatchingParamCount).GetTypeInfo().GetConstructors();
+            var members = new Dictionary<string, IConfigurationSection>
+            {
+                { "one", null },
+                { "two", null }
+            };
+            var resolver = new Resolver(t => t, t => t == typeof(string) ? true : false);
+
+            var orderInfo1 = _constructorOrderInfoType.New(constructors[0], members, resolver);
+            var orderInfo2 = _constructorOrderInfoType.New(constructors[1], members, resolver);
+
+            Assert.Equal(2, orderInfo1.MatchedParameters);
+            Assert.Equal(2, orderInfo2.MatchedParameters);
+            Assert.Equal(4, orderInfo1.TotalParameters);
+            Assert.Equal(4, orderInfo2.TotalParameters);
+            Assert.Equal(2, orderInfo1.MatchedNamedParameters);
+            Assert.Equal(1, orderInfo2.MatchedNamedParameters);
+
+            Assert.Equal(-1, orderInfo1.CompareTo(orderInfo2));
         }
 
         private class DefaultConstructor { }
@@ -153,6 +183,11 @@ namespace Tests
             public MultipleAlternateNames([AlternateName("bar"), AlternateName("baz")] int foo) => Foo = foo;
             public int Foo { get; }
         }
+
+        private class ConstructorsWithMatchingParamCount
+        {
+            public ConstructorsWithMatchingParamCount(int one = 1, double two = 2, decimal three = 3, object four = null) { }
+            public ConstructorsWithMatchingParamCount(string notOne, double two = 2, decimal three = 3, object four = null) { }
+        }
     }
 }
-#endif
