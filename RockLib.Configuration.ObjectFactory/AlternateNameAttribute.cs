@@ -6,7 +6,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// Defines an alternate name for a constructor parameter or property.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property, AllowMultiple = true)]
-    public class AlternateNameAttribute : Attribute
+    public sealed class AlternateNameAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="AlternateNameAttribute"/> class.

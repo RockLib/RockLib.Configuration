@@ -7,7 +7,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// of such a configuration section should declare an object of the target type.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
-    public class ConfigSectionAttribute : Attribute
+    public sealed class ConfigSectionAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfigSectionAttribute"/> class,

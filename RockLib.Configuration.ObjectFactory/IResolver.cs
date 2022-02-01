@@ -35,6 +35,6 @@ namespace RockLib.Configuration.ObjectFactory
         /// <returns>
         /// true if a dependency was successfully retrieved; otherwise, false.
         /// </returns>
-        bool TryResolve(ParameterInfo parameter, out object value);
+        bool TryResolve(ParameterInfo parameter, out object? value);
     }
 }

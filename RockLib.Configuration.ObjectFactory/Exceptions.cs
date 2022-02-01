@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -14,7 +15,7 @@ namespace RockLib.Configuration.ObjectFactory
         public static InvalidOperationException ResultCannotBeNull(Type targetType, Type declaringType, string memberName) =>
             new InvalidOperationException($"A null {targetType} value was returned by the custom convert func for {(declaringType == null ? "the value" : $"the {declaringType}.{memberName} member")}");
 
-        public static InvalidOperationException CannotConvertSectionValueToTargetType(IConfigurationSection section, Type targetType, Exception innerException = null) =>
+        public static InvalidOperationException CannotConvertSectionValueToTargetType(IConfigurationSection section, Type targetType, Exception? innerException = null) =>
             new InvalidOperationException($"Unable to convert value '{section.Value}' in {section.Description()} to target type '{targetType}'.", innerException);
 
         public static InvalidOperationException ConfigurationSpecifiedTypeIsNotAssignableToTargetType(Type targetType, Type specifiedType) =>
@@ -101,22 +102,23 @@ namespace RockLib.Configuration.ObjectFactory
         private static string Description(this IConfigurationSection section) => $"section '{section.Key}' at path '{section.Path}'";
 
         private static string Format(this ConstructorInfo constructor) =>
-            constructor.ToString().Replace("Void .ctor", constructor.DeclaringType.ToString());
+            constructor.ToString()!.Replace("Void .ctor", constructor.DeclaringType!.ToString(), StringComparison.InvariantCulture);
 
         private static string Format(this IEnumerable<string> parameterNames)
         {
             var list = parameterNames.ToList();
             if (list.Count == 1) return $"'{list[0]}' parameter";
             if (list.Count == 2) return $"'{list[0]}' and '{list[1]}' parameters";
-            var sb = new StringBuilder();
-            for (int i = 0; i < list.Count; i++)
+
+            var builder = new StringBuilder();
+            for (var i = 0; i < list.Count; i++)
             {
-                if (i == list.Count - 1) sb.Append($"'{list[i]}'");
-                else if (i == list.Count - 2) sb.Append($"'{list[i]}', and ");
-                else sb.Append($"'{list[i]}', ");
+                if (i == list.Count - 1) builder.Append(CultureInfo.InvariantCulture, $"'{list[i]}'");
+                else if (i == list.Count - 2) builder.Append(CultureInfo.InvariantCulture, $"'{list[i]}', and ");
+                else builder.Append(CultureInfo.InvariantCulture, $"'{list[i]}', ");
             }
-            sb.Append(" parameters");
-            return sb.ToString();
+            builder.Append(" parameters");
+            return builder.ToString();
         }
     }
 }

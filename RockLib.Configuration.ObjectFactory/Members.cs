@@ -18,7 +18,7 @@ namespace RockLib.Configuration.ObjectFactory
             declaringType.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                 .SelectMany(c => c.GetParameters())
                 .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName))
-                .Select(p => new Member(p.Name, p.ParameterType, MemberType.ConstructorParameter));
+                .Select(p => new Member(p.Name!, p.ParameterType, MemberType.ConstructorParameter));
 
         private static IEnumerable<Member> FindProperties(Type declaringType, string memberName, List<Member> constructorParameters) =>
             declaringType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
