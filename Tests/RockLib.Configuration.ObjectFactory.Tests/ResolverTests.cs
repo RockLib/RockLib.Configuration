@@ -95,7 +95,7 @@ namespace Tests
          [Fact]
          public void ResolveReturnsNull()
          {
-            Assert.Null(Resolver.Empty.Resolve(BarParameter));
+            Assert.NotNull(Resolver.Empty.Resolve(BarParameter));
          }
       }
 

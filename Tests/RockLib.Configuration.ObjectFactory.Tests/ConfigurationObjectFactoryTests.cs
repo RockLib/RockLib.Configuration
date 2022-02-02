@@ -3411,7 +3411,7 @@ namespace Tests
    {
       public HasMembersDecoratedWithSingleAlternateNameAttribute([AlternateName("foo1")] string? foo = null) => Foo = foo;
       public string? Foo { get; }
-      [AlternateName("bar1")] public string? Bar { get; }
+      [AlternateName("bar1")] public string? Bar { get; set; }
       [AlternateName("baz1")] public List<string> Baz { get; } = new List<string>();
       [AlternateName("qux1")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
    }
@@ -3422,7 +3422,7 @@ namespace Tests
    {
       public HasMembersDecoratedWithSingleLocallyDefinedAlternateNameAttribute([LocallyDefined.AlternateName("foo1")] string? foo = null) => Foo = foo;
       public string? Foo { get; }
-      [LocallyDefined.AlternateName("bar1")] public string? Bar { get; }
+      [LocallyDefined.AlternateName("bar1")] public string? Bar { get; set; }
       [LocallyDefined.AlternateName("baz1")] public List<string> Baz { get; } = new List<string>();
       [LocallyDefined.AlternateName("qux1")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
    }
@@ -3431,7 +3431,7 @@ namespace Tests
    {
       public HasMembersDecoratedWithMultipleAlternateNameAttributes([AlternateName("foo1"), AlternateName("foo2")] string? foo = null) => Foo = foo;
       public string? Foo { get; }
-      [AlternateName("bar1"), AlternateName("bar2")] public string? Bar { get; }
+      [AlternateName("bar1"), AlternateName("bar2")] public string? Bar { get; set; }
       [AlternateName("baz1"), AlternateName("baz2")] public List<string> Baz { get; } = new List<string>();
       [AlternateName("qux1"), AlternateName("qux2")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
    }
@@ -3440,7 +3440,7 @@ namespace Tests
    {
       public HasMembersDecoratedWithMultipleLocallyDefinedAlternateNameAttributes([LocallyDefined.AlternateName("foo1"), LocallyDefined.AlternateName("foo2")] string? foo = null) => Foo = foo;
       public string? Foo { get; }
-      [LocallyDefined.AlternateName("bar1"), LocallyDefined.AlternateName("bar2")] public string? Bar { get; }
+      [LocallyDefined.AlternateName("bar1"), LocallyDefined.AlternateName("bar2")] public string? Bar { get; set; }
       [LocallyDefined.AlternateName("baz1"), LocallyDefined.AlternateName("baz2")] public List<string> Baz { get; } = new List<string>();
       [LocallyDefined.AlternateName("qux1"), LocallyDefined.AlternateName("qux2")] public Dictionary<string, string> Qux { get; } = new Dictionary<string, string>();
    }
