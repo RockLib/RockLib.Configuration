@@ -1,12 +1,11 @@
 ﻿using RockLib.Configuration.ObjectFactory;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace Tests
 {
-    public class DefaultTypesTests
+   public class DefaultTypesTests
     {
         [Fact]
         public void CanAddByDeclaringTypeAndMemberName()

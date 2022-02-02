@@ -13,8 +13,8 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
    {
       int Bar { get; }
       int Baz(int factor);
-      string Qux { get; set; } // Special case - read/write reference-type property
-      event EventHandler Garply;
+      string? Qux { get; set; } // Special case - read/write reference-type property
+      event EventHandler? Garply;
    }
 
    public class ProxyFoo : ConfigReloadingProxy<IFoo>, IFoo
@@ -31,11 +31,11 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
       int IFoo.Baz(int qux) => Object.Baz(qux);
 
       // Properties are strictly pass-through.
-      string IFoo.Qux { get => Object.Qux; set => Object.Qux = value; }
+      string? IFoo.Qux { get => Object.Qux; set => Object.Qux = value; }
 
       // Events are pass-through, but also need to capture handlers in a private field.
       private EventHandler? _garply;
-      event EventHandler IFoo.Garply
+      event EventHandler? IFoo.Garply
       {
          add
          {

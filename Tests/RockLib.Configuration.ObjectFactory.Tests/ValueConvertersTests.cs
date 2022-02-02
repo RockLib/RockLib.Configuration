@@ -1,12 +1,11 @@
 ﻿using RockLib.Configuration.ObjectFactory;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
 namespace Tests
 {
-    public class ValueConvertersTests
+   public class ValueConvertersTests
     {
         [Fact]
         public void CanAddConvertFuncByDeclaringTypeAndMemberName()

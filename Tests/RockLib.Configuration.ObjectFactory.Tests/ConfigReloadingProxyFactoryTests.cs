@@ -9,418 +9,428 @@ using Xunit;
 
 namespace Tests
 {
-    public class ConfigReloadingProxyFactoryTests
-    {
-        [Fact]
-        public void MissingConstructorParametersAreSuppliedByTheResolver()
-        {
-            var config = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string> { { "waldo", "123" } })
-                .Build();
+   public class ConfigReloadingProxyFactoryTests
+   {
+      [Fact]
+      public void MissingConstructorParametersAreSuppliedByTheResolver()
+      {
+         var config = new ConfigurationBuilder()
+             .AddInMemoryCollection(new Dictionary<string, string> { { "waldo", "123" } })
+             .Build();
 
-            var garply = new Garply();
+         var garply = new Garply();
 
-            var defaultTypes = new DefaultTypes().Add(typeof(IGrault), typeof(Grault));
-            var resolver = new Resolver(t => garply, t => t == typeof(IGarply));
+         var defaultTypes = new DefaultTypes().Add(typeof(IGrault), typeof(Grault));
+         var resolver = new Resolver(t => garply, t => t == typeof(IGarply));
 
-            var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
+         var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
 
-            Assert.Same(garply, grault.Garply);
-            Assert.Equal(123, grault.Waldo);
+         Assert.Same(garply, grault.Garply);
+         Assert.Equal(123, grault.Waldo);
 
-            ChangeConfig(config, new KeyValuePair<string, string>("waldo", "456"));
+         ChangeConfig(config, new KeyValuePair<string, string>("waldo", "456"));
 
-            Assert.Same(garply, grault.Garply);
-            Assert.Equal(456, grault.Waldo);
-        }
+         Assert.Same(garply, grault.Garply);
+         Assert.Equal(456, grault.Waldo);
+      }
 
-        [Fact]
-        public void NullConfigurationThrowsArgumentNullException()
-        {
-            IConfiguration configuration = null;
-            Type interfaceType = typeof(IFoo);
+      [Fact]
+      public void NullConfigurationThrowsArgumentNullException()
+      {
+         IConfiguration? configuration = null;
+         var interfaceType = typeof(IFoo);
 
-            Assert.Throws<ArgumentNullException>(() => configuration.CreateReloadingProxy(interfaceType));
-        }
+         Assert.Throws<ArgumentNullException>(() => configuration!.CreateReloadingProxy(interfaceType));
+      }
 
-        [Fact]
-        public void NullInterfaceTypeThrowsArgumentNullException()
-        {
-            IConfiguration configuration = GetConfig();
-            Type interfaceType = null;
+      [Fact]
+      public void NullInterfaceTypeThrowsArgumentNullException()
+      {
+         var configuration = GetConfig();
+         Type interfaceType = null!;
 
-            Assert.Throws<ArgumentNullException>(() => configuration.CreateReloadingProxy(interfaceType));
-        }
+         Assert.Throws<ArgumentNullException>(() => configuration.CreateReloadingProxy(interfaceType));
+      }
 
-        [Fact]
-        public void NonInterfaceInterfaceTypeThrowsArgumentException()
-        {
-            IConfiguration configuration = GetConfig();
-            Type interfaceType = typeof(int);
+      [Fact]
+      public void NonInterfaceInterfaceTypeThrowsArgumentException()
+      {
+         var configuration = GetConfig();
+         var interfaceType = typeof(int);
 
-            Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
-        }
+         Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
+      }
 
-        [Fact]
-        public void EnumerableInterfaceTypeThrowsArgumentException()
-        {
-            IConfiguration configuration = GetConfig();
-            Type interfaceType = typeof(IEnumerable<int>);
+      [Fact]
+      public void EnumerableInterfaceTypeThrowsArgumentException()
+      {
+         var configuration = GetConfig();
+         var interfaceType = typeof(IEnumerable<int>);
 
-            Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
-        }
+         Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
+      }
 
-        [Fact]
-        public void NullConfigurationThrowsArgumentNullExceptionGeneric()
-        {
-            IConfiguration configuration = null;
+      [Fact]
+      public void NullConfigurationThrowsArgumentNullExceptionGeneric()
+      {
+         IConfiguration? configuration = null;
 
-            Assert.Throws<ArgumentNullException>(() => configuration.CreateReloadingProxy<IFoo>());
-        }
+         Assert.Throws<ArgumentNullException>(() => configuration!.CreateReloadingProxy<IFoo>());
+      }
 
-        [Fact]
-        public void NonInterfaceInterfaceTypeThrowsArgumentExceptionGeneric()
-        {
-            IConfiguration configuration = GetConfig();
+      [Fact]
+      public void NonInterfaceInterfaceTypeThrowsArgumentExceptionGeneric()
+      {
+         var configuration = GetConfig();
 
-            Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy<int>());
-        }
+         Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy<int>());
+      }
 
-        [Fact]
-        public void EnumerableInterfaceTypeThrowsArgumentExceptionGeneric()
-        {
-            IConfiguration configuration = GetConfig();
+      [Fact]
+      public void EnumerableInterfaceTypeThrowsArgumentExceptionGeneric()
+      {
+         var configuration = GetConfig();
 
-            Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy<IEnumerable<int>>());
-        }
+         Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy<IEnumerable<int>>());
+      }
 
-        [Fact]
-        public void PropertiesWork()
-        {
-            IConfigurationRoot configuration = GetConfig();
+      [Fact]
+      public void PropertiesWork()
+      {
+         var configuration = GetConfig();
 
-            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            Assert.Equal(123, foo.Bar);
+         Assert.Equal(123, foo.Bar);
 
-            ChangeConfig(configuration);
+         ChangeConfig(configuration);
 
-            Assert.Equal(456, foo.Bar);
-        }
+         Assert.Equal(456, foo.Bar);
+      }
 
-        [Fact]
-        public void MethodsWork()
-        {
-            IConfigurationRoot configuration = GetConfig();
+      [Fact]
+      public void MethodsWork()
+      {
+         var configuration = GetConfig();
 
-            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            Assert.Equal(123 * 2, foo.Baz());
+         Assert.Equal(123 * 2, foo.Baz());
 
-            ChangeConfig(configuration);
+         ChangeConfig(configuration);
 
-            Assert.Equal(456 * 2, foo.Baz());
-        }
+         Assert.Equal(456 * 2, foo.Baz());
+      }
 
-        [Fact]
-        public void EventsWork()
-        {
-            IConfigurationRoot configuration = GetConfig();
+      [Fact]
+      public void EventsWork()
+      {
+         var configuration = GetConfig();
 
-            IBar bar = configuration.GetSection("bar").CreateReloadingProxy<IBar>();
+         var bar = configuration.GetSection("bar").CreateReloadingProxy<IBar>();
 
-            int qux = -1;
+         var qux = -1;
 
-            bar.Baz += (s, e) =>
-            {
-                qux = bar.Qux;
-            };
+         bar.Baz += (s, e) =>
+         {
+            qux = bar.Qux;
+         };
 
-            ((Bar)((ConfigReloadingProxy<IBar>)bar).Object).OnBaz();
+         ((Bar)((ConfigReloadingProxy<IBar>)bar).Object).OnBaz();
 
-            Assert.Equal(5, qux);
-            
-            ChangeConfig(configuration);
+         Assert.Equal(5, qux);
 
-            qux = -1;
+         ChangeConfig(configuration);
 
-            ((Bar)((ConfigReloadingProxy<IBar>)bar).Object).OnBaz();
+         qux = -1;
 
-            Assert.Equal(10, qux);
-        }
+         ((Bar)((ConfigReloadingProxy<IBar>)bar).Object).OnBaz();
 
-        [Fact]
-        public void DisposableImplementationsAreDisposed()
-        {
-            IConfigurationRoot configuration = GetConfig();
+         Assert.Equal(10, qux);
+      }
 
-            IBaz baz = configuration.GetSection("baz").CreateReloadingProxy<IBaz>();
+      [Fact]
+      public void DisposableImplementationsAreDisposed()
+      {
+         var configuration = GetConfig();
 
-            Baz initialBaz = (Baz)((ConfigReloadingProxy<IBaz>)baz).Object;
+         var baz = configuration.GetSection("baz").CreateReloadingProxy<IBaz>();
 
-            Assert.False(initialBaz.IsDisposed);
+         var initialBaz = (Baz)((ConfigReloadingProxy<IBaz>)baz).Object;
 
-            ChangeConfig(configuration);
+         Assert.False(initialBaz.IsDisposed);
 
-            Baz changedBaz = (Baz)((ConfigReloadingProxy<IBaz>)baz).Object;
+         ChangeConfig(configuration);
 
-            Assert.False(changedBaz.IsDisposed);
-            Assert.True(initialBaz.IsDisposed);
+         var changedBaz = (Baz)((ConfigReloadingProxy<IBaz>)baz).Object;
 
-            ((IDisposable)baz).Dispose();
+         Assert.False(changedBaz.IsDisposed);
+         Assert.True(initialBaz.IsDisposed);
 
-            Assert.True(changedBaz.IsDisposed);
-        }
+         ((IDisposable)baz).Dispose();
 
-        [Fact]
-        public void ReadWriteReferenceTypePropertiesCopyTheOldValueWhenTheValueIsNotSpecifiedInChangedConfig()
-        {
-            IConfigurationRoot configuration = GetConfig();
+         Assert.True(changedBaz.IsDisposed);
+      }
 
-            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
-            foo.Qux = "abc";
+      [Fact]
+      public void ReadWriteReferenceTypePropertiesCopyTheOldValueWhenTheValueIsNotSpecifiedInChangedConfig()
+      {
+         var configuration = GetConfig();
 
-            ChangeConfig(configuration);
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         foo.Qux = "abc";
 
-            Assert.Equal("abc", foo.Qux);
-        }
+         ChangeConfig(configuration);
 
-        [Fact]
-        public void ReadWriteReferenceTypePropertiesDoNotCopyTheOldValueWhenTheValueIsSpecifiedInChangedConfig()
-        {
-            IConfigurationRoot configuration = GetConfig();
+         Assert.Equal("abc", foo.Qux);
+      }
 
-            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
-            foo.Qux = "abc";
+      [Fact]
+      public void ReadWriteReferenceTypePropertiesDoNotCopyTheOldValueWhenTheValueIsSpecifiedInChangedConfig()
+      {
+         var configuration = GetConfig();
 
-            ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         foo.Qux = "abc";
 
-            Assert.Equal("xyz", foo.Qux);
-        }
+         ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
 
-        [Fact]
-        public void SettingReloadOnChangeToFalseCausesTheProxyToStopReloading()
-        {
-            IConfigurationRoot configuration = GetConfig();
+         Assert.Equal("xyz", foo.Qux);
+      }
 
-            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+      [Fact]
+      public void SettingReloadOnChangeToFalseCausesTheProxyToStopReloading()
+      {
+         var configuration = GetConfig();
 
-            ChangeConfig(configuration, new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            Assert.Equal(123, foo.Bar);
-        }
+         ChangeConfig(configuration, new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
 
-        [Fact]
-        public void ReloadMethodForcesTheUnderlyingObjectToReload()
-        {
-            IConfigurationRoot configuration = GetConfig();
+         Assert.Equal(123, foo.Bar);
+      }
 
-            var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+      [Fact]
+      public void ReloadMethodForcesTheUnderlyingObjectToReload()
+      {
+         var configuration = GetConfig();
 
-            var initialObject = foo.Object;
+         var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            foo.Reload();
+         var initialObject = foo.Object;
 
-            var reloadedObject = foo.Object;
+         foo.Reload();
 
-            Assert.NotSame(initialObject, reloadedObject);
-        }
+         var reloadedObject = foo.Object;
 
-        [Fact]
-        public void AnInitialReloadOnChangeOfFalseDoesNotCreateProxy()
-        {
-            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
+         Assert.NotSame(initialObject, reloadedObject);
+      }
 
-            var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+      [Fact]
+      public void AnInitialReloadOnChangeOfFalseDoesNotCreateProxy()
+      {
+         var configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
 
-            Assert.IsType<Foo>(foo);
-        }
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-        [Fact]
-        public void UnrelatedConfigChangeDoesNotCauseReload()
-        {
-            IConfigurationRoot configuration = GetConfig(new KeyValuePair<string, string>("garply", "abc"));
+         Assert.IsType<Foo>(foo);
+      }
 
-            var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+      [Fact]
+      public void UnrelatedConfigChangeDoesNotCauseReload()
+      {
+         var configuration = GetConfig(new KeyValuePair<string, string>("garply", "abc"));
 
-            var initialObject = foo.Object;
+         var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            ChangeConfig(configuration, settings: new Dictionary<string, string> { ["garply"] = "xyz" });
+         var initialObject = foo.Object;
 
-            var reloadedObject = foo.Object;
+         ChangeConfig(configuration, settings: new Dictionary<string, string> { ["garply"] = "xyz" });
 
-            Assert.Same(initialObject, reloadedObject);
-        }
+         var reloadedObject = foo.Object;
 
-        [Fact]
-        public void ReturnedObjectsImplementIConfigReloadingProxyInterface()
-        {
-            IConfigurationRoot configuration = GetConfig();
+         Assert.Same(initialObject, reloadedObject);
+      }
 
-            IFoo foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+      [Fact]
+      public void ReturnedObjectsImplementIConfigReloadingProxyInterface()
+      {
+         var configuration = GetConfig();
 
-            ConfigReloadingProxy<IFoo> proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
+         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
-            var initialObject = proxyFoo.Object;
-            Assert.IsType<Foo>(initialObject);
+         var proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
 
-            IFoo reloadingFoo = null;
-            IFoo reloadedFoo = null;
+         var initialObject = proxyFoo.Object;
+         Assert.IsType<Foo>(initialObject);
 
-            proxyFoo.Reloading += (s, e) => { reloadingFoo = proxyFoo.Object; };
-            proxyFoo.Reloaded += (s, e) => { reloadedFoo = proxyFoo.Object; };
+         IFoo? reloadingFoo = null;
+         IFoo? reloadedFoo = null;
 
-            ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
+         proxyFoo.Reloading += (s, e) => { reloadingFoo = proxyFoo.Object; };
+         proxyFoo.Reloaded += (s, e) => { reloadedFoo = proxyFoo.Object; };
 
-            var changedObject = proxyFoo.Object;
+         ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
 
-            Assert.NotSame(initialObject, changedObject);
-            Assert.Same(initialObject, reloadingFoo);
-            Assert.Same(changedObject, reloadedFoo);
-        }
+         var changedObject = proxyFoo.Object;
 
-        [Fact]
-        public void SpecifyingReloadOnChangeInConfigCausesCreateExtensionToReturnReloadingProxy()
-        {
-            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
-            {
-                ["foo:type"] = typeof(Foo).AssemblyQualifiedName,
-                ["foo:value:bar"] = "123",
-                ["foo:reloadOnChange"] = "true",
-            }).Build();
+         Assert.NotSame(initialObject, changedObject);
+         Assert.Same(initialObject, reloadingFoo);
+         Assert.Same(changedObject, reloadedFoo);
+      }
 
-            var foo = config.GetSection("foo").Create<IFoo>();
+      [Fact]
+      public void SpecifyingReloadOnChangeInConfigCausesCreateExtensionToReturnReloadingProxy()
+      {
+         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+         {
+            ["foo:type"] = typeof(Foo).AssemblyQualifiedName!,
+            ["foo:value:bar"] = "123",
+            ["foo:reloadOnChange"] = "true",
+         }).Build();
 
-            Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
-        }
+         var foo = config.GetSection("foo").Create<IFoo>();
 
-        [Fact]
-        public void SpecifyingReloadOnChangeInConfigCausesCreateExtensionToReturnReloadingProxy2()
-        {
-            var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
-            {
-                ["foo:value:bar"] = "123",
-                ["foo:reloadOnChange"] = "true",
-            }).Build();
+         Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
+      }
 
-            var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
+      [Fact]
+      public void SpecifyingReloadOnChangeInConfigCausesCreateExtensionToReturnReloadingProxy2()
+      {
+         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+         {
+            ["foo:value:bar"] = "123",
+            ["foo:reloadOnChange"] = "true",
+         }).Build();
 
-            Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
-        }
+         var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
 
-        private static IConfigurationRoot GetConfig(params KeyValuePair<string, string>[] additionalSettings)
-        {
-            var initialData = new Dictionary<string, string>
-            {
-                ["foo:type"] = typeof(Foo).AssemblyQualifiedName,
-                ["foo:value:bar"] = "123",
-                ["bar:type"] = typeof(Bar).AssemblyQualifiedName,
-                ["bar:value:qux"] = "5",
-                ["baz:type"] = typeof(Baz).AssemblyQualifiedName,
-                ["baz:value:qux"] = "7",
-            };
-            foreach (var setting in additionalSettings)
-                initialData.Add(setting.Key, setting.Value);
-            return new ConfigurationBuilder().AddInMemoryCollection(initialData).Build();
-        }
+         Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
+      }
 
-        private static void ChangeConfig(IConfigurationRoot root, params KeyValuePair<string, string>[] additionalSettings)
-        {
-            ChangeConfig(root, new Dictionary<string, string> { { "foo:value:bar", "456" }, { "bar:value:qux", "10" }, { "baz:value:foo", "11" } }.Concat(additionalSettings));
-        }
+      private static IConfigurationRoot GetConfig(params KeyValuePair<string, string>[] additionalSettings)
+      {
+         var initialData = new Dictionary<string, string>
+         {
+            ["foo:type"] = typeof(Foo).AssemblyQualifiedName!,
+            ["foo:value:bar"] = "123",
+            ["bar:type"] = typeof(Bar).AssemblyQualifiedName!,
+            ["bar:value:qux"] = "5",
+            ["baz:type"] = typeof(Baz).AssemblyQualifiedName!,
+            ["baz:value:qux"] = "7",
+         };
+         foreach (var setting in additionalSettings)
+            initialData.Add(setting.Key, setting.Value);
+         return new ConfigurationBuilder().AddInMemoryCollection(initialData).Build();
+      }
 
-        private static void ChangeConfig(IConfigurationRoot root, IEnumerable<KeyValuePair<string, string>> settings)
-        {
-            var provider = (MemoryConfigurationProvider)root.Providers.First();
-            foreach (var setting in settings)
-                provider.Set(setting.Key, setting.Value);
-            var _onReloadMethod = typeof(ConfigurationProvider).GetMethod("OnReload", BindingFlags.Instance | BindingFlags.NonPublic);
-            _onReloadMethod.Invoke(provider, null);
-        }
+      private static void ChangeConfig(IConfigurationRoot root, params KeyValuePair<string, string>[] additionalSettings)
+      {
+         ChangeConfig(root, new Dictionary<string, string> { { "foo:value:bar", "456" }, { "bar:value:qux", "10" }, { "baz:value:foo", "11" } }.Concat(additionalSettings));
+      }
 
-        public interface IFooBase
-        {
-            int Bar { get; }
-        }
+      private static void ChangeConfig(IConfigurationRoot root, IEnumerable<KeyValuePair<string, string>> settings)
+      {
+         var provider = (MemoryConfigurationProvider)root.Providers.First();
+         foreach (var setting in settings)
+            provider.Set(setting.Key, setting.Value);
+         var _onReloadMethod = typeof(ConfigurationProvider).GetMethod("OnReload", BindingFlags.Instance | BindingFlags.NonPublic)!;
+         _onReloadMethod.Invoke(provider, null);
+      }
 
-        public interface IFoo : IFooBase
-        {
-            int Baz();
-            string Qux { get; set; }
-        }
+#pragma warning disable CA1034 // Nested types should not be visible
+      public interface IFooBase
+      {
+         int Bar { get; }
+      }
 
-        public class Foo : IFoo
-        {
-            public Foo(int bar)
-            {
-                Bar = bar;
-            }
+      public interface IFoo : IFooBase
+      {
+         int Baz();
+         string? Qux { get; set; }
+      }
 
-            public int Bar { get; }
-            public int Baz() => Bar * 2;
-            public string Qux { get; set; }
-        }
+      public class Foo : IFoo
+      {
+         public Foo(int bar)
+         {
+            Bar = bar;
+         }
 
-        public interface IBar
-        {
-            int Qux { get; }
-            event EventHandler Baz;
-        }
+         public int Bar { get; }
+         public int Baz() => Bar * 2;
+         public string? Qux { get; set; }
+      }
 
-        public class Bar : IBar
-        {
-            public Bar(int qux)
-            {
-                Qux = qux;
-            }
+      public interface IBar
+      {
+         int Qux { get; }
+         event EventHandler? Baz;
+      }
 
-            public int Qux { get; }
+      public class Bar : IBar
+      {
+         public Bar(int qux)
+         {
+            Qux = qux;
+         }
 
-            public event EventHandler Baz;
+         public int Qux { get; }
 
-            public void OnBaz()
-            {
-                Baz?.Invoke(this, EventArgs.Empty);
-            }
-        }
+         public event EventHandler? Baz;
 
-        public interface IBaz
-        {
-            int Foo { get; set; }
-            bool IsDisposed { get; }
-        }
+         public void OnBaz()
+         {
+            Baz?.Invoke(this, EventArgs.Empty);
+         }
+      }
 
-        public class Baz : IBaz, IDisposable
-        {
-            public int Foo { get; set; }
-            public bool IsDisposed { get; private set; }
+      public interface IBaz
+      {
+         int Foo { get; set; }
+         bool IsDisposed { get; }
+      }
 
-            public void Dispose()
-            {
-                IsDisposed = true;
-            }
-        }
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+      public class Baz : IBaz, IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
+      {
+         public int Foo { get; set; }
+         public bool IsDisposed { get; private set; }
 
-        public interface IGrault
-        {
-            int Waldo { get; }
-            IGarply Garply { get; }
-        }
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
+         public void Dispose()
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
+#pragma warning restore CA1063 // Implement IDisposable Correctly
+         {
+            IsDisposed = true;
+         }
+      }
 
-        public class Grault : IGrault
-        {
-            public Grault(int waldo, IGarply garply)
-            {
-                Waldo = waldo;
-                Garply = garply;
-            }
+      public interface IGrault
+      {
+         int Waldo { get; }
+         IGarply Garply { get; }
+      }
 
-            public int Waldo { get; }
-            public IGarply Garply { get; }
-        }
+      public class Grault : IGrault
+      {
+         public Grault(int waldo, IGarply garply)
+         {
+            Waldo = waldo;
+            Garply = garply;
+         }
 
-        public interface IGarply { }
+         public int Waldo { get; }
+         public IGarply Garply { get; }
+      }
 
-        public class Garply : IGarply { }
-    }
+#pragma warning disable CA1040 // Avoid empty interfaces
+      public interface IGarply { }
+#pragma warning restore CA1040 // Avoid empty interfaces
+
+      public class Garply : IGarply { }
+#pragma warning restore CA1034 // Nested types should not be visible
+   }
 }
