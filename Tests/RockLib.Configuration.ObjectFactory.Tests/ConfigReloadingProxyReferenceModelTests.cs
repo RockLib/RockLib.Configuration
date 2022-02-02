@@ -341,7 +341,9 @@ namespace Tests
          _onReloadMethod.Invoke(provider, null);
       }
 
+#pragma warning disable CA1812
       private class Foo : IFoo, IDisposable
+#pragma warning restore CA1812
       {
          public Foo(int bar) => Bar = bar;
          public int Bar { get; }

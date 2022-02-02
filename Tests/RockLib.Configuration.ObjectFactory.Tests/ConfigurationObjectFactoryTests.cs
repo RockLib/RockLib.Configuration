@@ -2696,7 +2696,9 @@ namespace Tests
       public IReadOnlyList<int> Waldo { get; }
    }
 
+#pragma warning disable CA1812
    internal class HasByteCollectionConstructorParameters
+#pragma warning restore CA1812
    {
       public HasByteCollectionConstructorParameters(
           byte[] bar,
