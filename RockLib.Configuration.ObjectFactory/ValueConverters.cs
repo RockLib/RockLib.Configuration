@@ -35,7 +35,7 @@ namespace RockLib.Configuration.ObjectFactory
       /// </exception>
       public ValueConverters Add<T>(Type declaringType, string memberName, Func<string, T> convertFunc)
       {
-         if (convertFunc == null)
+         if (convertFunc is null)
          {
             throw new ArgumentNullException(nameof(convertFunc));
          }
@@ -59,7 +59,7 @@ namespace RockLib.Configuration.ObjectFactory
       /// </exception>
       public ValueConverters Add<T>(Type targetType, Func<string, T> convertFunc)
       {
-         if (convertFunc == null)
+         if (convertFunc is null)
          {
             throw new ArgumentNullException(nameof(convertFunc));
          }
@@ -103,15 +103,15 @@ namespace RockLib.Configuration.ObjectFactory
 
       private ValueConverters Add(Type declaringType, string memberName, Type returnType, Func<string, object> convertFunc)
       {
-         if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
-         if (memberName == null) throw new ArgumentNullException(nameof(memberName));
+         if (declaringType is null) throw new ArgumentNullException(nameof(declaringType));
+         if (memberName is null) throw new ArgumentNullException(nameof(memberName));
 
          var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
          if (matchingMembers.Count == 0)
             throw Exceptions.NoMatchingMembers(declaringType, memberName);
 
-         var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(returnType)).ToList();
+         var notAssignableMembers = matchingMembers.Where(m => !m.Type.IsAssignableFrom(returnType)).ToList();
          if (notAssignableMembers.Count > 0)
             throw Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(declaringType, memberName, returnType, notAssignableMembers);
 
@@ -121,8 +121,8 @@ namespace RockLib.Configuration.ObjectFactory
 
       private ValueConverters Add(Type targetType, Type returnType, Func<string, object> convertFunc)
       {
-         if (targetType == null) throw new ArgumentNullException(nameof(targetType));
-         if (!targetType.GetTypeInfo().IsAssignableFrom(returnType)) throw Exceptions.ReturnTypeOfConvertFuncIsNotAssignableToTargetType(targetType, returnType);
+         if (targetType is null) throw new ArgumentNullException(nameof(targetType));
+         if (!targetType.IsAssignableFrom(returnType)) throw Exceptions.ReturnTypeOfConvertFuncIsNotAssignableToTargetType(targetType, returnType);
          _converters.Add(GetKey(targetType), new ValueConverter(returnType, convertFunc));
          return this;
       }

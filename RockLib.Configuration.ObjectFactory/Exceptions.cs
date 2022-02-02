@@ -13,7 +13,7 @@ namespace RockLib.Configuration.ObjectFactory
       private const string SpecifyType = "A type must be specified in configuration or by specifying a default type.";
 
       public static InvalidOperationException ResultCannotBeNull(Type targetType, Type? declaringType, string? memberName) =>
-          new InvalidOperationException($"A null {targetType} value was returned by the custom convert func for {(declaringType == null ? "the value" : $"the {declaringType}.{memberName} member")}");
+          new InvalidOperationException($"A null {targetType} value was returned by the custom convert func for {(declaringType is null ? "the value" : $"the {declaringType}.{memberName} member")}");
 
       public static InvalidOperationException CannotConvertSectionValueToTargetType(IConfigurationSection section, Type targetType, Exception? innerException = null) =>
           new InvalidOperationException($"Unable to convert value '{section.Value}' in {section.Description()} to target type '{targetType}'.", innerException);
@@ -92,7 +92,7 @@ namespace RockLib.Configuration.ObjectFactory
           new InvalidOperationException($"The best matching constructor - `{constructorOrderInfo.Constructor.Format()}` - is missing the {constructorOrderInfo.MissingParameterNames.Format()} from {configuration.Description()}.");
 
       private static string Description(this Type targetType, Type? declaringType, string? memberName) =>
-          declaringType == null || memberName == null
+          declaringType is null || memberName is null
           ? $"target type '{targetType}'"
           : $"'{targetType} {declaringType}.{memberName}' member";
 

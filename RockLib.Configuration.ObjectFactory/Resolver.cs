@@ -23,7 +23,7 @@ namespace RockLib.Configuration.ObjectFactory
       /// </param>
       public Resolver(Func<Type, object> resolve)
       {
-         if (resolve == null) throw new ArgumentNullException(nameof(resolve));
+         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
 
          CanResolve = p =>
          {
@@ -52,8 +52,8 @@ namespace RockLib.Configuration.ObjectFactory
       /// </param>
       public Resolver(Func<Type, object> resolve, Func<Type, bool> canResolve)
       {
-         if (resolve == null) throw new ArgumentNullException(nameof(resolve));
-         if (canResolve == null) throw new ArgumentNullException(nameof(canResolve));
+         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+         if (canResolve is null) throw new ArgumentNullException(nameof(canResolve));
 
          CanResolve = p =>
          {
@@ -81,8 +81,8 @@ namespace RockLib.Configuration.ObjectFactory
       /// </param>
       public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed)
       {
-         if (resolve == null) throw new ArgumentNullException(nameof(resolve));
-         if (resolveNamed == null) throw new ArgumentNullException(nameof(resolveNamed));
+         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+         if (resolveNamed is null) throw new ArgumentNullException(nameof(resolveNamed));
 
          CanResolve = p =>
          {
@@ -125,10 +125,10 @@ namespace RockLib.Configuration.ObjectFactory
       public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed,
           Func<Type, bool> canResolve, Func<Type, string, bool> canResolveNamed)
       {
-         if (resolve == null) throw new ArgumentNullException(nameof(resolve));
-         if (resolveNamed == null) throw new ArgumentNullException(nameof(resolveNamed));
-         if (canResolve == null) throw new ArgumentNullException(nameof(canResolve));
-         if (canResolveNamed == null) throw new ArgumentNullException(nameof(canResolveNamed));
+         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+         if (resolveNamed is null) throw new ArgumentNullException(nameof(resolveNamed));
+         if (canResolve is null) throw new ArgumentNullException(nameof(canResolve));
+         if (canResolveNamed is null) throw new ArgumentNullException(nameof(canResolveNamed));
 
          CanResolve = p =>
          {

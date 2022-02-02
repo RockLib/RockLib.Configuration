@@ -59,7 +59,7 @@ namespace RockLib.Configuration.ObjectFactory.ReferenceModel
             // Special case for when the interface has a read/write property: if the new
             // property value is null and the old property value is not null, then copy
             // the value from old to new.
-            if (oldObject.Qux != null && newObject.Qux == null)
+            if (oldObject.Qux != null && newObject.Qux is null)
             {
                newObject.Qux = oldObject.Qux;
             }

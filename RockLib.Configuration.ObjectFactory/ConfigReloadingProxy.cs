@@ -55,7 +55,7 @@ namespace RockLib.Configuration.ObjectFactory
       {
          if (typeof(TInterface) == typeof(IEnumerable))
             throw new InvalidOperationException("The IEnumerable interface is not supported.");
-         if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(typeof(TInterface)))
+         if (typeof(IEnumerable).IsAssignableFrom(typeof(TInterface)))
             throw new InvalidOperationException($"Interfaces that inherit from IEnumerable are not suported: '{typeof(TInterface).FullName}'");
 
          _section = section ?? throw new ArgumentNullException(nameof(section));
@@ -115,7 +115,7 @@ namespace RockLib.Configuration.ObjectFactory
             // Throw if the value does not represent a valid Type.
             concreteType = Type.GetType(typeValue, true)!;
 
-            if (!typeof(TInterface).GetTypeInfo().IsAssignableFrom(concreteType))
+            if (!typeof(TInterface).IsAssignableFrom(concreteType))
                throw Exceptions.ConfigurationSpecifiedTypeIsNotAssignableToTargetType(typeof(TInterface), concreteType);
 
             valueSection = _section.GetSection(ConfigurationObjectFactory.ValueKey);

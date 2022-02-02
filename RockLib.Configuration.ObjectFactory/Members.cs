@@ -9,19 +9,19 @@ namespace RockLib.Configuration.ObjectFactory
     {
         public static IEnumerable<Member> Find(Type? declaringType, string? memberName)
         {
-            if (declaringType == null || memberName == null) return Enumerable.Empty<Member>();
+            if (declaringType is null || memberName is null) return Enumerable.Empty<Member>();
             var constructorParameters = FindConstructorParameters(declaringType, memberName).ToList();
             return FindProperties(declaringType, memberName, constructorParameters).Concat(constructorParameters);
         }
 
         private static IEnumerable<Member> FindConstructorParameters(Type declaringType, string memberName) =>
-            declaringType.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance)
+            declaringType.GetConstructors(BindingFlags.Public | BindingFlags.Instance)
                 .SelectMany(c => c.GetParameters())
                 .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName))
                 .Select(p => new Member(p.Name!, p.ParameterType, MemberType.ConstructorParameter));
 
         private static IEnumerable<Member> FindProperties(Type declaringType, string memberName, List<Member> constructorParameters) =>
-            declaringType.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            declaringType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, memberName)
                     && (p.CanWrite
                         || ((p.IsReadonlyList() || p.IsReadonlyDictionary())
@@ -31,7 +31,7 @@ namespace RockLib.Configuration.ObjectFactory
         public static bool IsReadonlyList(this PropertyInfo p) =>
             p.CanRead
             && !p.CanWrite
-            && ((p.PropertyType.GetTypeInfo().IsGenericType
+            && ((p.PropertyType.IsGenericType
                     && (p.PropertyType.GetGenericTypeDefinition() == typeof(List<>)
                         || p.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)
                         || p.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)))
@@ -40,7 +40,7 @@ namespace RockLib.Configuration.ObjectFactory
         public static bool IsReadonlyDictionary(this PropertyInfo p) =>
             p.CanRead
             && !p.CanWrite
-            && p.PropertyType.GetTypeInfo().IsGenericType
+            && p.PropertyType.IsGenericType
             && (p.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>)
                 || p.PropertyType.GetGenericTypeDefinition() == typeof(IDictionary<,>));
     }

@@ -184,8 +184,8 @@ namespace RockLib.Configuration.ObjectFactory
       public static object? Create(this IConfiguration configuration, Type type,
          DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null)
       {
-         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-         if (type == null) throw new ArgumentNullException(nameof(type));
+         if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+         if (type is null) throw new ArgumentNullException(nameof(type));
          return configuration.CreateValue(type, null, null, valueConverters ?? EmptyValueConverters, defaultTypes ?? EmptyDefaultTypes, resolver ?? Resolver.Empty);
       }
 
@@ -213,7 +213,7 @@ namespace RockLib.Configuration.ObjectFactory
 
       private static bool IsFuncOfT(Type targetType)
       {
-         return targetType.GetTypeInfo().IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Func<>);
+         return targetType.IsGenericType && targetType.GetGenericTypeDefinition() == typeof(Func<>);
       }
 
       private abstract class FuncOfT
@@ -223,7 +223,7 @@ namespace RockLib.Configuration.ObjectFactory
          public static Delegate? Create(IConfiguration configuration, Type targetType, Type? declaringType, string? memberName,
             ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver? resolver)
          {
-            var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
+            var tType = targetType.GetGenericArguments()[0];
             var funcOfT = (FuncOfT)Activator.CreateInstance(typeof(FuncOf<>)!.MakeGenericType(tType)!,
                 configuration, tType, declaringType, memberName, valueConverters, defaultTypes, resolver)!;
             return funcOfT!.Value;
@@ -272,7 +272,7 @@ namespace RockLib.Configuration.ObjectFactory
          {
             if (convert != null)
                return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
-            if (targetType.GetTypeInfo().IsAssignableFrom(typeof(string)))
+            if (targetType.IsAssignableFrom(typeof(string)))
                return valueSection.Value;
             if (targetType == typeof(Encoding))
                return Encoding.GetEncoding(valueSection.Value);
@@ -282,7 +282,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (typeConverter.CanConvertFrom(typeof(string)))
             {
                var value = valueSection.Value;
-               if (targetType.GetTypeInfo().IsEnum)
+               if (targetType.IsEnum)
                {
                   // Replace flags delimiters: c#'s "|" and vb's " Or ".
                   value = Regex.Replace(value, @"\s*\|\s*|\s+[Oo][Rr]\s+", ", ");
@@ -311,7 +311,7 @@ namespace RockLib.Configuration.ObjectFactory
                CreateConvertFunc(declaringTypeOfDecoratedMember ?? declaringType!, convertMethodName, out returnType, out convert);
             else
             {
-               convertMethodName = GetConverterMethodNameFromCustomAttributes(targetType.GetTypeInfo().CustomAttributes);
+               convertMethodName = GetConverterMethodNameFromCustomAttributes(targetType.CustomAttributes);
                if (convertMethodName != null)
                   CreateConvertFunc(targetType, convertMethodName, out returnType, out convert);
                else
@@ -322,7 +322,7 @@ namespace RockLib.Configuration.ObjectFactory
             }
             if (returnType != null)
             {
-               if (!targetType.GetTypeInfo().IsAssignableFrom(returnType))
+               if (!targetType.IsAssignableFrom(returnType))
                   throw Exceptions.ReturnTypeOfMethodFromAttributeIsNotAssignableToTargetType(targetType, returnType, convertMethodName);
             }
          }
@@ -337,7 +337,7 @@ namespace RockLib.Configuration.ObjectFactory
                  m.Name == methodName
                  && m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(string)
                  && m.ReturnType != typeof(void) && m.ReturnType != typeof(object));
-         if (convertMethod == null)
+         if (convertMethod is null)
             throw Exceptions.NoMethodFound(declaringType, methodName);
          returnType = convertMethod.ReturnType;
          convertFunc = value => convertMethod.Invoke(null, new object[] { value })!;
@@ -422,7 +422,7 @@ namespace RockLib.Configuration.ObjectFactory
       }
 
       private static bool IsGenericList(Type type) =>
-          type.GetTypeInfo().IsGenericType
+          type.IsGenericType
               && (type.GetGenericTypeDefinition() == typeof(List<>)
                   || type.GetGenericTypeDefinition() == typeof(IList<>)
                   || type.GetGenericTypeDefinition() == typeof(ICollection<>)
@@ -433,7 +433,7 @@ namespace RockLib.Configuration.ObjectFactory
       private static object BuildGenericList(IConfiguration configuration, Type targetType, Type? declaringType, string? memberName,
          ValueConverters valueConverters, DefaultTypes defaultTypes, IResolver? resolver)
       {
-         var tType = targetType.GetTypeInfo().GetGenericArguments()[0];
+         var tType = targetType.GetGenericArguments()[0];
          var listType = typeof(List<>).MakeGenericType(tType);
          var addMethod = GetListAddMethod(tType);
          var list = Activator.CreateInstance(listType)!;
@@ -456,11 +456,11 @@ namespace RockLib.Configuration.ObjectFactory
 
       internal static bool IsNonGenericList(this Type type, bool defaultConstructorRequired = false)
       {
-         if (typeof(IList).GetTypeInfo().IsAssignableFrom(type))
+         if (typeof(IList).IsAssignableFrom(type))
          {
             return
                 (!defaultConstructorRequired
-                    || type.GetTypeInfo().GetConstructor(Type.EmptyTypes) != null)
+                    || type.GetConstructor(Type.EmptyTypes) != null)
                 && GetNonGenericListItemType(type) != null;
          }
          return false;
@@ -469,7 +469,7 @@ namespace RockLib.Configuration.ObjectFactory
       private static Type? GetNonGenericListItemType(Type nonGenericListType)
       {
          var itemTypes =
-             nonGenericListType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+             nonGenericListType.GetMethods(BindingFlags.Public | BindingFlags.Instance)
                  .Where(m => m.Name == "Add"
                      && m.GetParameters().Length == 1
                      && m.GetParameters()[0].ParameterType != typeof(object))
@@ -513,9 +513,9 @@ namespace RockLib.Configuration.ObjectFactory
          if (type == typeof(object) && TryGetDefaultType(defaultTypes, type, declaringType, memberName, out var defaultType))
             type = defaultType!;
 
-         if (type.GetTypeInfo().IsGenericType
+         if (type.IsGenericType
              && (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) || type.GetGenericTypeDefinition() == typeof(IDictionary<,>) || type.GetGenericTypeDefinition() == typeof(IReadOnlyDictionary<,>))
-             && type.GetTypeInfo().GetGenericArguments()[0] == typeof(string))
+             && type.GetGenericArguments()[0] == typeof(string))
          {
             if (type != targetType)
                targetType = type;
@@ -545,11 +545,11 @@ namespace RockLib.Configuration.ObjectFactory
             targetType = defaultType!;
          if (IsSimpleType(targetType, declaringType, memberName, valueConverters))
             throw Exceptions.TargetTypeRequiresConfigurationValue(configuration, targetType, declaringType, memberName);
-         if (targetType.GetTypeInfo().IsAbstract)
+         if (targetType.IsAbstract)
             throw Exceptions.CannotCreateAbstractType(configuration, targetType);
          if (targetType == typeof(object))
             throw Exceptions.CannotCreateObjectType;
-         if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(targetType) && targetType.FullName!.StartsWith("System.Collections.", StringComparison.OrdinalIgnoreCase))
+         if (typeof(IEnumerable).IsAssignableFrom(targetType) && targetType.FullName!.StartsWith("System.Collections.", StringComparison.OrdinalIgnoreCase))
             throw Exceptions.UnsupportedCollectionType(targetType);
          if (IsList(configuration, includeEmptyList: false))
             throw Exceptions.ConfigurationIsAList(configuration, targetType);
@@ -559,8 +559,8 @@ namespace RockLib.Configuration.ObjectFactory
       private static bool IsSimpleType(Type targetType, Type? declaringType, string? memberName, ValueConverters valueConverters)
       {
          var type = Nullable.GetUnderlyingType(targetType) ?? targetType;
-         return type.GetTypeInfo().IsPrimitive
-             || type.GetTypeInfo().IsEnum
+         return type.IsPrimitive
+             || type.IsEnum
              || type == typeof(string)
              || type == typeof(decimal)
              || type == typeof(Guid)
@@ -580,16 +580,16 @@ namespace RockLib.Configuration.ObjectFactory
          if (defaultTypes.TryGet(targetType, out defaultType)) return true;
 
          defaultType = GetDefaultTypeFromMemberCustomAttributes(declaringType, memberName) ?? 
-            GetDefaultTypeFromCustomAttributes(targetType.GetTypeInfo().CustomAttributes);
+            GetDefaultTypeFromCustomAttributes(targetType.CustomAttributes);
 
          if (defaultType != null)
          {
-            if (!targetType.GetTypeInfo().IsAssignableFrom(defaultType))
+            if (!targetType.IsAssignableFrom(defaultType))
             {
                throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
             }
 
-            if (defaultType.GetTypeInfo().IsAbstract)
+            if (defaultType.IsAbstract)
             {
                throw Exceptions.DefaultTypeFromAttributeCannotBeAbstract(defaultType);
             }
@@ -630,7 +630,7 @@ namespace RockLib.Configuration.ObjectFactory
             }
             else
             {
-               foreach (var parameter in declaringType!.GetTypeInfo().GetConstructors()
+               foreach (var parameter in declaringType!.GetConstructors()
                    .SelectMany(c => c.GetParameters())
                    .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, member.Name)))
                {
@@ -774,14 +774,14 @@ namespace RockLib.Configuration.ObjectFactory
                if (_members.TryGetValue(name, out var section))
                {
                   var list = property.GetValue(obj);
-                  if (list == null) return;
+                  if (list is null) return;
                   var tType = IsGenericList(property.PropertyType)
-                      ? property.PropertyType.GetTypeInfo().GetGenericArguments()[0]
+                      ? property.PropertyType.GetGenericArguments()[0]
                       : null;
                   var addMethod = GetListAddMethod(tType);
                   var clearMethod = GetListClearMethod(tType);
                   var targetType = property.PropertyType;
-                  if (tType == null)
+                  if (tType is null)
                      targetType = typeof(List<>).MakeGenericType(GetNonGenericListItemType(targetType)!);
                   var propertyValue = section.CreateValue(targetType, Type, name, valueConverters, defaultTypes, Resolver)!;
                   clearMethod.Invoke(list, null);
@@ -799,8 +799,8 @@ namespace RockLib.Configuration.ObjectFactory
                if (_members.TryGetValue(name, out var section))
                {
                   var dictionary = property.GetValue(obj);
-                  if (dictionary == null) return;
-                  var tValueType = property.PropertyType.GetTypeInfo().GetGenericArguments()[1];
+                  if (dictionary is null) return;
+                  var tValueType = property.PropertyType.GetGenericArguments()[1];
                   var addMethod = GetDictionaryAddMethod(tValueType);
                   var clearMethod = GetDictionaryClearMethod(tValueType);
                   var propertyValue = section.CreateValue(property.PropertyType, Type, name, valueConverters, defaultTypes, Resolver)!;
@@ -814,7 +814,7 @@ namespace RockLib.Configuration.ObjectFactory
 
          private ConstructorInfo GetConstructor()
          {
-            var constructors = Type.GetTypeInfo().GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+            var constructors = Type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
             if (constructors.Length == 0) throw Exceptions.NoPublicConstructorsFound;
             var orderedConstructors = constructors
                 .Select(ctor => new ConstructorOrderInfo(ctor, _members, Resolver))
@@ -839,7 +839,7 @@ namespace RockLib.Configuration.ObjectFactory
                   if (_members.TryGetValue(name, out var section))
                   {
                      var arg = section.CreateValue(parameters[i].ParameterType, Type, name, valueConverters, defaultTypes, Resolver)!;
-                     if (parameters[i].ParameterType.GetTypeInfo().IsInstanceOfType(arg))
+                     if (parameters[i].ParameterType.IsInstanceOfType(arg))
                      {
                         found = true;
                         args[i] = arg;
@@ -857,7 +857,7 @@ namespace RockLib.Configuration.ObjectFactory
                      if (parameters[i].DefaultValue != null)
                      {
                         var underlyingType = Nullable.GetUnderlyingType(parameters[i].ParameterType);
-                        if (underlyingType != null && underlyingType.GetTypeInfo().IsEnum)
+                        if (underlyingType != null && underlyingType.IsEnum)
                            args[i] = Enum.ToObject(underlyingType, parameters[i].DefaultValue!);
                         else
                            args[i] = parameters[i].DefaultValue!;
@@ -869,13 +869,13 @@ namespace RockLib.Configuration.ObjectFactory
          }
 
          private IEnumerable<PropertyInfo> WritableProperties =>
-             Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite);
+             Type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.CanWrite);
 
          private IEnumerable<PropertyInfo> ReadonlyListProperties =>
-             Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyList());
+             Type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyList());
 
          private IEnumerable<PropertyInfo> ReadonlyDictionaryProperties =>
-             Type.GetTypeInfo().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyDictionary());
+             Type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(p => p.IsReadonlyDictionary());
 
          private class IdentifierComparer : IEqualityComparer<string>
          {

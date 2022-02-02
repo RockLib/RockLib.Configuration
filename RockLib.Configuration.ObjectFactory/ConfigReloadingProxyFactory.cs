@@ -135,15 +135,15 @@ namespace RockLib.Configuration.ObjectFactory
       internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, 
          DefaultTypes? defaultTypes, ValueConverters? valueConverters, Type? declaringType, string? memberName, IResolver? resolver)
       {
-         if (configuration == null)
+         if (configuration is null)
             throw new ArgumentNullException(nameof(configuration));
-         if (interfaceType == null)
+         if (interfaceType is null)
             throw new ArgumentNullException(nameof(interfaceType));
          if (!interfaceType.IsInterface)
             throw new ArgumentException($"Specified type is not an interface: '{interfaceType.FullName}'.", nameof(interfaceType));
          if (interfaceType == typeof(IEnumerable))
             throw new ArgumentException("The IEnumerable interface is not supported.");
-         if (typeof(IEnumerable).GetTypeInfo().IsAssignableFrom(interfaceType))
+         if (typeof(IEnumerable).IsAssignableFrom(interfaceType))
             throw new ArgumentException($"Interfaces that inherit from IEnumerable are not suported: '{interfaceType.FullName}'", nameof(interfaceType));
 
          if (!string.IsNullOrEmpty(configuration[ConfigurationObjectFactory.TypeKey])
@@ -408,12 +408,12 @@ namespace RockLib.Configuration.ObjectFactory
       }
 
       private static IEnumerable<PropertyInfo> GetAllProperties(this Type type) =>
-          type.GetTypeInfo().GetProperties().Concat(type.GetTypeInfo().GetInterfaces().SelectMany(i => i.GetTypeInfo().GetProperties()));
+          type.GetProperties().Concat(type.GetInterfaces().SelectMany(i => i.GetProperties()));
 
       private static IEnumerable<MethodInfo> GetAllMethods(this Type type) =>
-          type.GetTypeInfo().GetMethods().Concat(type.GetTypeInfo().GetInterfaces().SelectMany(i => i.GetTypeInfo().GetMethods()));
+          type.GetMethods().Concat(type.GetInterfaces().SelectMany(i => i.GetMethods()));
 
       private static IEnumerable<EventInfo> GetAllEvents(this Type type) =>
-          type.GetTypeInfo().GetEvents().Concat(type.GetTypeInfo().GetInterfaces().SelectMany(i => i.GetTypeInfo().GetEvents()));
+          type.GetEvents().Concat(type.GetInterfaces().SelectMany(i => i.GetEvents()));
    }
 }

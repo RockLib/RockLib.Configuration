@@ -34,11 +34,11 @@ namespace RockLib.Configuration.ObjectFactory
         /// </exception>
         public DefaultTypes Add(Type declaringType, string memberName, Type defaultType)
         {
-            if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
-            if (memberName == null) throw new ArgumentNullException(nameof(memberName));
-            if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
+            if (declaringType is null) throw new ArgumentNullException(nameof(declaringType));
+            if (memberName is null) throw new ArgumentNullException(nameof(memberName));
+            if (defaultType is null) throw new ArgumentNullException(nameof(defaultType));
 
-            if (defaultType.GetTypeInfo().IsAbstract)
+            if (defaultType.IsAbstract)
                 throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
@@ -46,7 +46,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (matchingMembers.Count == 0)
                 throw Exceptions.NoMatchingMembers(declaringType, memberName);
 
-            var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(defaultType)).ToList();
+            var notAssignableMembers = matchingMembers.Where(m => !m.Type.IsAssignableFrom(defaultType)).ToList();
             if (notAssignableMembers.Count > 0)
                 throw Exceptions.DefaultTypeNotAssignableToMembers(declaringType, memberName, defaultType, notAssignableMembers);
 
@@ -67,12 +67,12 @@ namespace RockLib.Configuration.ObjectFactory
         /// <exception cref="ArgumentException">If <paramref name="defaultType"/> is not assignable to <paramref name="targetType"/>.</exception>
         public DefaultTypes Add(Type targetType, Type defaultType)
         {
-            if (targetType == null) throw new ArgumentNullException(nameof(targetType));
-            if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
+            if (targetType is null) throw new ArgumentNullException(nameof(targetType));
+            if (defaultType is null) throw new ArgumentNullException(nameof(defaultType));
 
-            if (defaultType.GetTypeInfo().IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
+            if (defaultType.IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
-            if (!targetType.GetTypeInfo().IsAssignableFrom(defaultType))
+            if (!targetType.IsAssignableFrom(defaultType))
                 throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
 
             _dictionary.Add(GetKey(targetType), defaultType);
