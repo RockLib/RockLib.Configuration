@@ -17,15 +17,17 @@ namespace RockLib.Configuration.ObjectFactory
    /// </summary>
    public static class ConfigReloadingProxyFactory
    {
-      private delegate object CreateProxyDelegate(IConfiguration configuration, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver);
+      private delegate object CreateProxyDelegate(IConfiguration configuration, DefaultTypes? defaultTypes, ValueConverters? valueConverters,
+         Type? declaringType, string? memberName, IResolver? resolver);
 
       private const TypeAttributes ProxyClassAttributes = TypeAttributes.Public | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit;
       private const MethodAttributes ExplicitInterfaceMethodAttributes = MethodAttributes.Private | MethodAttributes.HideBySig | MethodAttributes.NewSlot | MethodAttributes.Virtual | MethodAttributes.Final;
       private const MethodAttributes TransferStateAttributes = MethodAttributes.FamORAssem | MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Final;
       private const MethodAttributes ConstructorAttributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
-      private static readonly MethodInfo _delegateCombineMethod = typeof(Delegate).GetTypeInfo().GetMethod(nameof(Delegate.Combine), new[] { typeof(Delegate), typeof(Delegate) });
-      private static readonly MethodInfo _delegateRemoveMethod = typeof(Delegate).GetTypeInfo().GetMethod(nameof(Delegate.Remove), new[] { typeof(Delegate), typeof(Delegate) });
-      private static readonly CustomAttributeBuilder _debuggerBrowsableNeverAttribute = new CustomAttributeBuilder(typeof(DebuggerBrowsableAttribute).GetTypeInfo().GetConstructor(new[] { typeof(DebuggerBrowsableState) }), new object[] { DebuggerBrowsableState.Never });
+      private static readonly MethodInfo _delegateCombineMethod = typeof(Delegate).GetMethod(nameof(Delegate.Combine), new[] { typeof(Delegate), typeof(Delegate) })!;
+      private static readonly MethodInfo _delegateRemoveMethod = typeof(Delegate).GetMethod(nameof(Delegate.Remove), new[] { typeof(Delegate), typeof(Delegate) })!;
+      private static readonly CustomAttributeBuilder _debuggerBrowsableNeverAttribute = new CustomAttributeBuilder(
+         typeof(DebuggerBrowsableAttribute).GetConstructor(new[] { typeof(DebuggerBrowsableState) })!, new object[] { DebuggerBrowsableState.Never });
 
       private static readonly ConcurrentDictionary<Type, CreateProxyDelegate> _proxyFactories = new ConcurrentDictionary<Type, CreateProxyDelegate>();
 
@@ -74,8 +76,9 @@ namespace RockLib.Configuration.ObjectFactory
       /// An object of type <typeparamref name="TInterface"/> with values set from the configuration that reloads
       /// itself when the configuration changes.
       /// </returns>
-      public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null) =>
-          (TInterface)configuration.CreateReloadingProxy(typeof(TInterface), defaultTypes, valueConverters, resolver);
+      public static TInterface CreateReloadingProxy<TInterface>(this IConfiguration configuration,
+         DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null) =>
+            (TInterface)configuration.CreateReloadingProxy(typeof(TInterface), defaultTypes, valueConverters, resolver);
 
       /// <summary>
       /// Create an object of type <paramref name="interfaceType"/> based on the specified configuration. The returned
@@ -124,16 +127,19 @@ namespace RockLib.Configuration.ObjectFactory
       /// </returns>
       public static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType,
          DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null) =>
-          configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null, resolver ?? Resolver.Empty);
+            configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null, resolver ?? Resolver.Empty);
 
+      // TODO: Can these really be null?
+      // They HAVE to be, because other code is already passing them in.
+      // DefaultTypes defaultTypes = null, ValueConverters valueConverters = null, IResolver resolver = null
       internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, 
-         DefaultTypes? defaultTypes, ValueConverters? valueConverters, Type declaringType, string memberName, IResolver? resolver)
+         DefaultTypes? defaultTypes, ValueConverters? valueConverters, Type? declaringType, string? memberName, IResolver? resolver)
       {
          if (configuration == null)
             throw new ArgumentNullException(nameof(configuration));
          if (interfaceType == null)
             throw new ArgumentNullException(nameof(interfaceType));
-         if (!interfaceType.GetTypeInfo().IsInterface)
+         if (!interfaceType.IsInterface)
             throw new ArgumentException($"Specified type is not an interface: '{interfaceType.FullName}'.", nameof(interfaceType));
          if (interfaceType == typeof(IEnumerable))
             throw new ArgumentException("The IEnumerable interface is not supported.");
@@ -158,9 +164,9 @@ namespace RockLib.Configuration.ObjectFactory
       {
          var baseClass = typeof(ConfigReloadingProxy<>).MakeGenericType(interfaceType);
 
-         var baseConstructor = baseClass.GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
-         var baseGetObjectMethod = baseClass.GetTypeInfo().GetProperty("Object").GetMethod;
-         var baseTransferStateMethod = baseClass.GetTypeInfo().GetMethod("TransferState", BindingFlags.NonPublic | BindingFlags.Instance);
+         var baseConstructor = baseClass.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0];
+         var baseGetObjectMethod = baseClass.GetProperty("Object")!.GetMethod!;
+         var baseTransferStateMethod = baseClass.GetMethod("TransferState", BindingFlags.NonPublic | BindingFlags.Instance);
 
          var eventFields = new Dictionary<EventInfo, FieldBuilder>();
          var implementedMethods = new List<MethodInfo>();
@@ -185,9 +191,9 @@ namespace RockLib.Configuration.ObjectFactory
 
          // The eventFields dictionary needs to be fully populated in order to correctly
          // implement the TransferState method.
-         AddTransferStateOverrideMethod(proxyTypeBuilder, interfaceType, eventFields, baseTransferStateMethod);
+         AddTransferStateOverrideMethod(proxyTypeBuilder, interfaceType, eventFields, baseTransferStateMethod!);
 
-         return proxyTypeBuilder.CreateTypeInfo();
+         return proxyTypeBuilder.CreateTypeInfo()!;
       }
 
       private static TypeBuilder CreateProxyTypeBuilder(Type interfaceType, Type baseType)
@@ -230,15 +236,15 @@ namespace RockLib.Configuration.ObjectFactory
 
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, baseGetObjectMethod);
-            for (int i = 0; i < parameters.Length; i++)
+            for (var i = 0; i < parameters.Length; i++)
                il.Emit(OpCodes.Ldarg, i + 1);
-            il.Emit(OpCodes.Callvirt, interfaceProperty.GetMethod);
+            il.Emit(OpCodes.Callvirt, interfaceProperty.GetMethod!);
             il.Emit(OpCodes.Ret);
 
             propertyBuilder.SetCustomAttribute(_debuggerBrowsableNeverAttribute);
             propertyBuilder.SetGetMethod(getMethodBuilder);
-            proxyTypeBuilder.DefineMethodOverride(getMethodBuilder, interfaceProperty.GetMethod);
-            implementedMethods.Add(interfaceProperty.GetMethod);
+            proxyTypeBuilder.DefineMethodOverride(getMethodBuilder, interfaceProperty.GetMethod!);
+            implementedMethods.Add(interfaceProperty.GetMethod!);
          }
 
          if (interfaceProperty.CanWrite)
@@ -251,26 +257,32 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_1);
             for (int i = 0; i < parameters.Length; i++)
                il.Emit(OpCodes.Ldarg, i + 2);
-            il.Emit(OpCodes.Callvirt, interfaceProperty.SetMethod);
+            il.Emit(OpCodes.Callvirt, interfaceProperty.SetMethod!);
             il.Emit(OpCodes.Ret);
 
             propertyBuilder.SetSetMethod(setMethodBuilder);
-            proxyTypeBuilder.DefineMethodOverride(setMethodBuilder, interfaceProperty.SetMethod);
-            implementedMethods.Add(interfaceProperty.SetMethod);
+            proxyTypeBuilder.DefineMethodOverride(setMethodBuilder, interfaceProperty.SetMethod!);
+            implementedMethods.Add(interfaceProperty.SetMethod!);
          }
       }
 
       private static void AddEvent(TypeBuilder proxyTypeBuilder, EventInfo interfaceEvent, MethodInfo baseGetObjectMethod, IDictionary<EventInfo, FieldBuilder> eventFields, ICollection<MethodInfo> implementedMethods)
       {
-         var eventField = proxyTypeBuilder.DefineField($"_{interfaceEvent.DeclaringType.FullName.Replace(".", "_")}_{interfaceEvent.Name}", interfaceEvent.EventHandlerType, FieldAttributes.Private);
+#if NET48
+         var interfaceEventDeclaringTypeName = interfaceEvent.DeclaringType!.FullName!.Replace(".", "_");
+#else
+         var interfaceEventDeclaringTypeName = interfaceEvent.DeclaringType!.FullName!.Replace(".", "_", StringComparison.OrdinalIgnoreCase);
+#endif
+         var eventField = proxyTypeBuilder.DefineField($"_{interfaceEventDeclaringTypeName}_{interfaceEvent.Name}",
+            interfaceEvent.EventHandlerType!, FieldAttributes.Private);
          eventField.SetCustomAttribute(_debuggerBrowsableNeverAttribute);
          eventFields.Add(interfaceEvent, eventField);
 
-         var parameters = new[] { interfaceEvent.EventHandlerType };
+         var parameters = new[] { interfaceEvent.EventHandlerType! };
 
-         var eventBuilder = proxyTypeBuilder.DefineEvent(interfaceEvent.Name, interfaceEvent.Attributes, interfaceEvent.EventHandlerType);
-         var addMethod = proxyTypeBuilder.DefineMethod(interfaceEvent.AddMethod.Name, ExplicitInterfaceMethodAttributes, typeof(void), parameters);
-         var removeMethod = proxyTypeBuilder.DefineMethod(interfaceEvent.RemoveMethod.Name, ExplicitInterfaceMethodAttributes, typeof(void), parameters);
+         var eventBuilder = proxyTypeBuilder.DefineEvent(interfaceEvent.Name, interfaceEvent.Attributes, interfaceEvent.EventHandlerType!);
+         var addMethod = proxyTypeBuilder.DefineMethod(interfaceEvent.AddMethod!.Name, ExplicitInterfaceMethodAttributes, typeof(void), parameters);
+         var removeMethod = proxyTypeBuilder.DefineMethod(interfaceEvent.RemoveMethod!.Name, ExplicitInterfaceMethodAttributes, typeof(void), parameters);
 
          var il = addMethod.GetILGenerator();
 
@@ -286,7 +298,7 @@ namespace RockLib.Configuration.ObjectFactory
          il.Emit(OpCodes.Ldfld, eventField);
          il.Emit(OpCodes.Ldarg_1);
          il.Emit(OpCodes.Call, _delegateCombineMethod);
-         il.Emit(OpCodes.Castclass, interfaceEvent.EventHandlerType);
+         il.Emit(OpCodes.Castclass, interfaceEvent.EventHandlerType!);
          il.Emit(OpCodes.Stfld, eventField);
          il.Emit(OpCodes.Ret);
 
@@ -308,7 +320,7 @@ namespace RockLib.Configuration.ObjectFactory
          il.Emit(OpCodes.Ldfld, eventField);
          il.Emit(OpCodes.Ldarg_1);
          il.Emit(OpCodes.Call, _delegateRemoveMethod);
-         il.Emit(OpCodes.Castclass, interfaceEvent.EventHandlerType);
+         il.Emit(OpCodes.Castclass, interfaceEvent.EventHandlerType!);
          il.Emit(OpCodes.Stfld, eventField);
          il.Emit(OpCodes.Ret);
 
@@ -336,7 +348,8 @@ namespace RockLib.Configuration.ObjectFactory
          proxyTypeBuilder.DefineMethodOverride(methodBuilder, interfaceMethod);
       }
 
-      private static void AddTransferStateOverrideMethod(TypeBuilder proxyTypeBuilder, Type interfaceType, IReadOnlyDictionary<EventInfo, FieldBuilder> eventFields, MethodInfo baseTransferStateMethod)
+      private static void AddTransferStateOverrideMethod(TypeBuilder proxyTypeBuilder, Type interfaceType,
+         IReadOnlyDictionary<EventInfo, FieldBuilder> eventFields, MethodInfo baseTransferStateMethod)
       {
          var transferStateMethod = proxyTypeBuilder.DefineMethod("TransferState", TransferStateAttributes, typeof(void), new[] { interfaceType, interfaceType });
 
@@ -348,26 +361,26 @@ namespace RockLib.Configuration.ObjectFactory
             il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Ldfld, eventFields[evt]);
-            il.Emit(OpCodes.Callvirt, evt.AddMethod);
+            il.Emit(OpCodes.Callvirt, evt.AddMethod!);
          }
 
          // Special case for when the interface has a read/write property: if the new
          // property value is null and the old property value is not null, then copy
          // the value from old to new.
-         foreach (var property in interfaceType.GetAllProperties().Where(p => p.CanRead && p.CanWrite && !p.PropertyType.GetTypeInfo().IsValueType))
+         foreach (var property in interfaceType.GetAllProperties().Where(p => p.CanRead && p.CanWrite && !p.PropertyType.IsValueType))
          {
             var doNotCopyProperty = il.DefineLabel();
 
             il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Callvirt, property.GetMethod);
+            il.Emit(OpCodes.Callvirt, property.GetMethod!);
             il.Emit(OpCodes.Brfalse_S, doNotCopyProperty);
             il.Emit(OpCodes.Ldarg_2);
-            il.Emit(OpCodes.Callvirt, property.GetMethod);
+            il.Emit(OpCodes.Callvirt, property.GetMethod!);
             il.Emit(OpCodes.Brtrue_S, doNotCopyProperty);
             il.Emit(OpCodes.Ldarg_2);
             il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Callvirt, property.GetMethod);
-            il.Emit(OpCodes.Callvirt, property.SetMethod);
+            il.Emit(OpCodes.Callvirt, property.GetMethod!);
+            il.Emit(OpCodes.Callvirt, property.SetMethod!);
             il.MarkLabel(doNotCopyProperty);
          }
 

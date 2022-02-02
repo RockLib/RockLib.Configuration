@@ -9,11 +9,17 @@ using System.Text;
 
 namespace RockLib.Configuration.ObjectFactory
 {
+   // Given that this class is already public,
+   // changing how IDisposable is implemented could be a breaking change,
+   // hence the #pragmas
+
    /// <summary>
    /// The base class for reloading proxy classes.
    /// </summary>
    [DebuggerDisplay("{" + nameof(Object) + "}")]
+#pragma warning disable CA1063 // Implement IDisposable Correctly
    public abstract class ConfigReloadingProxy<TInterface> : IDisposable
+#pragma warning restore CA1063 // Implement IDisposable Correctly
    {
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly IConfiguration _section;
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly DefaultTypes _defaultTypes;
@@ -45,7 +51,7 @@ namespace RockLib.Configuration.ObjectFactory
       /// StructureMap. Consider using the <see cref="Resolver"/> class for this parameter, as it supports
       /// most depenedency injection containers.
       /// </param>
-      protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver resolver)
+      protected ConfigReloadingProxy(IConfiguration section, DefaultTypes defaultTypes, ValueConverters valueConverters, Type declaringType, string memberName, IResolver? resolver)
       {
          if (typeof(TInterface) == typeof(IEnumerable))
             throw new InvalidOperationException("The IEnumerable interface is not supported.");
@@ -89,13 +95,17 @@ namespace RockLib.Configuration.ObjectFactory
       /// <summary>
       /// Dispose the underlying object if it implements <see cref="IDisposable"/>.
       /// </summary>
+#pragma warning disable CA1063 // Implement IDisposable Correctly
+#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
       public void Dispose() => (Object as IDisposable)?.Dispose();
+#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
+#pragma warning restore CA1063 // Implement IDisposable Correctly
 
       private TInterface CreateObject()
       {
          // In order to create the object (and avoid infinite recursion), we need to figure out
          // the concrete type to create and the config section that defines the value to create.
-         Type concreteType;
+         Type? concreteType;
          IConfiguration valueSection;
 
          // If _section contains a type-specified value, extract the type and use the value sub-section.
@@ -129,7 +139,7 @@ namespace RockLib.Configuration.ObjectFactory
          }
 
          // Put everything together.
-         return (TInterface)valueSection.Create(concreteType, _defaultTypes, _valueConverters, _resolver);
+         return (TInterface)valueSection.Create(concreteType!, _defaultTypes, _valueConverters, _resolver)!;
       }
 
       private void ReloadObject(bool force)

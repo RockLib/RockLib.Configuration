@@ -86,7 +86,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// <param name="memberName">The name of the member to find a default type for.</param>
         /// <param name="defaultType">When a match is found for the member, contains its default type.</param>
         /// <returns>True, if a default type was found for the member. Otherwise, false if a default type could not be found.</returns>
-        public bool TryGet(Type declaringType, string memberName, [MaybeNullWhen(false)] out Type defaultType) =>
+        public bool TryGet(Type? declaringType, string? memberName, [MaybeNullWhen(false)] out Type defaultType) =>
             _dictionary.TryGetValue(GetKey(declaringType, memberName), out defaultType);
 
         /// <summary>
@@ -98,10 +98,10 @@ namespace RockLib.Configuration.ObjectFactory
         public bool TryGet(Type targetType, [MaybeNullWhen(false)] out Type defaultType) =>
             _dictionary.TryGetValue(GetKey(targetType), out defaultType);
 
-        private static string GetKey(Type declaringType, string memberName) => 
+        private static string GetKey(Type? declaringType, string? memberName) => 
             (declaringType != null && memberName != null) ? declaringType.FullName + "::" + memberName : "";
 
-        private static string GetKey(Type targetType) => targetType != null ? targetType.FullName! : "";
+        private static string GetKey(Type? targetType) => targetType != null ? targetType.FullName! : "";
 
         IEnumerator<KeyValuePair<string, Type>> IEnumerable<KeyValuePair<string, Type>>.GetEnumerator() => _dictionary.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_dictionary).GetEnumerator();

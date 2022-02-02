@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace RockLib.Configuration.ObjectFactory
@@ -171,7 +172,7 @@ namespace RockLib.Configuration.ObjectFactory
 #pragma warning restore CA1033 // Interface methods should be callable by child types
 
       /// <inheritdoc/>
-      public bool TryResolve(ParameterInfo parameter, out object? value)
+      public bool TryResolve(ParameterInfo parameter, [MaybeNullWhen(false)] out object value)
       {
          if (CanResolve(parameter))
          {

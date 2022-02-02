@@ -7,7 +7,7 @@ namespace RockLib.Configuration.ObjectFactory
 {
     internal static class Members
     {
-        public static IEnumerable<Member> Find(Type declaringType, string memberName)
+        public static IEnumerable<Member> Find(Type? declaringType, string? memberName)
         {
             if (declaringType == null || memberName == null) return Enumerable.Empty<Member>();
             var constructorParameters = FindConstructorParameters(declaringType, memberName).ToList();

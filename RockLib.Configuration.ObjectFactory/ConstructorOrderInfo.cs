@@ -8,7 +8,7 @@ namespace RockLib.Configuration.ObjectFactory
 {
    internal class ConstructorOrderInfo : IComparable<ConstructorOrderInfo>
    {
-      public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers, IResolver resolver)
+      public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers, IResolver? resolver)
       {
          Constructor = constructor;
          var parameters = constructor.GetParameters();
@@ -23,7 +23,7 @@ namespace RockLib.Configuration.ObjectFactory
          else
          {
             bool HasAvailableValue(ParameterInfo p) =>
-                p.GetNames().Any(name => availableMembers.ContainsKey(name)) || resolver.CanResolve(p);
+                p.GetNames().Any(name => availableMembers.ContainsKey(name)) || (resolver?.CanResolve(p) ?? false);
             bool HasAvailableNamedValue(ParameterInfo p) =>
                 p.GetNames().Any(name => availableMembers.ContainsKey(name));
 
