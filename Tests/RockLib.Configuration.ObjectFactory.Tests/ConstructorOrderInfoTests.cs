@@ -21,7 +21,9 @@ namespace Tests
       [InlineData(typeof(OneParameterOneOptionalParameter), 2)]
       public void TotalParametersIsCorrect(Type type, int expectedTotalParameters)
       {
-         var constructor = type.GetTypeInfo().GetConstructors()[0];
+#pragma warning disable CA1062 // Validate arguments of public methods
+         var constructor = type.GetConstructors()[0];
+#pragma warning restore CA1062 // Validate arguments of public methods
          var members = new Dictionary<string, IConfigurationSection>();
 
          var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
@@ -50,7 +52,9 @@ namespace Tests
       [InlineData(typeof(TwoOptionalParameters), false)]
       public void IsInvokableWithoutDefaultParametersIsCorrect(Type type, bool expectedIsInvokableWithoutDefaultParameters, params string[] resolvableMemberNames)
       {
-         var constructor = type.GetTypeInfo().GetConstructors()[0];
+#pragma warning disable CA1062 // Validate arguments of public methods
+         var constructor = type.GetConstructors()[0];
+#pragma warning restore CA1062 // Validate arguments of public methods
          var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null!);
 
          var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
@@ -79,7 +83,9 @@ namespace Tests
       [InlineData(typeof(TwoOptionalParameters), true)]
       public void IsInvokableWithDefaultParametersIsCorrect(Type type, bool expectedIsInvokableWithDefaultParameters, params string[] resolvableMemberNames)
       {
-         var constructor = type.GetTypeInfo().GetConstructors()[0];
+#pragma warning disable CA1062 // Validate arguments of public methods
+         var constructor = type.GetConstructors()[0];
+#pragma warning restore CA1062 // Validate arguments of public methods
          var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null!);
 
          var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
@@ -103,8 +109,10 @@ namespace Tests
       [InlineData(typeof(ThreeParametersOneRequired), typeof(ThreeOptionalParameters), -1, "foo")]
       public void CompareToReturnsTheCorrectValue(Type lhsConstructorType, Type rhsConstructorType, int expectedComparisonValue, params string[] resolvableMemberNames)
       {
-         var lhsConstructor = lhsConstructorType.GetTypeInfo().GetConstructors()[0];
-         var rhsConstructor = rhsConstructorType.GetTypeInfo().GetConstructors()[0];
+#pragma warning disable CA1062 // Validate arguments of public methods
+         var lhsConstructor = lhsConstructorType.GetConstructors()[0];
+         var rhsConstructor = rhsConstructorType.GetConstructors()[0];
+#pragma warning restore CA1062 // Validate arguments of public methods
 
          var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null!);
 
@@ -140,7 +148,7 @@ namespace Tests
       [Fact]
       public void MatchedNamesAreHigherPriorityThanResolvedTypes()
       {
-         var constructors = typeof(ConstructorsWithMatchingParamCount).GetTypeInfo().GetConstructors();
+         var constructors = typeof(ConstructorsWithMatchingParamCount).GetConstructors();
          var members = new Dictionary<string, IConfigurationSection>
             {
                 { "one", null! },

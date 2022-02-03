@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - As the package now uses nullable reference types, some method parameters now specify if they can accept nullable values.
 - Updated attributes to be `sealed`.
 - Fixes ambiguous constructor issue between injectable and named parameters counts.
+- `Resolver` no longer catches all exceptions for invocations of provided `Func<>` objects on construction.
 
 ## 1.6.9 - 2021-08-11
 
