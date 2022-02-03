@@ -244,7 +244,7 @@ namespace RockLib.Configuration.ObjectFactory
       private static bool IsValueSection(IConfiguration configuration)
       {
          var valueSection = configuration as IConfigurationSection;
-         return valueSection?.Value != null;
+         return valueSection?.Value is not null;
       }
 
       private static bool IsValueSection(IConfiguration configuration, [MaybeNullWhen(false)] out IConfigurationSection valueSection)
@@ -253,7 +253,7 @@ namespace RockLib.Configuration.ObjectFactory
 
          if (configuration is IConfigurationSection valueConfigurationSection)
          {
-            if (valueConfigurationSection.Value != null)
+            if (valueConfigurationSection.Value is not null)
             {
                valueSection = valueConfigurationSection;
                return true;
@@ -270,7 +270,7 @@ namespace RockLib.Configuration.ObjectFactory
          var convert = GetConvertFunc(targetType, declaringType, memberName, valueConverters);
          try
          {
-            if (convert != null)
+            if (convert is not null)
                return convert(valueSection.Value) ?? throw Exceptions.ResultCannotBeNull(targetType, declaringType, memberName);
             if (targetType.IsAssignableFrom(typeof(string)))
                return valueSection.Value;
@@ -307,12 +307,12 @@ namespace RockLib.Configuration.ObjectFactory
          {
             Type? returnType;
             var convertMethodName = GetConverterMethodNameFromMemberCustomAttributes(declaringType, memberName, out var declaringTypeOfDecoratedMember);
-            if (convertMethodName != null)
+            if (convertMethodName is not null)
                CreateConvertFunc(declaringTypeOfDecoratedMember ?? declaringType!, convertMethodName, out returnType, out convert);
             else
             {
                convertMethodName = GetConverterMethodNameFromCustomAttributes(targetType.CustomAttributes);
-               if (convertMethodName != null)
+               if (convertMethodName is not null)
                   CreateConvertFunc(targetType, convertMethodName, out returnType, out convert);
                else
                {
@@ -320,7 +320,7 @@ namespace RockLib.Configuration.ObjectFactory
                   returnType = null;
                }
             }
-            if (returnType != null)
+            if (returnType is not null)
             {
                if (!targetType.IsAssignableFrom(returnType))
                   throw Exceptions.ReturnTypeOfMethodFromAttributeIsNotAssignableToTargetType(targetType, returnType, convertMethodName);
@@ -460,8 +460,8 @@ namespace RockLib.Configuration.ObjectFactory
          {
             return
                 (!defaultConstructorRequired
-                    || type.GetConstructor(Type.EmptyTypes) != null)
-                && GetNonGenericListItemType(type) != null;
+                    || type.GetConstructor(Type.EmptyTypes) is not null)
+                && GetNonGenericListItemType(type) is not null;
          }
          return false;
       }
@@ -570,7 +570,7 @@ namespace RockLib.Configuration.ObjectFactory
              || type == typeof(Uri)
              || type == typeof(Encoding)
              || type == typeof(Type)
-             || GetConvertFunc(targetType, declaringType, memberName, valueConverters) != null;
+             || GetConvertFunc(targetType, declaringType, memberName, valueConverters) is not null;
       }
 
       internal static bool TryGetDefaultType(DefaultTypes defaultTypes, Type targetType, Type? declaringType, string? memberName,
@@ -582,7 +582,7 @@ namespace RockLib.Configuration.ObjectFactory
          defaultType = GetDefaultTypeFromMemberCustomAttributes(declaringType, memberName) ?? 
             GetDefaultTypeFromCustomAttributes(targetType.CustomAttributes);
 
-         if (defaultType != null)
+         if (defaultType is not null)
          {
             if (!targetType.IsAssignableFrom(defaultType))
             {
@@ -622,7 +622,7 @@ namespace RockLib.Configuration.ObjectFactory
             {
                var property = declaringType!.GetProperty(member.Name, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)!;
                var value = GetFirstParameterValueFromCustomAttributes<T>(property.CustomAttributes, attributeTypeName);
-               if (value != null)
+               if (value is not null)
                {
                   parameterValueSet.Add(value);
                   declaringTypeSet.Add(property.DeclaringType!);
@@ -635,7 +635,7 @@ namespace RockLib.Configuration.ObjectFactory
                    .Where(p => StringComparer.OrdinalIgnoreCase.Equals(p.Name, member.Name)))
                {
                   var value = GetFirstParameterValueFromCustomAttributes<T>(parameter.CustomAttributes, attributeTypeName);
-                  if (value != null)
+                  if (value is not null)
                   {
                      parameterValueSet.Add(value);
                      declaringTypeSet.Add(parameter.Member.DeclaringType!);
@@ -708,14 +708,14 @@ namespace RockLib.Configuration.ObjectFactory
               attribute.AttributeType.Name == attributeTypeName
                   && attribute.ConstructorArguments.Count == 1
                   && attribute.ConstructorArguments[0].ArgumentType == typeof(T)
-                  && attribute.ConstructorArguments[0].Value != null)
+                  && attribute.ConstructorArguments[0].Value is not null)
               .Select(attribute => (T)attribute.ConstructorArguments[0].Value!)!;
 
       private static MethodInfo GetListAddMethod(Type? tType) =>
-          (tType != null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList)).GetMethod("Add")!;
+          (tType is not null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList)).GetMethod("Add")!;
 
       private static MethodInfo GetListClearMethod(Type? tType) =>
-          (tType != null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList)).GetMethod("Clear")!;
+          (tType is not null ? typeof(ICollection<>).MakeGenericType(tType) : typeof(IList)).GetMethod("Clear")!;
 
       private static MethodInfo GetDictionaryAddMethod(Type tValueType) =>
           typeof(ICollection<>).MakeGenericType(typeof(KeyValuePair<,>).MakeGenericType(typeof(string), tValueType)).GetMethod("Add")!;
@@ -850,14 +850,14 @@ namespace RockLib.Configuration.ObjectFactory
                }
                if (!found)
                {
-                  if (Resolver != null && Resolver.TryResolve(parameters[i], out var arg))
+                  if (Resolver is not null && Resolver.TryResolve(parameters[i], out var arg))
                      args[i] = arg;
                   else if (parameters[i].HasDefaultValue)
                   {
-                     if (parameters[i].DefaultValue != null)
+                     if (parameters[i].DefaultValue is not null)
                      {
                         var underlyingType = Nullable.GetUnderlyingType(parameters[i].ParameterType);
-                        if (underlyingType != null && underlyingType.IsEnum)
+                        if (underlyingType is not null && underlyingType.IsEnum)
                            args[i] = Enum.ToObject(underlyingType, parameters[i].DefaultValue!);
                         else
                            args[i] = parameters[i].DefaultValue!;

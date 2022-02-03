@@ -296,7 +296,7 @@ namespace Tests
             ["foo:value:bar"] = "123",
          };
 
-         if (type != null)
+         if (type is not null)
          {
             initialData.Add("foo:type", type.AssemblyQualifiedName!);
          }

@@ -129,9 +129,6 @@ namespace RockLib.Configuration.ObjectFactory
          DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null) =>
             configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null, resolver ?? Resolver.Empty);
 
-      // TODO: Can these really be null?
-      // They HAVE to be, because other code is already passing them in.
-      // DefaultTypes defaultTypes = null, ValueConverters valueConverters = null, IResolver resolver = null
       internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, 
          DefaultTypes? defaultTypes, ValueConverters? valueConverters, Type? declaringType, string? memberName, IResolver? resolver)
       {

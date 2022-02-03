@@ -27,7 +27,7 @@ namespace RockLib.Configuration.ObjectFactory
 
          CanResolve = p =>
          {
-            return resolve(p.ParameterType) != null;
+            return resolve(p.ParameterType) is not null;
          };
 
          Resolve = p =>
@@ -86,16 +86,16 @@ namespace RockLib.Configuration.ObjectFactory
 
          CanResolve = p =>
          {
-            if (resolveNamed(p.ParameterType, p.Name!) != null)
+            if (resolveNamed(p.ParameterType, p.Name!) is not null)
                return true;
 
-            return resolve(p.ParameterType) != null;
+            return resolve(p.ParameterType) is not null;
          };
 
          Resolve = p =>
          {
             var obj = resolveNamed(p.ParameterType, p.Name!);
-            if (obj != null)
+            if (obj is not null)
                return obj;
 
             return resolve(p.ParameterType);
@@ -141,7 +141,7 @@ namespace RockLib.Configuration.ObjectFactory
          Resolve = p =>
          {
             var obj = resolveNamed(p.ParameterType, p.Name!);
-            if (obj != null)
+            if (obj is not null)
                return obj;
 
             return resolve(p.ParameterType);
@@ -177,7 +177,7 @@ namespace RockLib.Configuration.ObjectFactory
          if (CanResolve(parameter))
          {
             value = Resolve(parameter);
-            return value != null;
+            return value is not null;
          }
 
          value = null;

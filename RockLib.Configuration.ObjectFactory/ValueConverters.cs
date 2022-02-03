@@ -82,8 +82,8 @@ namespace RockLib.Configuration.ObjectFactory
       /// </returns>
       public bool TryGet(Type? declaringType, string? memberName, [MaybeNullWhen(false)] out Func<string, object>? convertFunc) =>
           _converters.TryGetValue(GetKey(declaringType, memberName), out var converter)
-              ? (convertFunc = converter.ConvertFunc) != null
-              : (convertFunc = null) != null;
+              ? (convertFunc = converter.ConvertFunc) is not null
+              : (convertFunc = null) is not null;
 
       /// <summary>
       /// Attempt to get a convert function for a specified target type.
@@ -98,8 +98,8 @@ namespace RockLib.Configuration.ObjectFactory
       /// </returns>
       public bool TryGet(Type targetType, [MaybeNullWhen(false)] out Func<string, object>? convertFunc) =>
           _converters.TryGetValue(GetKey(targetType), out var converter)
-              ? (convertFunc = converter.ConvertFunc) != null
-              : (convertFunc = null) != null;
+              ? (convertFunc = converter.ConvertFunc) is not null
+              : (convertFunc = null) is not null;
 
       private ValueConverters Add(Type declaringType, string memberName, Type returnType, Func<string, object> convertFunc)
       {
@@ -128,9 +128,9 @@ namespace RockLib.Configuration.ObjectFactory
       }
 
       private static string GetKey(Type? declaringType, string? memberName) =>
-         (declaringType != null && memberName != null) ? declaringType.FullName + "::" + memberName : "";
+         (declaringType is not null && memberName is not null) ? declaringType.FullName + "::" + memberName : "";
 
-      private static string GetKey(Type targetType) => targetType != null ? targetType.FullName! : "";
+      private static string GetKey(Type targetType) => targetType is not null ? targetType.FullName! : "";
 
       private class ValueConverter
       {

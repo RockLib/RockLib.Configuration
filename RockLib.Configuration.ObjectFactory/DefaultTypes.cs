@@ -99,9 +99,9 @@ namespace RockLib.Configuration.ObjectFactory
             _dictionary.TryGetValue(GetKey(targetType), out defaultType);
 
         private static string GetKey(Type? declaringType, string? memberName) => 
-            (declaringType != null && memberName != null) ? declaringType.FullName + "::" + memberName : "";
+            (declaringType is not null && memberName is not null) ? declaringType.FullName + "::" + memberName : "";
 
-        private static string GetKey(Type? targetType) => targetType != null ? targetType.FullName! : "";
+        private static string GetKey(Type? targetType) => targetType is not null ? targetType.FullName! : "";
 
         IEnumerator<KeyValuePair<string, Type>> IEnumerable<KeyValuePair<string, Type>>.GetEnumerator() => _dictionary.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_dictionary).GetEnumerator();

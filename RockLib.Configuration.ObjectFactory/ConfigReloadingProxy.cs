@@ -110,7 +110,7 @@ namespace RockLib.Configuration.ObjectFactory
 
          // If _section contains a type-specified value, extract the type and use the value sub-section.
          string typeValue = _section[ConfigurationObjectFactory.TypeKey];
-         if (typeValue != null)
+         if (typeValue is not null)
          {
             // Throw if the value does not represent a valid Type.
             concreteType = Type.GetType(typeValue, true)!;
@@ -194,7 +194,7 @@ namespace RockLib.Configuration.ObjectFactory
 
          void AddSettingsDump(IConfiguration config, StringBuilder sb)
          {
-            if (config is IConfigurationSection section && section.Value != null)
+            if (config is IConfigurationSection section && section.Value is not null)
                sb.Append(section.Path).Append(section.Value);
             foreach (var child in config.GetChildren())
                AddSettingsDump(child, sb);
