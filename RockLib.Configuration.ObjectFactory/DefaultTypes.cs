@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -33,11 +34,11 @@ namespace RockLib.Configuration.ObjectFactory
         /// </exception>
         public DefaultTypes Add(Type declaringType, string memberName, Type defaultType)
         {
-            if (declaringType == null) throw new ArgumentNullException(nameof(declaringType));
-            if (memberName == null) throw new ArgumentNullException(nameof(memberName));
-            if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
+            if (declaringType is null) throw new ArgumentNullException(nameof(declaringType));
+            if (memberName is null) throw new ArgumentNullException(nameof(memberName));
+            if (defaultType is null) throw new ArgumentNullException(nameof(defaultType));
 
-            if (defaultType.GetTypeInfo().IsAbstract)
+            if (defaultType.IsAbstract)
                 throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
             var matchingMembers = Members.Find(declaringType, memberName).ToList();
@@ -45,7 +46,7 @@ namespace RockLib.Configuration.ObjectFactory
             if (matchingMembers.Count == 0)
                 throw Exceptions.NoMatchingMembers(declaringType, memberName);
 
-            var notAssignableMembers = matchingMembers.Where(m => !m.Type.GetTypeInfo().IsAssignableFrom(defaultType)).ToList();
+            var notAssignableMembers = matchingMembers.Where(m => !m.Type.IsAssignableFrom(defaultType)).ToList();
             if (notAssignableMembers.Count > 0)
                 throw Exceptions.DefaultTypeNotAssignableToMembers(declaringType, memberName, defaultType, notAssignableMembers);
 
@@ -66,12 +67,12 @@ namespace RockLib.Configuration.ObjectFactory
         /// <exception cref="ArgumentException">If <paramref name="defaultType"/> is not assignable to <paramref name="targetType"/>.</exception>
         public DefaultTypes Add(Type targetType, Type defaultType)
         {
-            if (targetType == null) throw new ArgumentNullException(nameof(targetType));
-            if (defaultType == null) throw new ArgumentNullException(nameof(defaultType));
+            if (targetType is null) throw new ArgumentNullException(nameof(targetType));
+            if (defaultType is null) throw new ArgumentNullException(nameof(defaultType));
 
-            if (defaultType.GetTypeInfo().IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
+            if (defaultType.IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
-            if (!targetType.GetTypeInfo().IsAssignableFrom(defaultType))
+            if (!targetType.IsAssignableFrom(defaultType))
                 throw Exceptions.DefaultTypeIsNotAssignableToTargetType(targetType, defaultType);
 
             _dictionary.Add(GetKey(targetType), defaultType);
@@ -85,7 +86,7 @@ namespace RockLib.Configuration.ObjectFactory
         /// <param name="memberName">The name of the member to find a default type for.</param>
         /// <param name="defaultType">When a match is found for the member, contains its default type.</param>
         /// <returns>True, if a default type was found for the member. Otherwise, false if a default type could not be found.</returns>
-        public bool TryGet(Type declaringType, string memberName, out Type defaultType) =>
+        public bool TryGet(Type? declaringType, string? memberName, [MaybeNullWhen(false)] out Type defaultType) =>
             _dictionary.TryGetValue(GetKey(declaringType, memberName), out defaultType);
 
         /// <summary>
@@ -94,13 +95,13 @@ namespace RockLib.Configuration.ObjectFactory
         /// <param name="targetType">The type to find a default type for.</param>
         /// <param name="defaultType">When a match is found for the target type, contains its default type.</param>
         /// <returns>True, if a default type was found for the target type. Otherwise, false if a default type could not be found.</returns>
-        public bool TryGet(Type targetType, out Type defaultType) =>
+        public bool TryGet(Type targetType, [MaybeNullWhen(false)] out Type defaultType) =>
             _dictionary.TryGetValue(GetKey(targetType), out defaultType);
 
-        private static string GetKey(Type declaringType, string memberName) => 
-            (declaringType != null && memberName != null) ? declaringType.FullName + "::" + memberName : "";
+        private static string GetKey(Type? declaringType, string? memberName) => 
+            (declaringType is not null && memberName is not null) ? declaringType.FullName + "::" + memberName : "";
 
-        private static string GetKey(Type targetType) => targetType != null ? targetType.FullName: "";
+        private static string GetKey(Type? targetType) => targetType is not null ? targetType.FullName! : "";
 
         IEnumerator<KeyValuePair<string, Type>> IEnumerable<KeyValuePair<string, Type>>.GetEnumerator() => _dictionary.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_dictionary).GetEnumerator();

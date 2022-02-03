@@ -8,7 +8,7 @@ namespace RockLib.Configuration.ObjectFactory
     /// that is assignable to the member that this attribute decorates.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Parameter | AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = false)]
-    public class ConvertMethodAttribute : Attribute
+    public sealed class ConvertMethodAttribute : Attribute
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConvertMethodAttribute"/> class.
