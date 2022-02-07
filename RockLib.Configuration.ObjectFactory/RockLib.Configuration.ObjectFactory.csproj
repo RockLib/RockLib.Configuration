@@ -4,7 +4,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<PackageId>RockLib.Configuration.ObjectFactory</PackageId>
-		<PackageVersion>1.6.9</PackageVersion>
+		<PackageVersion>2.0.0</PackageVersion>
 		<Authors>RockLib</Authors>
 		<Description>Creates objects from IConfiguration and IConfigurationSection objects. A replacement for some of the functionality of Microsoft.Extensions.Configuration.Binder.</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -14,7 +14,7 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<Copyright>Copyright 2017-2021 (c) Rocket Mortgage. All rights reserved.</Copyright>
 		<PackageTags>Configuration Factory Binder IConfiguration IConfigurationSection</PackageTags>
-		<Version>1.1.2</Version>
+		<Version>2.0.0</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
