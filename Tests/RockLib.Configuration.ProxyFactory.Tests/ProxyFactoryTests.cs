@@ -102,7 +102,7 @@ namespace Tests
         [Fact]
         public void NonGeneric_GivenNullConfiguration_ThrowsArgumentNullException()
         {
-            IConfiguration fooSection = null;
+            IConfiguration fooSection = null!;
 
             Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy(typeof(IReadonlyProperties)));
         }
@@ -125,7 +125,7 @@ namespace Tests
         [Fact]
         public void Generic_GivenNullConfiguration_ThrowsArgumentNullException()
         {
-            IConfiguration fooSection = null;
+            IConfiguration fooSection = null!;
 
             Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy<IReadonlyProperties>());
         }
