@@ -165,7 +165,7 @@ namespace Tests
             var ex = Assert.Throws<ArgumentException>(() => fooSection.CreateProxy<IHasMethod>());
 
 #if DEBUG
-            var expected = Exceptions.TargetInterfaceCannotHaveAnyMethods(typeof(IHasMethod), typeof(IHasMethod).GetTypeInfo().GetMethod("Foo"));
+            var expected = Exceptions.TargetInterfaceCannotHaveAnyMethods(typeof(IHasMethod), typeof(IHasMethod).GetTypeInfo().GetMethod("Foo")!);
             Assert.Equal(expected.Message, ex.Message);
 #endif
         }
@@ -185,7 +185,7 @@ namespace Tests
             var ex = Assert.Throws<ArgumentException>(() => fooSection.CreateProxy<IHasEvent>());
 
 #if DEBUG
-            var expected = Exceptions.TargetInterfaceCannotHaveAnyEvents(typeof(IHasEvent), typeof(IHasEvent).GetTypeInfo().GetEvent("Foo"));
+            var expected = Exceptions.TargetInterfaceCannotHaveAnyEvents(typeof(IHasEvent), typeof(IHasEvent).GetTypeInfo().GetEvent("Foo")!);
             Assert.Equal(expected.Message, ex.Message);
 #endif
         }
@@ -225,7 +225,7 @@ namespace Tests
             var ex = Assert.Throws<ArgumentException>(() => fooSection.CreateProxy<IHasWriteOnlyProperty>());
 
 #if DEBUG
-            var expected = Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(typeof(IHasWriteOnlyProperty), typeof(IHasWriteOnlyProperty).GetTypeInfo().GetProperty("Foo"));
+            var expected = Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(typeof(IHasWriteOnlyProperty), typeof(IHasWriteOnlyProperty).GetTypeInfo().GetProperty("Foo")!);
             Assert.Equal(expected.Message, ex.Message);
 #endif
         }
