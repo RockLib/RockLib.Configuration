@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard1.6;netstandard2.0;net451;net47</TargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <PackageId>RockLib.Configuration.ProxyFactory</PackageId>
     <PackageVersion>1.0.7</PackageVersion>
     <Authors>RockLib</Authors>
@@ -41,15 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RockLib.Configuration.ObjectFactory" Version="1.6.9" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6' Or '$(TargetFramework)'=='netstandard2.0'">
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.6' Or '$(TargetFramework)'=='net451'">
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="RockLib.Configuration.ObjectFactory" Version="2.0.0" />
   </ItemGroup>
 
 </Project>
