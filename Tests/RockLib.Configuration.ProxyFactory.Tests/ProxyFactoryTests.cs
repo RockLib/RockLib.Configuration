@@ -230,36 +230,36 @@ namespace Tests
 #endif
         }
 
-        public interface IReadonlyProperties
+        private interface IReadonlyProperties
         {
             string Bar { get; }
             int Baz { get; }
         }
 
-        public interface IReadWriteProperties
+        private interface IReadWriteProperties
         {
             string Bar { get; set; }
             int Baz { get; set; }
         }
 
-        public class NotAnInterface { }
+        private class NotAnInterface { }
 
-        public interface IHasMethod
+        private interface IHasMethod
         {
             void Foo();
         }
 
-        public interface IHasEvent
+        private interface IHasEvent
         {
             event EventHandler Foo;
         }
 
-        public interface IHasIndexerProperty
+        private interface IHasIndexerProperty
         {
             int this[string foo] { get; set; }
         }
 
-        public interface IHasWriteOnlyProperty
+        private interface IHasWriteOnlyProperty
         {
             int Foo { set; }
         }
