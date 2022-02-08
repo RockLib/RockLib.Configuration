@@ -4,6 +4,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+        <Authors>Rocket Mortgage</Authors>
 		<LangVersion>latest</LangVersion>
 		<Nullable>enable</Nullable>
 		<TargetFrameworks>net6.0;netcoreapp3.1;net48</TargetFrameworks>
