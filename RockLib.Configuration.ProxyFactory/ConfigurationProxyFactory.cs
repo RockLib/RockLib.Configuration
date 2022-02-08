@@ -45,8 +45,8 @@ namespace RockLib.Configuration.ProxyFactory
         /// <exception cref="ArgumentException">
         /// If <typeparamref name="T"/> is not an interface or has any declared methods, events, or write-only properties.
         /// </exception>
-        public static T CreateProxy<T>(this IConfiguration configuration, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null) =>
-            (T)configuration.CreateProxy(typeof(T), defaultTypes, valueConverters);
+        public static T? CreateProxy<T>(this IConfiguration configuration, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null) =>
+            (T)configuration.CreateProxy(typeof(T), defaultTypes, valueConverters)!;
 
         /// <summary>
         /// Returns an instance of a proxy type that implements the interface specified by the <paramref name="type"/>
@@ -75,7 +75,7 @@ namespace RockLib.Configuration.ProxyFactory
         /// <exception cref="ArgumentException">
         /// If <paramref name="type"/> is not an interface or has any declared methods, events, or write-only properties.
         /// </exception>
-        public static object CreateProxy(this IConfiguration configuration, Type type, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null)
+        public static object? CreateProxy(this IConfiguration configuration, Type type, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null)
         {
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
             if (type is null) throw new ArgumentNullException(nameof(type));
