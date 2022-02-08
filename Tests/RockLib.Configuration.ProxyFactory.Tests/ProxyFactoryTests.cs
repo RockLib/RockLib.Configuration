@@ -10,7 +10,7 @@ namespace Tests
     public class ProxyFactoryTests
     {
         [Fact]
-        public void NonGeneric_CanCreateProxyForReadonlyProperties()
+        public void NonGenericCanCreateProxyForReadonlyProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -31,7 +31,7 @@ namespace Tests
         }
 
         [Fact]
-        public void NonGeneric_CanCreateProxyForReadWriteProperties()
+        public void NonGenericCanCreateProxyForReadWriteProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -59,7 +59,7 @@ namespace Tests
         }
 
         [Fact]
-        public void Generic_CanCreateProxyForReadonlyProperties()
+        public void GenericCanCreateProxyForReadonlyProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -76,7 +76,7 @@ namespace Tests
         }
 
         [Fact]
-        public void Generic_CanCreateProxyForReadWriteProperties()
+        public void GenericCanCreateProxyForReadWriteProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -100,7 +100,7 @@ namespace Tests
         }
 
         [Fact]
-        public void NonGeneric_GivenNullConfiguration_ThrowsArgumentNullException()
+        public void NonGenericGivenNullConfigurationThrowsArgumentNullException()
         {
             IConfiguration fooSection = null!;
 
@@ -108,7 +108,7 @@ namespace Tests
         }
 
         [Fact]
-        public void NonGeneric_GivenNullType_ThrowsArgumentNullException()
+        public void NonGenericGivenNullTypeThrowsArgumentNullException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -123,7 +123,7 @@ namespace Tests
         }
 
         [Fact]
-        public void Generic_GivenNullConfiguration_ThrowsArgumentNullException()
+        public void GenericGivenNullConfigurationThrowsArgumentNullException()
         {
             IConfiguration fooSection = null!;
 
@@ -131,7 +131,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenTypeIsNotAnInterface_ThrowsArgumentException()
+        public void GivenTypeIsNotAnInterfaceThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -151,7 +151,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAMethod_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAMethodThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -171,7 +171,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAnEvent_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAnEventThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -191,7 +191,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAnIndexerProperty_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAnIndexerPropertyThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -211,7 +211,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAWriteOnlyProperty_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAWriteOnlyPropertyThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
