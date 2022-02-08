@@ -119,7 +119,7 @@ namespace Tests
 
             var fooSection = config.GetSection("foo");
 
-            Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy(null));
+            Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy(null!));
         }
 
         [Fact]
