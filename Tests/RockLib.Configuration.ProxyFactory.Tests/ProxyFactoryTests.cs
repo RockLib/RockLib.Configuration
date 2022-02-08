@@ -71,7 +71,7 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var foo = fooSection.CreateProxy<IReadonlyProperties>();
 
-            Assert.Equal("abcdefg", foo.Bar);
+            Assert.Equal("abcdefg", foo!.Bar);
             Assert.Equal(123, foo.Baz);
         }
 
@@ -88,7 +88,7 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var foo = fooSection.CreateProxy<IReadWriteProperties>();
 
-            Assert.Equal("abcdefg", foo.Bar);
+            Assert.Equal("abcdefg", foo!.Bar);
             Assert.Equal(123, foo.Baz);
 
             // Make sure getters and setters work as expected.
