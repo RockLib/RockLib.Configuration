@@ -182,7 +182,10 @@ namespace RockLib.Configuration.ProxyFactory
             {
                 switch (member)
                 {
-                    case MethodInfo m when !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.StartsWith("add_") && !m.Name.StartsWith("remove_"):
+                    case MethodInfo m when !m.Name.StartsWith("get_", StringComparison.InvariantCulture) &&
+                                           !m.Name.StartsWith("set_", StringComparison.InvariantCulture) &&
+                                           !m.Name.StartsWith("add_", StringComparison.InvariantCulture) &&
+                                           !m.Name.StartsWith("remove_", StringComparison.InvariantCulture):
                         throw Exceptions.TargetInterfaceCannotHaveAnyMethods(type, m);
                     case EventInfo e:
                         throw Exceptions.TargetInterfaceCannotHaveAnyEvents(type, e);
