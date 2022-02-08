@@ -230,40 +230,44 @@ namespace Tests
 #endif
         }
 
-        private interface IReadonlyProperties
+#pragma warning disable CA1034
+        public interface IReadonlyProperties
         {
             string Bar { get; }
             int Baz { get; }
         }
 
-        private interface IReadWriteProperties
+        public interface IReadWriteProperties
         {
             string Bar { get; set; }
             int Baz { get; set; }
         }
 
 #pragma warning disable CA1812
-        private class NotAnInterface { }
+        public class NotAnInterface { }
 #pragma warning restore CA1812
 
-        private interface IHasMethod
+        public interface IHasMethod
         {
             void Foo();
         }
 
-        private interface IHasEvent
+        public interface IHasEvent
         {
             event EventHandler Foo;
         }
 
-        private interface IHasIndexerProperty
+        public interface IHasIndexerProperty
         {
             int this[string foo] { get; set; }
         }
 
-        private interface IHasWriteOnlyProperty
+        public interface IHasWriteOnlyProperty
         {
+#pragma warning disable CA1044
             int Foo { set; }
+#pragma warning restore CA1044
         }
+#pragma warning restore CA1034
     }
 }
