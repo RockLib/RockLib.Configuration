@@ -80,7 +80,7 @@ namespace RockLib.Configuration.ProxyFactory
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
             if (type is null) throw new ArgumentNullException(nameof(type));
             var proxyType = _proxyCache.GetOrAdd(type, CreateProxyType);
-            return configuration.Create(proxyType, defaultTypes, valueConverters);
+            return configuration.Create(proxyType, defaultTypes, valueConverters, null);
         }
 
         private static Type CreateProxyType(Type type)
