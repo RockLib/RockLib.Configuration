@@ -24,7 +24,7 @@ namespace Tests
 
             Assert.IsAssignableFrom<IReadonlyProperties>(fooObject);
 
-            var foo = (IReadonlyProperties)fooObject;
+            var foo = (IReadonlyProperties)fooObject!;
 
             Assert.Equal("abcdefg", foo.Bar);
             Assert.Equal(123, foo.Baz);
@@ -45,7 +45,7 @@ namespace Tests
 
             Assert.IsAssignableFrom<IReadWriteProperties>(fooObject);
 
-            var foo = (IReadWriteProperties)fooObject;
+            var foo = (IReadWriteProperties)fooObject!;
 
             Assert.Equal("abcdefg", foo.Bar);
             Assert.Equal(123, foo.Baz);
