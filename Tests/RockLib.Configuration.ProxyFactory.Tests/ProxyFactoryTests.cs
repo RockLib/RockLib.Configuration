@@ -242,7 +242,9 @@ namespace Tests
             int Baz { get; set; }
         }
 
+#pragma warning disable CA1812
         private class NotAnInterface { }
+#pragma warning restore CA1812
 
         private interface IHasMethod
         {
