@@ -115,7 +115,7 @@ namespace RockLib.Configuration.ProxyFactory
 
             AddConstructor(typeBuilder, readonlyFields);
 
-            return typeBuilder.CreateTypeInfo().AsType();
+            return typeBuilder.CreateTypeInfo()!.AsType();
         }
 
         private static TypeBuilder GetTypeBuilder(Type type)
@@ -189,7 +189,8 @@ namespace RockLib.Configuration.ProxyFactory
                         throw Exceptions.TargetInterfaceCannotHaveAnyMethods(type, m);
                     case EventInfo e:
                         throw Exceptions.TargetInterfaceCannotHaveAnyEvents(type, e);
-                    case PropertyInfo p when p.CanRead && p.GetGetMethod().GetParameters().Length > 0 || p.CanWrite && p.GetSetMethod().GetParameters().Length > 1:
+                    case PropertyInfo p when p.CanRead && p.GetGetMethod()!.GetParameters().Length > 0 ||
+                                             p.CanWrite && p.GetSetMethod()!.GetParameters().Length > 1:
                         throw Exceptions.TargetInterfaceCannotHaveAnyIndexerProperties(type, p);
                     case PropertyInfo p when !p.CanRead:
                         throw Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(type, p);
