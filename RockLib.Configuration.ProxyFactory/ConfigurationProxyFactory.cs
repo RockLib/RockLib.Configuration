@@ -45,8 +45,8 @@ namespace RockLib.Configuration.ProxyFactory
         /// <exception cref="ArgumentException">
         /// If <typeparamref name="T"/> is not an interface or has any declared methods, events, or write-only properties.
         /// </exception>
-        public static T CreateProxy<T>(this IConfiguration configuration, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null) =>
-            (T)configuration.CreateProxy(typeof(T), defaultTypes, valueConverters);
+        public static T? CreateProxy<T>(this IConfiguration configuration, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null) =>
+            (T)configuration.CreateProxy(typeof(T), defaultTypes, valueConverters)!;
 
         /// <summary>
         /// Returns an instance of a proxy type that implements the interface specified by the <paramref name="type"/>
@@ -75,12 +75,12 @@ namespace RockLib.Configuration.ProxyFactory
         /// <exception cref="ArgumentException">
         /// If <paramref name="type"/> is not an interface or has any declared methods, events, or write-only properties.
         /// </exception>
-        public static object CreateProxy(this IConfiguration configuration, Type type, DefaultTypes defaultTypes = null, ValueConverters valueConverters = null)
+        public static object? CreateProxy(this IConfiguration configuration, Type type, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null)
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (configuration is null) throw new ArgumentNullException(nameof(configuration));
+            if (type is null) throw new ArgumentNullException(nameof(type));
             var proxyType = _proxyCache.GetOrAdd(type, CreateProxyType);
-            return configuration.Create(proxyType, defaultTypes, valueConverters);
+            return configuration.Create(proxyType, defaultTypes, valueConverters, null);
         }
 
         private static Type CreateProxyType(Type type)
@@ -115,7 +115,7 @@ namespace RockLib.Configuration.ProxyFactory
 
             AddConstructor(typeBuilder, readonlyFields);
 
-            return typeBuilder.CreateTypeInfo().AsType();
+            return typeBuilder.CreateTypeInfo()!.AsType();
         }
 
         private static TypeBuilder GetTypeBuilder(Type type)
@@ -182,11 +182,15 @@ namespace RockLib.Configuration.ProxyFactory
             {
                 switch (member)
                 {
-                    case MethodInfo m when !m.Name.StartsWith("get_") && !m.Name.StartsWith("set_") && !m.Name.StartsWith("add_") && !m.Name.StartsWith("remove_"):
+                    case MethodInfo m when !m.Name.StartsWith("get_", StringComparison.InvariantCulture) &&
+                                           !m.Name.StartsWith("set_", StringComparison.InvariantCulture) &&
+                                           !m.Name.StartsWith("add_", StringComparison.InvariantCulture) &&
+                                           !m.Name.StartsWith("remove_", StringComparison.InvariantCulture):
                         throw Exceptions.TargetInterfaceCannotHaveAnyMethods(type, m);
                     case EventInfo e:
                         throw Exceptions.TargetInterfaceCannotHaveAnyEvents(type, e);
-                    case PropertyInfo p when p.CanRead && p.GetGetMethod().GetParameters().Length > 0 || p.CanWrite && p.GetSetMethod().GetParameters().Length > 1:
+                    case PropertyInfo p when p.CanRead && p.GetGetMethod()!.GetParameters().Length > 0 ||
+                                             p.CanWrite && p.GetSetMethod()!.GetParameters().Length > 1:
                         throw Exceptions.TargetInterfaceCannotHaveAnyIndexerProperties(type, p);
                     case PropertyInfo p when !p.CanRead:
                         throw Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(type, p);

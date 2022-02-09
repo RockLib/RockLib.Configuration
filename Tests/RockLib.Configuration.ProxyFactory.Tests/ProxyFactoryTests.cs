@@ -10,7 +10,7 @@ namespace Tests
     public class ProxyFactoryTests
     {
         [Fact]
-        public void NonGeneric_CanCreateProxyForReadonlyProperties()
+        public void NonGenericCanCreateProxyForReadonlyProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -24,14 +24,14 @@ namespace Tests
 
             Assert.IsAssignableFrom<IReadonlyProperties>(fooObject);
 
-            var foo = (IReadonlyProperties)fooObject;
+            var foo = (IReadonlyProperties)fooObject!;
 
             Assert.Equal("abcdefg", foo.Bar);
             Assert.Equal(123, foo.Baz);
         }
 
         [Fact]
-        public void NonGeneric_CanCreateProxyForReadWriteProperties()
+        public void NonGenericCanCreateProxyForReadWriteProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -45,7 +45,7 @@ namespace Tests
 
             Assert.IsAssignableFrom<IReadWriteProperties>(fooObject);
 
-            var foo = (IReadWriteProperties)fooObject;
+            var foo = (IReadWriteProperties)fooObject!;
 
             Assert.Equal("abcdefg", foo.Bar);
             Assert.Equal(123, foo.Baz);
@@ -59,7 +59,7 @@ namespace Tests
         }
 
         [Fact]
-        public void Generic_CanCreateProxyForReadonlyProperties()
+        public void GenericCanCreateProxyForReadonlyProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -71,12 +71,12 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var foo = fooSection.CreateProxy<IReadonlyProperties>();
 
-            Assert.Equal("abcdefg", foo.Bar);
+            Assert.Equal("abcdefg", foo!.Bar);
             Assert.Equal(123, foo.Baz);
         }
 
         [Fact]
-        public void Generic_CanCreateProxyForReadWriteProperties()
+        public void GenericCanCreateProxyForReadWriteProperties()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -88,7 +88,7 @@ namespace Tests
             var fooSection = config.GetSection("foo");
             var foo = fooSection.CreateProxy<IReadWriteProperties>();
 
-            Assert.Equal("abcdefg", foo.Bar);
+            Assert.Equal("abcdefg", foo!.Bar);
             Assert.Equal(123, foo.Baz);
 
             // Make sure getters and setters work as expected.
@@ -100,15 +100,15 @@ namespace Tests
         }
 
         [Fact]
-        public void NonGeneric_GivenNullConfiguration_ThrowsArgumentNullException()
+        public void NonGenericGivenNullConfigurationThrowsArgumentNullException()
         {
-            IConfiguration fooSection = null;
+            IConfiguration fooSection = null!;
 
             Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy(typeof(IReadonlyProperties)));
         }
 
         [Fact]
-        public void NonGeneric_GivenNullType_ThrowsArgumentNullException()
+        public void NonGenericGivenNullTypeThrowsArgumentNullException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -119,19 +119,19 @@ namespace Tests
 
             var fooSection = config.GetSection("foo");
 
-            Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy(null));
+            Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy(null!));
         }
 
         [Fact]
-        public void Generic_GivenNullConfiguration_ThrowsArgumentNullException()
+        public void GenericGivenNullConfigurationThrowsArgumentNullException()
         {
-            IConfiguration fooSection = null;
+            IConfiguration fooSection = null!;
 
             Assert.Throws<ArgumentNullException>(() => fooSection.CreateProxy<IReadonlyProperties>());
         }
 
         [Fact]
-        public void GivenTypeIsNotAnInterface_ThrowsArgumentException()
+        public void GivenTypeIsNotAnInterfaceThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -151,7 +151,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAMethod_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAMethodThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -165,13 +165,13 @@ namespace Tests
             var ex = Assert.Throws<ArgumentException>(() => fooSection.CreateProxy<IHasMethod>());
 
 #if DEBUG
-            var expected = Exceptions.TargetInterfaceCannotHaveAnyMethods(typeof(IHasMethod), typeof(IHasMethod).GetTypeInfo().GetMethod("Foo"));
+            var expected = Exceptions.TargetInterfaceCannotHaveAnyMethods(typeof(IHasMethod), typeof(IHasMethod).GetTypeInfo().GetMethod("Foo")!);
             Assert.Equal(expected.Message, ex.Message);
 #endif
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAnEvent_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAnEventThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -185,13 +185,13 @@ namespace Tests
             var ex = Assert.Throws<ArgumentException>(() => fooSection.CreateProxy<IHasEvent>());
 
 #if DEBUG
-            var expected = Exceptions.TargetInterfaceCannotHaveAnyEvents(typeof(IHasEvent), typeof(IHasEvent).GetTypeInfo().GetEvent("Foo"));
+            var expected = Exceptions.TargetInterfaceCannotHaveAnyEvents(typeof(IHasEvent), typeof(IHasEvent).GetTypeInfo().GetEvent("Foo")!);
             Assert.Equal(expected.Message, ex.Message);
 #endif
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAnIndexerProperty_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAnIndexerPropertyThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -211,7 +211,7 @@ namespace Tests
         }
 
         [Fact]
-        public void GivenInterfaceTypeDefinesAWriteOnlyProperty_ThrowsArgumentException()
+        public void GivenInterfaceTypeDefinesAWriteOnlyPropertyThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
                .AddInMemoryCollection(new Dictionary<string, string>
@@ -225,11 +225,12 @@ namespace Tests
             var ex = Assert.Throws<ArgumentException>(() => fooSection.CreateProxy<IHasWriteOnlyProperty>());
 
 #if DEBUG
-            var expected = Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(typeof(IHasWriteOnlyProperty), typeof(IHasWriteOnlyProperty).GetTypeInfo().GetProperty("Foo"));
+            var expected = Exceptions.TargetInterfaceCannotHaveAnyWriteOnlyProperties(typeof(IHasWriteOnlyProperty), typeof(IHasWriteOnlyProperty).GetTypeInfo().GetProperty("Foo")!);
             Assert.Equal(expected.Message, ex.Message);
 #endif
         }
 
+#pragma warning disable CA1034
         public interface IReadonlyProperties
         {
             string Bar { get; }
@@ -242,7 +243,9 @@ namespace Tests
             int Baz { get; set; }
         }
 
+#pragma warning disable CA1812
         public class NotAnInterface { }
+#pragma warning restore CA1812
 
         public interface IHasMethod
         {
@@ -261,7 +264,10 @@ namespace Tests
 
         public interface IHasWriteOnlyProperty
         {
+#pragma warning disable CA1044
             int Foo { set; }
+#pragma warning restore CA1044
         }
+#pragma warning restore CA1034
     }
 }

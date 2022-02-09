@@ -2,6 +2,13 @@
 
 A factory that creates instances of property-only interfaces, defined at run-time, and populated with values defined in an instance of `IConfiguration`.
 
+### Supported Targets
+
+This library supports the following targets:
+  - .NET 6
+  - .NET Core 3.1
+  - .NET Framework 4.8
+
 ### Overview
 
 Let's say we have a class, `Foo`, that has various settings that it requires.
