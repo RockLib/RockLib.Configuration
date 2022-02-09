@@ -10,7 +10,7 @@ namespace RockLib.Configuration.AppSettingsConfigTests
 {
     public class ConfigTests
     {
-        static ConfigTests()
+        public ConfigTests()
         {
             // Set the environment variable before reading configs.
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
@@ -72,11 +72,11 @@ namespace RockLib.Configuration.AppSettingsConfigTests
         {
             try
             {
-                var section = Config.Root.GetSection("element_to_reload");
+                var section = Config.Root!.GetSection("element_to_reload");
 
                 Assert.Equal("123", section.Value);
 
-                var waitHandle = new AutoResetEvent(false);
+                using var waitHandle = new AutoResetEvent(false);
 
                 ChangeToken.OnChange(section.GetReloadToken, () => waitHandle.Set());
 
@@ -95,7 +95,7 @@ namespace RockLib.Configuration.AppSettingsConfigTests
         private static void WriteConfig(int value)
         {
             var json = JObject.Parse(File.ReadAllText("appsettings.json"));
-            ((JValue)json["element_to_reload"]).Value = value;
+            ((JValue)json["element_to_reload"]!).Value = value;
             File.WriteAllText("appsettings.json", json.ToString(Formatting.Indented));
         }
     }

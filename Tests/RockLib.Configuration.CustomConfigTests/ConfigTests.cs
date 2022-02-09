@@ -6,18 +6,18 @@ namespace RockLib.Configuration.CustomConfigurationManagerTests
 {
     public class ConfigTests
     {
-        private static readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        static ConfigTests()
+        public ConfigTests()
         {
             _configuration = new ConfigurationBuilder()
-                    .AddInMemoryCollection(
-                        new Dictionary<string, string>
-                        {
-                            { "AppSettings:Environment", "Test" },
-                            { "AppSettings:ApplicationId", "200001" }
-                        })
-                    .Build();
+                .AddInMemoryCollection(
+                    new Dictionary<string, string>
+                    {
+                        { "AppSettings:Environment", "Test" },
+                        { "AppSettings:ApplicationId", "200001" }
+                    })
+                .Build();
 
             Config.SetRoot(_configuration);
         }

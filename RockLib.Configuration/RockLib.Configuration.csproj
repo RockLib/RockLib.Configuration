@@ -2,7 +2,7 @@
 	<PropertyGroup>
 		<Copyright>Copyright 2017-2022 (c) Rocket Mortgage. All rights reserved.</Copyright>
 		<DebugType>Embedded</DebugType>
-		<Description>Provides a central location for an instance of IConfigurationRoot to be used as the "default" configuration by .NET Standard libraries and .NET Core applications. Replaces some of the functionality of the .NET Framework System.Configuration.ConfigurationManager class.</Description>
+		<Description>Provides a central location for an instance of IConfigurationRoot to be used as the "default" configuration by .NET libraries and applications. Replaces some of the functionality of the .NET Framework System.Configuration.ConfigurationManager class.</Description>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageId>RockLib.Configuration</PackageId>
