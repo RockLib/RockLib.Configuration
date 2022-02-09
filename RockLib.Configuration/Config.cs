@@ -57,7 +57,7 @@ namespace RockLib.Configuration
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void SetRoot(IConfiguration configurationRoot)
         {
-            if (configurationRoot == null) throw new ArgumentNullException(nameof(configurationRoot));
+            if (configurationRoot is null) throw new ArgumentNullException(nameof(configurationRoot));
             SetRoot(() => configurationRoot);
         }
 
@@ -76,7 +76,7 @@ namespace RockLib.Configuration
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void SetRoot(Func<IConfiguration> getRoot)
         {
-            if (getRoot == null) throw new ArgumentNullException(nameof(getRoot));
+            if (getRoot is null) throw new ArgumentNullException(nameof(getRoot));
             _root.SetValue(getRoot);
         }
 
@@ -91,7 +91,7 @@ namespace RockLib.Configuration
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void ResetRoot(IEnumerable<KeyValuePair<string, string>>? additionalValues = null)
         {
-            if (additionalValues == null)
+            if (additionalValues is null)
             {
                 _root.ResetValue();
             }

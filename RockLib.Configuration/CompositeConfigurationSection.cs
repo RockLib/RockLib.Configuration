@@ -41,7 +41,7 @@ namespace RockLib.Configuration
             {
                 foreach (var section in _allSections.Value)
                 {
-                    if (section[key] == null)
+                    if (section[key] is null)
                         continue;
                     section[key] = value;
                     return;
