@@ -120,7 +120,7 @@ namespace RockLib.Configuration
         {
             var builder = new ConfigurationBuilder();
 
-            if (_basePath != null)
+            if (_basePath is not null)
             {
                 builder.SetBasePath(_basePath);
             }

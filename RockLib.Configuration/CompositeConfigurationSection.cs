@@ -16,7 +16,7 @@ namespace RockLib.Configuration
         {
             _allSections = new Lazy<IReadOnlyCollection<IConfigurationSection>>(() => sections.ToList());
 
-            _primarySection = new Lazy<IConfigurationSection>(() => _allSections.Value.FirstOrDefault(section => section.Value != null)
+            _primarySection = new Lazy<IConfigurationSection>(() => _allSections.Value.FirstOrDefault(section => section.Value is not null)
                 ?? _allSections.Value.First());
 
             _children = new Lazy<IEnumerable<IConfigurationSection>>(() =>
@@ -36,7 +36,7 @@ namespace RockLib.Configuration
 
         public string? this[string key]
         {
-            get => _allSections.Value.FirstOrDefault(s => s[key] != null)?[key];
+            get => _allSections.Value.FirstOrDefault(s => s[key] is not null)?[key];
             set
             {
                 foreach (var section in _allSections.Value)
