@@ -2,16 +2,16 @@
 
   <PropertyGroup>
     <PackageId>RockLib.Configuration.ProxyFactory</PackageId>
-    <PackageVersion>1.0.7</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Description>Creates proxy objects from interfaces using IConfiguration and IConfigurationSection objects.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.ProxyFactory/CHANGELOG.md.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ProxyFactory</PackageProjectUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageIcon>icon.png</PackageIcon>
-    <Copyright>Copyright 2017-2021 (c) Rocket Mortgage. All rights reserved.</Copyright>
+    <Copyright>Copyright 2022 (c) Rocket Mortgage. All rights reserved.</Copyright>
     <PackageTags>Configuration Factory Proxy IConfiguration IConfigurationSection</PackageTags>
-    <Version>1.0.0</Version>
+    <Version>2.0.0</Version>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PublishRepositoryUrl>True</PublishRepositoryUrl>
     <EmbedUntrackedSources>True</EmbedUntrackedSources>
