@@ -14,7 +14,7 @@ namespace RockLib.Configuration
     {
         private static readonly Semimutable<IConfiguration> _root = new Semimutable<IConfiguration>(() => GetDefaultRoot(null));
 
-        private static string _basePath;
+        private static string? _basePath;
 
         /// <summary>
         /// Gets an object that retrieves settings from the "AppSettings" section of the
@@ -42,7 +42,7 @@ namespace RockLib.Configuration
         /// Gets the <see cref="IConfiguration"/> associated with the <see cref="Config"/> class.
         /// This property is guaranteed not to change.
         /// </summary>
-        public static IConfiguration Root => _root.Value;
+        public static IConfiguration? Root => _root.Value;
 
         /// <summary>
         /// Sets the value of the <see cref="Root"/> property to the specified
@@ -90,12 +90,16 @@ namespace RockLib.Configuration
         /// <param name="additionalValues">When specified, these key/value pairs are applied to the resulting
         /// instance of <see cref="IConfiguration"/>.</param>
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
-        public static void ResetRoot(IEnumerable<KeyValuePair<string, string>> additionalValues = null)
+        public static void ResetRoot(IEnumerable<KeyValuePair<string, string>>? additionalValues = null)
         {
             if (additionalValues == null)
+            {
                 _root.ResetValue();
+            }
             else
+            {
                 SetRoot(() => GetDefaultRoot(additionalValues));
+            }
         }
 
         /// <summary>
@@ -108,54 +112,49 @@ namespace RockLib.Configuration
         /// The base path for the <see cref="ConfigurationBuilder"/>, or null to use the value
         /// returned by the <see cref="Directory.GetCurrentDirectory"/> method.
         /// </param>
-        public static void SetBasePath(string basePath = null)
+        public static void SetBasePath(string? basePath = null)
         {
             _basePath = basePath ?? Directory.GetCurrentDirectory();
         }
 
-        private static IConfiguration GetDefaultRoot(IEnumerable<KeyValuePair<string, string>> additionalValues)
+        private static IConfiguration GetDefaultRoot(IEnumerable<KeyValuePair<string, string>>? additionalValues)
         {
             var builder = new ConfigurationBuilder();
 
             if (_basePath != null)
+            {
                 builder.SetBasePath(_basePath);
-
-#if NET451 || NET462
-            builder
-                .AddConfigurationManager(reloadOnChange: true);
-#endif
+            }
 
             builder
                 .AddAppSettingsJson(reloadOnChange: true)
                 .AddEnvironmentVariables();
 
-            if (additionalValues != null)
+            if (additionalValues is not null)
+            {
                 builder.AddInMemoryCollection(additionalValues);
+            }
 
             builder.AddRockLibSecrets();
 
-            var configurationRoot = builder.Build();
-           
-            return configurationRoot;
+            return builder.Build();
         }
 
         private static IConfigurationBuilder AddRockLibSecrets(this IConfigurationBuilder builder)
         {
-            try
-            {
-                const string extensionTypeName = "RockLib.Secrets.ConfigurationBuilderExtensions, RockLib.Secrets";
-                var extensionType = Type.GetType(extensionTypeName)?.GetTypeInfo();
-                if (extensionType != null)
-                {
-                    var addRockLibSecretsMethod = extensionType.GetMethod("AddRockLibSecrets",
-                        new Type[] { typeof(IConfigurationBuilder) });
+            const string extensionTypeName = "RockLib.Secrets.ConfigurationBuilderExtensions, RockLib.Secrets";
+            
+            var extensionType = Type.GetType(extensionTypeName);
 
-                    if (addRockLibSecretsMethod != null)
-                        addRockLibSecretsMethod.Invoke(null, new object[] { builder });
-                }
-            }
-            catch
+            if (extensionType is not null)
             {
+                var addRockLibSecretsMethod = extensionType.GetMethod("AddRockLibSecrets",
+                    new Type[] { typeof(IConfigurationBuilder) });
+
+                if (addRockLibSecretsMethod is not null)
+                {
+                    addRockLibSecretsMethod.Invoke(null, new object[] { builder });
+                }
             }
 
             return builder;

@@ -21,9 +21,7 @@ namespace RockLib.Configuration
         /// <exception cref="KeyNotFoundException">
         /// If the given key is not found in the "AppSettings" section of <see cref="Config.Root"/>.
         /// </exception>
-        public string this[string key] => Config.Root[$"AppSettings:{key}"] ?? throw GetKeyNotFoundExeption(key);
-
-        private static Exception GetKeyNotFoundExeption(string key) =>
-            new KeyNotFoundException($"Unable to locate {nameof(Config.AppSettings)} key '{key}' in {typeof(Config).FullName}.{nameof(Config.Root)}.");
+        public string this[string key] => Config.Root?[$"AppSettings:{key}"] ??
+            throw new KeyNotFoundException($"Unable to locate {nameof(Config.AppSettings)} key '{key}' in {typeof(Config).FullName}.{nameof(Config.Root)}.");
     }
 }
