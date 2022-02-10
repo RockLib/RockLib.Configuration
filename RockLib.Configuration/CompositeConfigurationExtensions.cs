@@ -20,7 +20,7 @@ namespace RockLib.Configuration
         /// <returns>The <see cref="IConfigurationSection"/>.</returns>
         public static IConfigurationSection GetCompositeSection(this IConfiguration configuration, IEnumerable<string> keys)
         {
-            if (keys == null) throw new ArgumentNullException(nameof(keys));
+            if (keys is null) throw new ArgumentNullException(nameof(keys));
 
             return configuration.GetCompositeSection(keys.ToArray());
         }
@@ -33,12 +33,25 @@ namespace RockLib.Configuration
         /// <returns>The <see cref="IConfigurationSection"/>.</returns>
         public static IConfigurationSection GetCompositeSection(this IConfiguration configuration, params string[] keys)
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-            if (keys == null) throw new ArgumentNullException(nameof(keys));
+            if (configuration is null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            if (keys is null)
+            {
+                throw new ArgumentNullException(nameof(keys));
+            }
+
             if (keys.Length == 0)
+            {
                 throw new ArgumentException("Must contain at least one key.", nameof(keys));
+            }
+
             if (keys.Any(key => string.IsNullOrEmpty(key)))
+            {
                 throw new ArgumentException("Cannot contain null or empty keys.", nameof(keys));
+            }
 
             return new CompositeConfigurationSection(keys.Select(key => configuration.GetSection(key)));
         }

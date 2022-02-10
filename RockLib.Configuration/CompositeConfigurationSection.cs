@@ -16,7 +16,7 @@ namespace RockLib.Configuration
         {
             _allSections = new Lazy<IReadOnlyCollection<IConfigurationSection>>(() => sections.ToList());
 
-            _primarySection = new Lazy<IConfigurationSection>(() => _allSections.Value.FirstOrDefault(section => section.Value != null)
+            _primarySection = new Lazy<IConfigurationSection>(() => _allSections.Value.FirstOrDefault(section => section.Value is not null)
                 ?? _allSections.Value.First());
 
             _children = new Lazy<IEnumerable<IConfigurationSection>>(() =>
@@ -34,14 +34,14 @@ namespace RockLib.Configuration
 
         public IChangeToken GetReloadToken() => _primarySection.Value.GetReloadToken();
 
-        public string this[string key]
+        public string? this[string key]
         {
-            get => _allSections.Value.FirstOrDefault(s => s[key] != null)?[key];
+            get => _allSections.Value.FirstOrDefault(s => s[key] is not null)?[key];
             set
             {
                 foreach (var section in _allSections.Value)
                 {
-                    if (section[key] == null)
+                    if (section[key] is null)
                         continue;
                     section[key] = value;
                     return;
@@ -64,24 +64,32 @@ namespace RockLib.Configuration
         {
             public static readonly IComparer<string> Instance = new CompositeSectionKeyComparer();
 
-            private CompositeSectionKeyComparer() {}
+            private CompositeSectionKeyComparer() { }
 
-            int IComparer<string>.Compare(string x, string y)
+            int IComparer<string>.Compare(string? x, string? y)
             {
                 var xIsInt = uint.TryParse(x, out var xValue);
                 var yIsInt = uint.TryParse(y, out var yValue);
 
                 // Do not change order when neither key is numeric.
                 if (!xIsInt && !yIsInt)
+                {
                     return 0;
+                }
 
                 // Put numeric keys in ascending order.
                 if (xIsInt && yIsInt)
+                {
                     return xValue.CompareTo(yValue);
+                }
 
                 // Put numeric keys after non-numeric keys.
-                if (xIsInt) return 1;
-                /*if (yIsInt)*/ return -1;
+                if (xIsInt)
+                { 
+                    return 1; 
+                }
+
+                return -1;
             }
         }
     }
