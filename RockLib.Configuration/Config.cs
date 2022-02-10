@@ -88,7 +88,6 @@ namespace RockLib.Configuration
         /// </summary>
         /// <param name="additionalValues">When specified, these key/value pairs are applied to the resulting
         /// instance of <see cref="IConfiguration"/>.</param>
-        /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void ResetRoot(IEnumerable<KeyValuePair<string, string>>? additionalValues = null)
         {
             if (additionalValues is null)
