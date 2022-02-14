@@ -39,11 +39,11 @@
     <PackageReference Include="RockLib.Configuration" Version="3.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net6.0' or '$(TargetFramework)'=='netcoreapp3.1'">
+  <ItemGroup Condition="'$(TargetFramework)'!='net48'">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'!='net6.0' or '$(TargetFramework)'!='netcoreapp3.1'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
   </ItemGroup>
 
