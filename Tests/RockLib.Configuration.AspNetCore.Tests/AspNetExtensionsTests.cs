@@ -30,10 +30,10 @@ namespace RockLib.Configuration.AspNetCore.Tests
                 _configRoot = configRoot;
             }
 
-            public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
+            public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection?> configureServices)
             {
                 var context = new WebHostBuilderContext { Configuration = _configRoot };
-                configureServices(context, null!);
+                configureServices(context, null);
                 return this;
             }
 
