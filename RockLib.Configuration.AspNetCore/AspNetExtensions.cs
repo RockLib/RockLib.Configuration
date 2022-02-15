@@ -15,11 +15,18 @@ namespace RockLib.Configuration.AspNetCore
         /// </summary>
         /// <param name="builder">The <see cref="IWebHostBuilder"/> to configure.</param>
         /// <returns>The <see cref="IWebHostBuilder"/>.</returns>
-        public static IWebHostBuilder SetConfigRoot(this IWebHostBuilder builder) =>
+        public static IWebHostBuilder SetConfigRoot(this IWebHostBuilder builder)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
             builder.ConfigureServices((context, services) =>
             {
                 if (!Config.IsLocked && Config.IsDefault)
                     Config.SetRoot(context.Configuration);
             });
+            return builder;
+        }
     }
 }

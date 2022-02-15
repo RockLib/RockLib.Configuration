@@ -1,13 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard2.0;net462</TargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <PackageId>RockLib.Configuration.AspNetCore</PackageId>
     <PackageVersion>1.0.5</PackageVersion>
-    <Authors>RockLib</Authors>
     <Description>Extension methods for RockLib.Configuration and ASP.NET Core.</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.AspNetCore/CHANGELOG.md.</PackageReleaseNotes>
@@ -32,7 +27,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,14 +36,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="RockLib.Configuration" Version="2.5.3" />
+    <PackageReference Include="RockLib.Configuration" Version="3.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'!='net5.0'">
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
   </ItemGroup>
 

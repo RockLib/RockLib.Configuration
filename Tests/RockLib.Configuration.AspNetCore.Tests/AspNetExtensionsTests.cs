@@ -30,7 +30,7 @@ namespace RockLib.Configuration.AspNetCore.Tests
                 _configRoot = configRoot;
             }
 
-            public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection> configureServices)
+            public IWebHostBuilder ConfigureServices(Action<WebHostBuilderContext, IServiceCollection?> configureServices)
             {
                 var context = new WebHostBuilderContext { Configuration = _configRoot };
                 configureServices(context, null);
@@ -41,7 +41,7 @@ namespace RockLib.Configuration.AspNetCore.Tests
             public IWebHostBuilder ConfigureAppConfiguration(Action<WebHostBuilderContext, IConfigurationBuilder> configureDelegate) => throw new NotImplementedException();
             public IWebHostBuilder ConfigureServices(Action<IServiceCollection> configureServices) => throw new NotImplementedException();
             public string GetSetting(string key) => throw new NotImplementedException();
-            public IWebHostBuilder UseSetting(string key, string value) => throw new NotImplementedException();
+            public IWebHostBuilder UseSetting(string key, string? value) => throw new NotImplementedException();
         }
     }
 }
