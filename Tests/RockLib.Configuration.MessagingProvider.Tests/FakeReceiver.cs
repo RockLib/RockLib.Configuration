@@ -2,7 +2,7 @@
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    internal class FakeReceiver : Receiver
+    internal sealed class FakeReceiver : Receiver
     {
         public FakeReceiver(string name)
             : base(name)

@@ -4,12 +4,12 @@ using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    public class NullSettingFilterTests
+    public static class NullSettingFilterTests
     {
         [Fact]
-        public void AlwaysReturnsTrue()
+        public static void AlwaysReturnsTrue()
         {
-            NullSettingFilter.Instance.ShouldProcessSettingChange(null, new Dictionary<string, object>()).Should().BeTrue();
+            NullSettingFilter.Instance.ShouldProcessSettingChange(null!, new Dictionary<string, object>()).Should().BeTrue();
         }
     }
 }

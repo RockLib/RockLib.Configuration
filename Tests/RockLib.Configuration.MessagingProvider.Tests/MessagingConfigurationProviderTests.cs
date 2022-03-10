@@ -1,27 +1,26 @@
 using FluentAssertions;
 using Microsoft.Extensions.Primitives;
 using RockLib.Dynamic;
-using RockLib.Messaging.Testing;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    public class MessagingConfigurationProviderTests
+    public static class MessagingConfigurationProviderTests
     {
         [Fact]
-        public void ConstructorSetsReceiverProperty()
+        public static void ConstructorSetsReceiverProperty()
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
             provider.Receiver.Should().BeSameAs(receiver);
         }
 
         [Fact]
-        public void ConstructorSetsSettingFilterProperty()
+        public static void ConstructorSetsSettingFilterProperty()
         {
             var receiver = new FakeReceiver("fake");
             var filter = new FakeSettingFilter();
@@ -32,33 +31,33 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ConstructorStartsTheReceiver()
+        public static void ConstructorStartsTheReceiver()
         {
             var receiver = new FakeReceiver("fake");
 
             receiver.MessageHandler.Should().BeNull();
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
             receiver.MessageHandler.Should().NotBeNull();
         }
 
         [Fact]
-        public void ConstructorLeavesDataEmpty()
+        public static void ConstructorLeavesDataEmpty()
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
             GetData(provider).Should().BeEmpty();
         }
 
         [Fact]
-        public async Task HappyPathNewSetting()
+        public static async Task HappyPathNewSetting()
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
             var newSettings = @"{
   ""foo"": ""abc""
@@ -89,7 +88,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public async Task HappyPathChangedSetting()
+        public static async Task HappyPathChangedSetting()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -125,7 +124,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public async Task HappyPathRemovedSetting()
+        public static async Task HappyPathRemovedSetting()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -158,7 +157,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public async Task HappyPathNothingChanged()
+        public static async Task HappyPathNothingChanged()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -195,7 +194,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public async Task InvalidMessage()
+        public static async Task InvalidMessage()
         {
             var receiver = new FakeReceiver("fake");
 

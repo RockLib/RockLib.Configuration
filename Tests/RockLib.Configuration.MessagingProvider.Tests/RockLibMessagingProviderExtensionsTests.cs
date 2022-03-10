@@ -5,10 +5,10 @@ using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    public class RockLibMessagingProviderExtensionsTests
+    public static class RockLibMessagingProviderExtensionsTests
     {
         [Fact]
-        public void AddRockLibMessagingProviderExtensionMethod1AddsAMessagingConfigurationSourceToTheConfigurationBuilder()
+        public static void AddRockLibMessagingProviderExtensionMethod1AddsAMessagingConfigurationSourceToTheConfigurationBuilder()
         {
             var filter = new FakeSettingFilter();
 
@@ -28,9 +28,9 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void AddRockLibMessagingProviderExtensionMethod2AddsAMessagingConfigurationSourceToTheConfigurationBuilder()
+        public static void AddRockLibMessagingProviderExtensionMethod2AddsAMessagingConfigurationSourceToTheConfigurationBuilder()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
             var filter = new FakeSettingFilter();
 
             var builder = new ConfigurationBuilder();

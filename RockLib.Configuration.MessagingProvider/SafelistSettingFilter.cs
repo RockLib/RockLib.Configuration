@@ -22,10 +22,12 @@ namespace RockLib.Configuration.MessagingProvider
         /// An optional setting filter that is applied if a setting is a
         /// member of <see cref="SafeSettings"/>.
         /// </param>
-        public SafelistSettingFilter(IEnumerable<string> safeSettings, ISettingFilter innerFilter = null)
+        public SafelistSettingFilter(IEnumerable<string> safeSettings, ISettingFilter? innerFilter = null)
         {
-            if (safeSettings == null)
+            if (safeSettings is null)
+            {
                 throw new ArgumentNullException(nameof(safeSettings));
+            }
             _safeSettings = new HashSet<string>(safeSettings, StringComparer.OrdinalIgnoreCase);
             InnerFilter = innerFilter ?? NullSettingFilter.Instance;
         }

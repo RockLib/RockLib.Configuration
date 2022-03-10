@@ -6,19 +6,19 @@ using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    public class SafelistSettingFilterTests
+    public static class SafelistSettingFilterTests
     {
         [Fact]
-        public void ConstructorThrowsIfSafeSettingsIsNull()
+        public static void ConstructorThrowsIfSafeSettingsIsNull()
         {
-            Action action = () => new SafelistSettingFilter(null);
+            Func<SafelistSettingFilter> action = () => new SafelistSettingFilter(null!);
             action.Should().ThrowExactly<ArgumentNullException>();
         }
 
         [Fact]
-        public void ConstructorSetsSafeSettings()
+        public static void ConstructorSetsSafeSettings()
         {
-            string[] safeSettings = new[] { "foo" };
+            var safeSettings = new[] { "foo" };
 
             var filter = new SafelistSettingFilter(safeSettings);
 
@@ -26,7 +26,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ConstructorSetsInnerFilter()
+        public static void ConstructorSetsInnerFilter()
         {
             var innerFilter = new FakeSettingFilter();
 
@@ -36,7 +36,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsInTheSafelist()
+        public static void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsInTheSafelist()
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
             mockInnerFilter
@@ -55,7 +55,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsAChildOfAnItemInTheAllowlist()
+        public static void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsAChildOfAnItemInTheAllowlist()
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
             mockInnerFilter
@@ -74,7 +74,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ReturnsFalseWhenTheSettingIsNotInTheSafelist()
+        public static void ReturnsFalseWhenTheSettingIsNotInTheSafelist()
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
 

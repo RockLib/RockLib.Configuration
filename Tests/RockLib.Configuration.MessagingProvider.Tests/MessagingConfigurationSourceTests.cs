@@ -5,17 +5,17 @@ using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    public class MessagingConfigurationSourceTests
+    public static class MessagingConfigurationSourceTests
     {
         [Fact]
-        public void ConstructorThrowsIfReceiverIsNull()
+        public static void ConstructorThrowsIfReceiverIsNull()
         {
-            Action action = () => new MessagingConfigurationSource(null);
+            Func<MessagingConfigurationSource> action = () => new MessagingConfigurationSource(null!);
             action.Should().ThrowExactly<ArgumentNullException>().WithMessage("*receiver*");
         }
 
         [Fact]
-        public void ConstructorThrowsIfReceiverIsUsedByAnotherMessagingConfigurationSource()
+        public static void ConstructorThrowsIfReceiverIsUsedByAnotherMessagingConfigurationSource()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -28,7 +28,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ConstructorThrowsIfReceiverIsAlreadyStarted()
+        public static void ConstructorThrowsIfReceiverIsAlreadyStarted()
         {
             var receiver = new FakeReceiver("fake");
             receiver.Start(m => m.AcknowledgeAsync());
@@ -38,7 +38,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ConstructorSetsReceiverProperty()
+        public static void ConstructorSetsReceiverProperty()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -48,7 +48,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ConstructorSetsSettingFilterProperty()
+        public static void ConstructorSetsSettingFilterProperty()
         {
             var receiver = new FakeReceiver("fake");
             var filter = new FakeSettingFilter();
@@ -59,14 +59,14 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void BuildMethodReturnsMessagingConfigurationProvider()
+        public static void BuildMethodReturnsMessagingConfigurationProvider()
         {
             var receiver = new FakeReceiver("fake");
             var filter = new FakeSettingFilter();
 
             var source = new MessagingConfigurationSource(receiver, filter);
 
-            var provider = source.Build(null);
+            var provider = source.Build(null!);
 
             provider.Should().BeOfType<MessagingConfigurationProvider>();
 
@@ -77,14 +77,14 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void BuildMethodReturnsSameMessagingConfigurationProviderEachTime()
+        public static void BuildMethodReturnsSameMessagingConfigurationProviderEachTime()
         {
             var receiver = new FakeReceiver("fake");
 
             var source = new MessagingConfigurationSource(receiver);
 
-            var provider1 = source.Build(null);
-            var provider2 = source.Build(null);
+            var provider1 = source.Build(null!);
+            var provider2 = source.Build(null!);
 
             provider1.Should().BeSameAs(provider2);
         }

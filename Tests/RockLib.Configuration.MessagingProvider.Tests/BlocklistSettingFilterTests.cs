@@ -6,19 +6,19 @@ using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    public class BlocklistSettingFilterTests
+    public static class BlocklistSettingFilterTests
     {
         [Fact]
-        public void ConstructorThrowsIfBlockedSettingsIsNull()
+        public static void ConstructorThrowsIfBlockedSettingsIsNull()
         {
-            Action action = () => new BlocklistSettingFilter(null);
+            Func<BlocklistSettingFilter> action = () => new BlocklistSettingFilter(null!);
             action.Should().ThrowExactly<ArgumentNullException>();
         }
 
         [Fact]
-        public void ConstructorSetsBlockedSettings()
+        public static void ConstructorSetsBlockedSettings()
         {
-            string[] blockedSettings = new[] { "foo" };
+            var blockedSettings = new[] { "foo" };
 
             var filter = new BlocklistSettingFilter(blockedSettings);
 
@@ -26,7 +26,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ConstructorSetsInnerFilter()
+        public static void ConstructorSetsInnerFilter()
         {
             var innerFilter = new FakeSettingFilter();
 
@@ -36,7 +36,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsNotInTheBlocklist()
+        public static void ReturnsWhatTheInnerFilterReturnsWhenTheSettingIsNotInTheBlocklist()
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
             mockInnerFilter
@@ -55,7 +55,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ReturnsFalseWhenTheSettingIsInTheBlocklist()
+        public static void ReturnsFalseWhenTheSettingIsInTheBlocklist()
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
 
@@ -69,7 +69,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         }
 
         [Fact]
-        public void ReturnsFalseWhenTheSettingIsAChildOfAnItemInTheBlocklist()
+        public static void ReturnsFalseWhenTheSettingIsAChildOfAnItemInTheBlocklist()
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
 

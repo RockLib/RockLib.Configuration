@@ -13,7 +13,7 @@ namespace RockLib.Configuration.MessagingProvider
     /// </summary>
     public sealed class MessagingConfigurationProvider : ConfigurationProvider
     {
-        internal MessagingConfigurationProvider(IReceiver receiver, ISettingFilter settingFilter)
+        internal MessagingConfigurationProvider(IReceiver receiver, ISettingFilter? settingFilter)
         {
             Receiver = receiver;
             SettingFilter = settingFilter ?? NullSettingFilter.Instance;
@@ -40,7 +40,7 @@ namespace RockLib.Configuration.MessagingProvider
             {
                 JsonConvert.PopulateObject(message.StringPayload, newSettings);
             }
-            catch
+            catch(JsonSerializationException)
             {
                 await message.RejectAsync().ConfigureAwait(false);
                 return;
@@ -62,15 +62,23 @@ namespace RockLib.Configuration.MessagingProvider
                 if (Data.ContainsKey(newSetting.Key))
                 {
                     if (Data[newSetting.Key] != newSetting.Value)
+                    {
                         return true;
+                    }
                 }
                 else if (SettingFilter.ShouldProcessSettingChange(newSetting.Key, headers))
+                {
                     return true;
+                }
             }
 
             foreach (var oldSetting in Data)
+            {
                 if (!newSettings.ContainsKey(oldSetting.Key))
+                {
                     return true;
+                }
+            }
 
             return false;
         }

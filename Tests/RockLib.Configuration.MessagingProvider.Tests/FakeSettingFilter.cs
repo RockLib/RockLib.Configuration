@@ -2,7 +2,7 @@
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    internal class FakeSettingFilter : ISettingFilter
+    internal sealed class FakeSettingFilter : ISettingFilter
     {
         public bool ShouldProcessSettingChange(string setting, IReadOnlyDictionary<string, object> receivedMessageHeaders) => false;
     }
