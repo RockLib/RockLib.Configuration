@@ -92,7 +92,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
             GetData(provider).Add("foo", "xyz");
 
             var newSettings = @"{
@@ -128,7 +128,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
             GetData(provider).Add("foo", "abc");
 
             var newSettings = @"{}";
@@ -161,7 +161,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
             GetData(provider).Add("foo", "abc");
 
             var reloaded = false;
@@ -198,7 +198,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var receiver = new FakeReceiver("fake");
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null);
+            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
             var reloaded = false;
             ChangeToken.OnChange(provider.GetReloadToken, () => reloaded = true);
