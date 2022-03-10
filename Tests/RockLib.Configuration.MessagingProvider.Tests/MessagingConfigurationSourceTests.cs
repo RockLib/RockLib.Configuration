@@ -17,30 +17,30 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorThrowsIfReceiverIsUsedByAnotherMessagingConfigurationSource()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
 
             // Create a source with the receiver and throw it away.
-            new MessagingConfigurationSource(receiver);
+            _ = new MessagingConfigurationSource(receiver);
 
             // Passing the same receiver to another source causes it to throw.
-            Action action = () => new MessagingConfigurationSource(receiver);
+            Func<MessagingConfigurationSource> action = () => new MessagingConfigurationSource(receiver);
             action.Should().ThrowExactly<ArgumentException>().WithMessage("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.*receiver*");
         }
 
         [Fact]
         public static void ConstructorThrowsIfReceiverIsAlreadyStarted()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
             receiver.Start(m => m.AcknowledgeAsync());
 
-            Action action = () => new MessagingConfigurationSource(receiver);
+            Func<MessagingConfigurationSource> action = () => new MessagingConfigurationSource(receiver);
             action.Should().ThrowExactly<ArgumentException>().WithMessage("The receiver is already started.*receiver*");
         }
 
         [Fact]
         public static void ConstructorSetsReceiverProperty()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
 
             var source = new MessagingConfigurationSource(receiver);
 
@@ -50,7 +50,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorSetsSettingFilterProperty()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
             var filter = new FakeSettingFilter();
 
             var source = new MessagingConfigurationSource(receiver, filter);
@@ -61,7 +61,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void BuildMethodReturnsMessagingConfigurationProvider()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
             var filter = new FakeSettingFilter();
 
             var source = new MessagingConfigurationSource(receiver, filter);
@@ -79,7 +79,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void BuildMethodReturnsSameMessagingConfigurationProviderEachTime()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new FakeReceiver("fake");
 
             var source = new MessagingConfigurationSource(receiver);
 
