@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Messaging;
-using System.Collections.Generic;
+using System;
 
 namespace RockLib.Configuration.MessagingProvider
 {
@@ -28,8 +28,14 @@ namespace RockLib.Configuration.MessagingProvider
         /// builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName)
         /// </code>
         /// </remarks>
-        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, string receiverName, ISettingFilter settingFilter = null) =>
-            builder.AddRockLibMessagingProvider(builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName), settingFilter);
+        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, string receiverName, ISettingFilter? settingFilter = null)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+            return builder.AddRockLibMessagingProvider(builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName), settingFilter);
+        }
 
         /// <summary>
         /// Adds an <see cref="IConfigurationProvider"/> that reloads with changes
@@ -44,7 +50,13 @@ namespace RockLib.Configuration.MessagingProvider
         /// received message.
         /// </param>
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
-        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, IReceiver receiver, ISettingFilter settingFilter = null) =>
-            builder.Add(new MessagingConfigurationSource(receiver, settingFilter));
+        public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, IReceiver receiver, ISettingFilter? settingFilter = null)
+        {
+            if (builder is null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+            return builder.Add(new MessagingConfigurationSource(receiver, settingFilter));
+        }
     }
 }

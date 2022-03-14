@@ -6,7 +6,7 @@ namespace RockLib.Configuration.MessagingProvider
     /// Singleton implementation of the <see cref="ISettingFilter"/> interface
     /// that always returns <see langword="true"/>.
     /// </summary>
-    public class NullSettingFilter : ISettingFilter
+    public sealed class NullSettingFilter : ISettingFilter
     {
         private NullSettingFilter() {}
 

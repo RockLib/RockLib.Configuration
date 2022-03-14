@@ -26,14 +26,20 @@ namespace RockLib.Configuration.MessagingProvider
         /// The <see cref="ISettingFilter"/> that is applied to each setting of each
         /// received message.
         /// </param>
-        public MessagingConfigurationSource(IReceiver receiver, ISettingFilter settingFilter = null)
+        public MessagingConfigurationSource(IReceiver receiver, ISettingFilter? settingFilter = null)
         {
-            if (receiver == null)
+            if (receiver is null)
+            {
                 throw new ArgumentNullException(nameof(receiver));
+            }
             if (!ReferenceEquals(this, _validationCache.GetValue(receiver, r => this)))
+            {
                 throw new ArgumentException("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.", nameof(receiver));
-            if (receiver.MessageHandler != null)
+            }
+            if (receiver.MessageHandler is not null)
+            {
                 throw new ArgumentException("The receiver is already started.", nameof(receiver));
+            }
 
             Receiver = receiver;
             SettingFilter = settingFilter;
@@ -50,7 +56,7 @@ namespace RockLib.Configuration.MessagingProvider
         /// Gets the <see cref="ISettingFilter"/> that is applied to each setting of each
         /// received message.
         /// </summary>
-        public ISettingFilter SettingFilter { get; }
+        public ISettingFilter? SettingFilter { get; }
 
         /// <summary>
         /// Builds the <see cref="MessagingConfigurationProvider"/> for this source.

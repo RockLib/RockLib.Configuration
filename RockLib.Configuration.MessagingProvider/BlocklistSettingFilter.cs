@@ -21,10 +21,12 @@ namespace RockLib.Configuration.MessagingProvider
         /// An optional setting filter that is applied if a setting is not a
         /// member of <see cref="BlockedSettings"/>.
         /// </param>
-        public BlocklistSettingFilter(IEnumerable<string> blockedSettings, ISettingFilter innerFilter = null)
+        public BlocklistSettingFilter(IEnumerable<string> blockedSettings, ISettingFilter? innerFilter = null)
         {
-            if (blockedSettings == null)
+            if (blockedSettings is null)
+            {
                 throw new ArgumentNullException(nameof(blockedSettings));
+            }
             _blockedSettings = new HashSet<string>(blockedSettings, StringComparer.OrdinalIgnoreCase);
             InnerFilter = innerFilter ?? NullSettingFilter.Instance;
         }
