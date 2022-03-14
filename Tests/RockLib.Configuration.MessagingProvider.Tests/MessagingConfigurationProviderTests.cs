@@ -210,9 +210,10 @@ namespace RockLib.Configuration.MessagingProvider.Tests
 
             var newSettings = "This is {not] a [valid} JSON string: \"";
 
+            var isHandled = false;
             var messageMock = new Mock<IReceiverMessage>();
             messageMock.Setup(_ => _.StringPayload).Returns(newSettings);
-            messageMock.Setup(_ => _.RejectAsync(It.IsAny<CancellationToken>()));
+            messageMock.Setup(_ => _.RejectAsync(It.IsAny<CancellationToken>())).Callback(() => isHandled = true);
             var message = messageMock.Object; // new FakeReceiverMessage(newSettings);
 
             var dataBefore = GetData(provider);
@@ -227,8 +228,9 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             reloaded.Should().BeFalse();
 
             // The received message should have been handled by acknowledging it.
-            //message.Handled.Should().BeTrue();
-            //message.HandledBy.Should().Be(nameof(message.RejectAsync));
+            isHandled.Should().BeTrue();
+
+            messageMock.VerifyAll();
         }
 
         private static IDictionary<string, string> GetData(MessagingConfigurationProvider provider) => provider.Unlock().Data;

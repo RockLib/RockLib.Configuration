@@ -40,7 +40,7 @@ namespace RockLib.Configuration.MessagingProvider
             {
                 JsonConvert.PopulateObject(message.StringPayload, newSettings);
             }
-            catch(JsonSerializationException)
+            catch (Exception ex) when (ex is JsonReaderException || ex is JsonSerializationException)
             {
                 await message.RejectAsync().ConfigureAwait(false);
                 return;
