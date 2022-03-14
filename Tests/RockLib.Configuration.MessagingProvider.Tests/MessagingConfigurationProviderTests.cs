@@ -55,7 +55,6 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             GetData(provider).Should().BeEmpty();
         }
 
-        /*
         [Fact]
         public static async Task HappyPathNewSetting()
         {
@@ -66,7 +65,12 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             var newSettings = @"{
   ""foo"": ""abc""
 }";
-            var message = new FakeReceiverMessage(newSettings);
+
+            var isHandled = false;
+            var messageMock = new Mock<IReceiverMessage>();
+            messageMock.Setup(_ => _.StringPayload).Returns(newSettings);
+            messageMock.Setup(_ => _.AcknowledgeAsync(It.IsAny<CancellationToken>())).Callback(() => isHandled = true);
+            var message = messageMock.Object;
 
             var reloaded = false;
             ChangeToken.OnChange(provider.GetReloadToken, () => reloaded = true);
@@ -74,7 +78,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             var dataBefore = GetData(provider);
 
             // Simulate the FakeReceiver receiving a message.
-            await receiver.MessageHandler.OnMessageReceivedAsync(receiver, message);
+            await receiver.MessageHandler!.OnMessageReceivedAsync(receiver, message).ConfigureAwait(false);
 
             // The protected Data property should have been replaced.
             GetData(provider).Should().NotBeSameAs(dataBefore);
@@ -87,12 +91,11 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             reloaded.Should().BeTrue();
 
             // The received message should have been handled by acknowledging it.
-            message.Handled.Should().BeTrue();
-            message.HandledBy.Should().Be(nameof(message.AcknowledgeAsync));
+            isHandled.Should().BeTrue();
         }
 
         [Fact]
-        public static async Task HappyPathChangedSetting()
+        public static async Task ReceiveMessageWithChangedSetting()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -102,7 +105,12 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             var newSettings = @"{
   ""foo"": ""abc""
 }";
-            var message = new FakeReceiverMessage(newSettings);
+
+            var isHandled = false;
+            var messageMock = new Mock<IReceiverMessage>();
+            messageMock.Setup(_ => _.StringPayload).Returns(newSettings);
+            messageMock.Setup(_ => _.AcknowledgeAsync(It.IsAny<CancellationToken>())).Callback(() => isHandled = true);
+            var message = messageMock.Object;
 
             var reloaded = false;
             ChangeToken.OnChange(provider.GetReloadToken, () => reloaded = true);
@@ -110,7 +118,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             var dataBefore = GetData(provider);
 
             // Simulate the FakeReceiver receiving a message.
-            await receiver.MessageHandler.OnMessageReceivedAsync(receiver, message);
+            await receiver.MessageHandler!.OnMessageReceivedAsync(receiver, message).ConfigureAwait(false);
 
             // The protected Data property should have been replaced.
             GetData(provider).Should().NotBeSameAs(dataBefore);
@@ -123,12 +131,11 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             reloaded.Should().BeTrue();
 
             // The received message should have been handled by acknowledging it.
-            message.Handled.Should().BeTrue();
-            message.HandledBy.Should().Be(nameof(message.AcknowledgeAsync));
+            isHandled.Should().BeTrue();
         }
 
         [Fact]
-        public static async Task HappyPathRemovedSetting()
+        public static async Task ReceiveMessageWithRemovedSetting()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -136,7 +143,12 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             GetData(provider).Add("foo", "abc");
 
             var newSettings = @"{}";
-            var message = new FakeReceiverMessage(newSettings);
+
+            var isHandled = false;
+            var messageMock = new Mock<IReceiverMessage>();
+            messageMock.Setup(_ => _.StringPayload).Returns(newSettings);
+            messageMock.Setup(_ => _.AcknowledgeAsync(It.IsAny<CancellationToken>())).Callback(() => isHandled = true);
+            var message = messageMock.Object;
 
             var reloaded = false;
             ChangeToken.OnChange(provider.GetReloadToken, () => reloaded = true);
@@ -144,7 +156,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             var dataBefore = GetData(provider);
 
             // Simulate the FakeReceiver receiving a message.
-            await receiver.MessageHandler.OnMessageReceivedAsync(receiver, message);
+            await receiver.MessageHandler!.OnMessageReceivedAsync(receiver, message).ConfigureAwait(false);
 
             // The protected Data property should have been replaced.
             GetData(provider).Should().NotBeSameAs(dataBefore);
@@ -156,12 +168,11 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             reloaded.Should().BeTrue();
 
             // The received message should have been handled by acknowledging it.
-            message.Handled.Should().BeTrue();
-            message.HandledBy.Should().Be(nameof(message.AcknowledgeAsync));
+            isHandled.Should().BeTrue();
         }
 
         [Fact]
-        public static async Task HappyPathNothingChanged()
+        public static async Task ReceiveMessageWhereNothingChanged()
         {
             var receiver = new FakeReceiver("fake");
 
@@ -175,12 +186,16 @@ namespace RockLib.Configuration.MessagingProvider.Tests
   ""foo"": ""abc""
 }";
 
-            var message = new FakeReceiverMessage(newSettings);
+            var isHandled = false;
+            var messageMock = new Mock<IReceiverMessage>();
+            messageMock.Setup(_ => _.StringPayload).Returns(newSettings);
+            messageMock.Setup(_ => _.AcknowledgeAsync(It.IsAny<CancellationToken>())).Callback(() => isHandled = true);
+            var message = messageMock.Object;
 
             var dataBefore = GetData(provider);
 
             // Simulate the FakeReceiver receiving a message.
-            await receiver.MessageHandler.OnMessageReceivedAsync(receiver, message);
+            await receiver.MessageHandler!.OnMessageReceivedAsync(receiver, message).ConfigureAwait(false);
 
             // The protected Data property should not have been replaced.
             GetData(provider).Should().BeSameAs(dataBefore);
@@ -193,13 +208,13 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             reloaded.Should().BeFalse();
 
             // The received message should have been handled by acknowledging it.
-            message.Handled.Should().BeTrue();
-            message.HandledBy.Should().Be(nameof(message.AcknowledgeAsync));
+            isHandled.Should().BeTrue();
+
+            messageMock.VerifyAll();
         }
-        */
 
         [Fact]
-        public static async Task InvalidMessage()
+        public static async Task ReceiveMessageWithInvalidMessage()
         {
             using var receiver = new FakeReceiver("fake");
 
@@ -214,7 +229,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             var messageMock = new Mock<IReceiverMessage>();
             messageMock.Setup(_ => _.StringPayload).Returns(newSettings);
             messageMock.Setup(_ => _.RejectAsync(It.IsAny<CancellationToken>())).Callback(() => isHandled = true);
-            var message = messageMock.Object; // new FakeReceiverMessage(newSettings);
+            var message = messageMock.Object;
 
             var dataBefore = GetData(provider);
 
