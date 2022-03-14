@@ -11,7 +11,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorThrowsIfBlockedSettingsIsNull()
         {
-            Func<BlocklistSettingFilter> action = () => new BlocklistSettingFilter(null!);
+            var action = () => new BlocklistSettingFilter(null!);
             action.Should().ThrowExactly<ArgumentNullException>();
         }
 

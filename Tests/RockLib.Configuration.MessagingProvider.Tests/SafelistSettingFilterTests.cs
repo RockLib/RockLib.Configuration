@@ -11,7 +11,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorThrowsIfSafeSettingsIsNull()
         {
-            Func<SafelistSettingFilter> action = () => new SafelistSettingFilter(null!);
+            var action = () => new SafelistSettingFilter(null!);
             action.Should().ThrowExactly<ArgumentNullException>();
         }
 

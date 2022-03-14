@@ -10,7 +10,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorThrowsIfReceiverIsNull()
         {
-            Func<MessagingConfigurationSource> action = () => new MessagingConfigurationSource(null!);
+            var action = () => new MessagingConfigurationSource(null!);
             action.Should().ThrowExactly<ArgumentNullException>().WithMessage("*receiver*");
         }
 
@@ -23,7 +23,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             _ = new MessagingConfigurationSource(receiver);
 
             // Passing the same receiver to another source causes it to throw.
-            Func<MessagingConfigurationSource> action = () => new MessagingConfigurationSource(receiver);
+            var action = () => new MessagingConfigurationSource(receiver);
             action.Should().ThrowExactly<ArgumentException>().WithMessage("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.*receiver*");
         }
 
@@ -33,7 +33,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             using var receiver = new FakeReceiver("fake");
             receiver.Start(m => m.AcknowledgeAsync());
 
-            Func<MessagingConfigurationSource> action = () => new MessagingConfigurationSource(receiver);
+            var action = () => new MessagingConfigurationSource(receiver);
             action.Should().ThrowExactly<ArgumentException>().WithMessage("The receiver is already started.*receiver*");
         }
 
