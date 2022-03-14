@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
+using Moq;
+using RockLib.Messaging;
 using Xunit;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
@@ -10,7 +12,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void AddRockLibMessagingProviderExtensionMethod1AddsAMessagingConfigurationSourceToTheConfigurationBuilder()
         {
-            var filter = new FakeSettingFilter();
+            var filter = Mock.Of<ISettingFilter>();
 
             var builder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
@@ -30,8 +32,8 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void AddRockLibMessagingProviderExtensionMethod2AddsAMessagingConfigurationSourceToTheConfigurationBuilder()
         {
-            using var receiver = new FakeReceiver("fake");
-            var filter = new FakeSettingFilter();
+            using var receiver = new Mock<Receiver>("fake").Object;
+            var filter = Mock.Of<ISettingFilter>();
 
             var builder = new ConfigurationBuilder();
 

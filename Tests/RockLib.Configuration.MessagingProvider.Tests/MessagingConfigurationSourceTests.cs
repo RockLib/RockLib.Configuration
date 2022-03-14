@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Moq;
 using RockLib.Messaging;
 using System;
 using Xunit;
@@ -17,7 +18,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorThrowsIfReceiverIsUsedByAnotherMessagingConfigurationSource()
         {
-            using var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             // Create a source with the receiver and throw it away.
             _ = new MessagingConfigurationSource(receiver);
@@ -30,7 +31,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorThrowsIfReceiverIsAlreadyStarted()
         {
-            using var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
             receiver.Start(m => m.AcknowledgeAsync());
 
             var action = () => new MessagingConfigurationSource(receiver);
@@ -40,7 +41,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorSetsReceiverProperty()
         {
-            using var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             var source = new MessagingConfigurationSource(receiver);
 
@@ -50,8 +51,8 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorSetsSettingFilterProperty()
         {
-            using var receiver = new FakeReceiver("fake");
-            var filter = new FakeSettingFilter();
+            using var receiver = new Mock<Receiver>("fake").Object;
+            var filter = Mock.Of<ISettingFilter>();
 
             var source = new MessagingConfigurationSource(receiver, filter);
 
@@ -61,8 +62,8 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void BuildMethodReturnsMessagingConfigurationProvider()
         {
-            using var receiver = new FakeReceiver("fake");
-            var filter = new FakeSettingFilter();
+            using var receiver = new Mock<Receiver>("fake").Object;
+            var filter = Mock.Of<ISettingFilter>();
 
             var source = new MessagingConfigurationSource(receiver, filter);
 
@@ -79,7 +80,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void BuildMethodReturnsSameMessagingConfigurationProviderEachTime()
         {
-            using var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             var source = new MessagingConfigurationSource(receiver);
 

@@ -15,7 +15,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorSetsReceiverProperty()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
@@ -25,8 +25,8 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorSetsSettingFilterProperty()
         {
-            var receiver = new FakeReceiver("fake");
-            var filter = new FakeSettingFilter();
+            using var receiver = new Mock<Receiver>("fake").Object;
+            var filter = Mock.Of<ISettingFilter>();
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, filter);
 
@@ -36,7 +36,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorStartsTheReceiver()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             receiver.MessageHandler.Should().BeNull();
 
@@ -48,7 +48,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorLeavesDataEmpty()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
@@ -58,7 +58,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static async Task HappyPathNewSetting()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 
@@ -97,7 +97,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static async Task ReceiveMessageWithChangedSetting()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
             GetData(provider).Add("foo", "xyz");
@@ -137,7 +137,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static async Task ReceiveMessageWithRemovedSetting()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
             GetData(provider).Add("foo", "abc");
@@ -174,7 +174,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static async Task ReceiveMessageWhereNothingChanged()
         {
-            var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
             GetData(provider).Add("foo", "abc");
@@ -216,7 +216,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static async Task ReceiveMessageWithInvalidMessage()
         {
-            using var receiver = new FakeReceiver("fake");
+            using var receiver = new Mock<Receiver>("fake").Object;
 
             MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
 

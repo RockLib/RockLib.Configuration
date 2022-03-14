@@ -1,19 +1,18 @@
 ﻿using RockLib.Messaging;
+using System;
 
 namespace RockLib.Configuration.MessagingProvider.Tests
 {
-    internal sealed class FakeReceiver : Receiver
+    // This class is only for the appsettings.json test.
+    // Use Moq to create a mocked version of Receiver instead.
+    public sealed class FakeReceiver : Receiver
     {
         public FakeReceiver(string name)
-            : base(name)
-        {
-        }
-
-        public bool IsStarted { get; private set; }
+            : base(name) { }
 
         protected override void Start()
         {
-            IsStarted = true;
+            throw new NotImplementedException();
         }
     }
 }

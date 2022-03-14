@@ -28,7 +28,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         [Fact]
         public static void ConstructorSetsInnerFilter()
         {
-            var innerFilter = new FakeSettingFilter();
+            var innerFilter = Mock.Of<ISettingFilter>();
 
             var filter = new SafelistSettingFilter(new[] { "foo" }, innerFilter);
 
