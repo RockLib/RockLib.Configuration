@@ -32,6 +32,7 @@ namespace RockLib.Configuration.ObjectFactory
             MissingParameterNames = parameters.Where(p => !HasAvailableValue(p) && !p.HasDefaultValue).Select(p => p.Name!);
             MatchedParameters = parameters.Count(HasAvailableValue);
             MatchedNamedParameters = parameters.Count(HasAvailableNamedValue);
+            ParameterTypes = parameters.Select(p => p.ParameterType);
          }
       }
 
@@ -40,6 +41,7 @@ namespace RockLib.Configuration.ObjectFactory
       public bool IsInvokableWithDefaultParameters { get; }
       public int MatchedParameters { get; }
       public int MatchedNamedParameters { get; }
+      public IEnumerable<Type>? ParameterTypes { get; }
       public int TotalParameters { get; }
       public IEnumerable<string> MissingParameterNames { get; }
 
@@ -56,6 +58,11 @@ namespace RockLib.Configuration.ObjectFactory
          if (TotalParameters < other.TotalParameters) return 1;
          if (MatchedNamedParameters > other.MatchedNamedParameters) return -1;
          if (MatchedNamedParameters < other.MatchedNamedParameters) return 1;
+         if (ParameterTypes is not null && other.ParameterTypes is not null)
+         {
+            if (ParameterTypes.Except(other.ParameterTypes).Any()) return -1;
+            if (other.ParameterTypes.Except(ParameterTypes).Any()) return 1;
+         }
          return 0;
       }
    }
