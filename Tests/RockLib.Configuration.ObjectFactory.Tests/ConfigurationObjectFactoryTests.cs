@@ -14,7 +14,48 @@ namespace Tests
 #pragma warning disable CA1034 // Nested types should not be visible
    public class ConfigurationObjectFactoryTests
    {
-      [Fact]
+        [Fact]
+        public void SameConstructorWithDifferentParameterType()
+        {
+            var config = new ConfigurationBuilder()
+             .AddInMemoryCollection(new Dictionary<string, string>
+             {
+                    { "MatchingConstructorsWithDifferenthParamType:name", "test" },
+                    { "MatchingConstructorsWithDifferenthParamType:url", "https://www.google.com" }
+             })
+             .Build();
+
+            var fooSection = config.GetSection("MatchingConstructorsWithDifferenthParamType");
+            var foo = fooSection.Create<MatchingConstructorsWithDifferenthParamType>()!;
+            Assert.Equal("test", foo.Name);
+            Assert.Equal(new Uri("https://www.google.com"), foo.Url);
+            Assert.Equal("POST", foo.Method);
+            Assert.Null(foo.DefaultHeaders);
+        }
+
+        public class MatchingConstructorsWithDifferenthParamType
+        {
+            public string Name { get; }
+            public Uri Url { get; }
+            public string Method { get; set; }
+            public IReadOnlyDictionary<string, string>? DefaultHeaders { get; set; }
+            public MatchingConstructorsWithDifferenthParamType(string name, Uri url, string method = "POST", IReadOnlyDictionary<string, string>? defaultHeaders = null)
+            {
+                Name = name;
+                Url = url;
+                Method = method;
+                DefaultHeaders = defaultHeaders;
+            }
+            public MatchingConstructorsWithDifferenthParamType(string name, string url, string method = "POST", IReadOnlyDictionary<string, string>? defaultHeaders = null) 
+            {
+                Name = name;
+                Url = new Uri(url);
+                Method = method;
+                DefaultHeaders = defaultHeaders;
+            }
+        }
+
+        [Fact]
       public void SupportsCustomTypeImplementingIEnumerable()
       {
          var config = new ConfigurationBuilder()
@@ -39,7 +80,6 @@ namespace Tests
              .Build();
 
          var baz = config.GetSection("baz").Create<Baz>()!;
-
          Assert.Equal(123, baz.GetFoo());
          var bar = baz.GetBar();
          Assert.IsType<AnotherBar>(bar);

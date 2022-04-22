@@ -314,26 +314,6 @@ namespace Tests
 #endif
       }
 
-      [Fact]
-      public void GivenATargetTypeWithAmbiguousConstructorsThrowsInvalidOperationException()
-      {
-         var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
-             {
-                    { "foo:bar", "123.45" },
-                    { "foo:baz", "456" },
-             })
-             .Build();
-
-         var fooSection = config.GetSection("foo");
-         var actual = Assert.Throws<InvalidOperationException>(() => fooSection.Create<AmbiguousConstructorsClass>());
-
-#if DEBUG
-            var expected = Exceptions.AmbiguousConstructors(typeof(AmbiguousConstructorsClass));
-            Assert.Equal(expected.Message, actual.Message);
-#endif
-      }
-
       [Theory]
       [InlineData(typeof(double))]
       [InlineData(typeof(Corge))]

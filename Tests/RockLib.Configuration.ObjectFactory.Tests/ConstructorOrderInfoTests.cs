@@ -218,7 +218,7 @@ namespace Tests
          public ConstructorsWithMatchingParamCount(string notOne, double two = 2, decimal three = 3, object? four = null) { }
          public ConstructorsWithMatchingParamCount(string name, Uri url, string method = "POST", IReadOnlyDictionary<string, string>? defaultHeaders = null) { }
          public ConstructorsWithMatchingParamCount(string name, string url, string method = "POST", IReadOnlyDictionary<string, string>? defaultHeaders = null) { }
-        }
+      }
 #pragma warning restore CA1812
    }
 }
