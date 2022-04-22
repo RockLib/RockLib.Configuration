@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
-- Updated `ToCompare()` method in `ConstructorOrderInfo` to also compare the parameter types during comparison.
+- Updated `CompareTo()` method in `ConstructorOrderInfo` to also compare the parameter types during comparison.
 
 ## 2.0.0 - 2022-02-07
 
