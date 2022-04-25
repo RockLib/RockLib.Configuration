@@ -169,6 +169,27 @@ namespace Tests
          Assert.Equal(-1, orderInfo1.CompareTo(orderInfo2));
       }
 
+
+      [Theory]
+      [InlineData(2, 3, -1)]
+      [InlineData(3, 2, 1)]
+      [InlineData(2, 2, 0)]
+      public void CompareParameterTypes(int constructorOneIndex, int constructorTwoIndex, int expectedComparisonValue)
+      {
+         var constructors = typeof(ConstructorsWithMatchingParamCount).GetConstructors();
+         var members = new Dictionary<string, IConfigurationSection>
+            {
+                { "name", null! },
+                { "url", null! }
+            };
+         var resolver = new Resolver(t => t, t => t == typeof(string) ? true : false);
+
+         var orderInfo1 = _constructorOrderInfoType.New(constructors[constructorOneIndex], members, resolver);
+         var orderInfo2 = _constructorOrderInfoType.New(constructors[constructorTwoIndex], members, resolver);
+
+         Assert.Equal(expectedComparisonValue, orderInfo1.CompareTo(orderInfo2));
+      }
+
 #pragma warning disable CA1812
       private class DefaultConstructor { }
       private class OneParameter { public OneParameter(int bar) { } }
@@ -195,6 +216,8 @@ namespace Tests
       {
          public ConstructorsWithMatchingParamCount(int one = 1, double two = 2, decimal three = 3, object? four = null) { }
          public ConstructorsWithMatchingParamCount(string notOne, double two = 2, decimal three = 3, object? four = null) { }
+         public ConstructorsWithMatchingParamCount(string name, Uri url, string method = "POST", IReadOnlyDictionary<string, string>? defaultHeaders = null) { }
+         public ConstructorsWithMatchingParamCount(string name, string url, string method = "POST", IReadOnlyDictionary<string, string>? defaultHeaders = null) { }
       }
 #pragma warning restore CA1812
    }

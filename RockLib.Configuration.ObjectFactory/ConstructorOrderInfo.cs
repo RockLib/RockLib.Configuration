@@ -17,8 +17,9 @@ namespace RockLib.Configuration.ObjectFactory
          {
             IsInvokableWithoutDefaultParameters = true;
             IsInvokableWithDefaultParameters = true;
-            MissingParameterNames = Enumerable.Empty<string>();
+            MissingParameterNames = new List<string>();
             MatchedParameters = 0;
+            ParameterTypes = new List<Type>();
          }
          else
          {
@@ -29,9 +30,10 @@ namespace RockLib.Configuration.ObjectFactory
 
             IsInvokableWithoutDefaultParameters = parameters.Count(HasAvailableValue) == TotalParameters;
             IsInvokableWithDefaultParameters = parameters.Count(p => HasAvailableValue(p) || p.HasDefaultValue) == TotalParameters;
-            MissingParameterNames = parameters.Where(p => !HasAvailableValue(p) && !p.HasDefaultValue).Select(p => p.Name!);
+            MissingParameterNames = parameters.Where(p => !HasAvailableValue(p) && !p.HasDefaultValue).Select(p => p.Name!).ToList();
             MatchedParameters = parameters.Count(HasAvailableValue);
             MatchedNamedParameters = parameters.Count(HasAvailableNamedValue);
+            ParameterTypes = parameters.Select(p => p.ParameterType).ToList();
          }
       }
 
@@ -40,8 +42,9 @@ namespace RockLib.Configuration.ObjectFactory
       public bool IsInvokableWithDefaultParameters { get; }
       public int MatchedParameters { get; }
       public int MatchedNamedParameters { get; }
+      public List<Type> ParameterTypes { get; }
       public int TotalParameters { get; }
-      public IEnumerable<string> MissingParameterNames { get; }
+      public List<string> MissingParameterNames { get; }
 
       public int CompareTo(ConstructorOrderInfo? other)
       {
@@ -56,6 +59,10 @@ namespace RockLib.Configuration.ObjectFactory
          if (TotalParameters < other.TotalParameters) return 1;
          if (MatchedNamedParameters > other.MatchedNamedParameters) return -1;
          if (MatchedNamedParameters < other.MatchedNamedParameters) return 1;
+         // Finds parameter types in ParameterTypes that are not in other.ParameterTypes
+         if (ParameterTypes.Except(other.ParameterTypes).Any()) return -1;
+         // Finds parameter types in other.ParameterTypes that are not in ParameterTypes
+         if (other.ParameterTypes.Except(ParameterTypes).Any()) return 1;
          return 0;
       }
    }
