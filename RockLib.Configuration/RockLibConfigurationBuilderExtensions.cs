@@ -56,6 +56,9 @@ namespace RockLib.Configuration
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
             if (string.IsNullOrEmpty(environment))
+                environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+
+            if (string.IsNullOrEmpty(environment))
                 environment = Environment.GetEnvironmentVariable("ROCKLIB_ENVIRONMENT");
 
             if (!string.IsNullOrEmpty(environment))
