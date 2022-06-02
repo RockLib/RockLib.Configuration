@@ -138,6 +138,8 @@ namespace RockLib.Configuration.ObjectFactory
             throw new ArgumentNullException(nameof(interfaceType));
          if (!interfaceType.IsInterface)
             throw new ArgumentException($"Specified type is not an interface: '{interfaceType.FullName}'.", nameof(interfaceType));
+         if (!DoesImplementDisposable(interfaceType))
+            throw new ArgumentException("The Specified type does not implement IDisposable.");
          if (interfaceType == typeof(IEnumerable))
             throw new ArgumentException("The IEnumerable interface is not supported.");
          if (typeof(IEnumerable).IsAssignableFrom(interfaceType))
@@ -183,7 +185,7 @@ namespace RockLib.Configuration.ObjectFactory
             AddEvent(proxyTypeBuilder, evt, baseGetObjectMethod, eventFields, implementedMethods);
 
          // Only add methods that weren't already created in AddProperty and AddEvent.
-         foreach (var method in interfaceType.GetAllMethods().Where(method => !implementedMethods.Contains(method)))
+         foreach (var method in interfaceType.GetAllMethods().Where(method => !implementedMethods.Contains(method) && method.Name is not "Dispose"))
             AddMethod(proxyTypeBuilder, method, baseGetObjectMethod);
 
          // The eventFields dictionary needs to be fully populated in order to correctly
@@ -412,5 +414,13 @@ namespace RockLib.Configuration.ObjectFactory
 
       private static IEnumerable<EventInfo> GetAllEvents(this Type type) =>
           type.GetEvents().Concat(type.GetInterfaces().SelectMany(i => i.GetEvents()));
+
+      private static bool DoesImplementDisposable(Type t)
+      {
+          var interfaceMap = t.GetInterfaceMap(typeof(IDisposable));
+          var methodInfo = t.GetMethod("Dispose");
+
+          return methodInfo == interfaceMap.TargetMethods[0];
+      }
    }
 }
