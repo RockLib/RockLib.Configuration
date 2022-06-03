@@ -129,7 +129,7 @@ namespace RockLib.Configuration.ObjectFactory
          DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null) =>
             configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null, resolver ?? Resolver.Empty);
 
-      internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, 
+      internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType,
          DefaultTypes? defaultTypes, ValueConverters? valueConverters, Type? declaringType, string? memberName, IResolver? resolver)
       {
          if (configuration is null)
@@ -138,7 +138,7 @@ namespace RockLib.Configuration.ObjectFactory
             throw new ArgumentNullException(nameof(interfaceType));
          if (!interfaceType.IsInterface)
             throw new ArgumentException($"Specified type is not an interface: '{interfaceType.FullName}'.", nameof(interfaceType));
-         if (!DoesImplementDisposable(interfaceType))
+         if (!typeof(IDisposable).IsAssignableFrom(interfaceType))
             throw new ArgumentException("The Specified type does not implement IDisposable.");
          if (interfaceType == typeof(IEnumerable))
             throw new ArgumentException("The IEnumerable interface is not supported.");
@@ -414,13 +414,5 @@ namespace RockLib.Configuration.ObjectFactory
 
       private static IEnumerable<EventInfo> GetAllEvents(this Type type) =>
           type.GetEvents().Concat(type.GetInterfaces().SelectMany(i => i.GetEvents()));
-
-      private static bool DoesImplementDisposable(Type t)
-      {
-          var interfaceMap = t.GetInterfaceMap(typeof(IDisposable));
-          var methodInfo = t.GetMethod("Dispose");
-
-          return methodInfo == interfaceMap.TargetMethods[0];
-      }
    }
 }

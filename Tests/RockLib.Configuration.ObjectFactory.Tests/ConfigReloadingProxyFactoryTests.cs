@@ -23,7 +23,7 @@ namespace Tests
          var defaultTypes = new DefaultTypes().Add(typeof(IGrault), typeof(Grault));
          var resolver = new Resolver(t => garply, t => t == typeof(IGarply));
 
-         var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
+         using var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
 
          Assert.Same(garply, grault.Garply);
          Assert.Equal(123, grault.Waldo);
@@ -99,7 +99,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          Assert.Equal(123, foo.Bar);
 
@@ -113,7 +113,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          Assert.Equal(123 * 2, foo.Baz());
 
@@ -127,7 +127,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var bar = configuration.GetSection("bar").CreateReloadingProxy<IBar>();
+         using var bar = configuration.GetSection("bar").CreateReloadingProxy<IBar>();
 
          var qux = -1;
 
@@ -177,7 +177,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
          foo.Qux = "abc";
 
          ChangeConfig(configuration);
@@ -190,7 +190,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
          foo.Qux = "abc";
 
          ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
@@ -203,7 +203,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          ChangeConfig(configuration, new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
 
@@ -215,7 +215,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          var initialObject = foo.Object;
 
@@ -231,7 +231,7 @@ namespace Tests
       {
          var configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          Assert.IsType<Foo>(foo);
       }
@@ -241,7 +241,7 @@ namespace Tests
       {
          var configuration = GetConfig(new KeyValuePair<string, string>("garply", "abc"));
 
-         var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          var initialObject = foo.Object;
 
@@ -257,7 +257,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          var proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
 
@@ -289,7 +289,7 @@ namespace Tests
             ["foo:reloadOnChange"] = "true",
          }).Build();
 
-         var foo = config.GetSection("foo").Create<IFoo>();
+         using var foo = config.GetSection("foo").Create<IFoo>();
 
          Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
       }
@@ -303,7 +303,7 @@ namespace Tests
             ["foo:reloadOnChange"] = "true",
          }).Build();
 
-         var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
+         using var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
 
          Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
       }
@@ -344,14 +344,16 @@ namespace Tests
          int Bar { get; }
       }
 
-      public interface IFoo : IFooBase
+      public interface IFoo : IFooBase, IDisposable   
       {
          int Baz();
          string? Qux { get; set; }
       }
 
-      public class Foo : IFoo
+      public sealed class Foo : IFoo
       {
+         private bool disposedValue;
+
          public Foo(int bar)
          {
             Bar = bar;
@@ -360,16 +362,47 @@ namespace Tests
          public int Bar { get; }
          public int Baz() => Bar * 2;
          public string? Qux { get; set; }
+
+         private void Dispose(bool disposing)
+         {
+            if (!disposedValue)
+            {
+               if (disposing)
+               {
+                  // TODO: dispose managed state (managed objects)
+               }
+
+               // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+               // TODO: set large fields to null
+               disposedValue = true;
+            }
+         }
+
+         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+         // ~Foo()
+         // {
+         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+         //     Dispose(disposing: false);
+         // }
+
+         public void Dispose()
+         {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+         }
       }
 
-      public interface IBar
+      public interface IBar : IDisposable
       {
          int Qux { get; }
          event EventHandler? Baz;
       }
 
-      public class Bar : IBar
+      public sealed class Bar : IBar
       {
+         private bool disposedValue;
+
          public Bar(int qux)
          {
             Qux = qux;
@@ -383,32 +416,55 @@ namespace Tests
          {
             Baz?.Invoke(this, EventArgs.Empty);
          }
+
+         private void Dispose(bool disposing)
+         {
+            if (!disposedValue)
+            {
+               if (disposing)
+               {
+                  // TODO: dispose managed state (managed objects)
+               }
+
+               // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+               // TODO: set large fields to null
+               disposedValue = true;
+            }
+         }
+
+         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+         // ~Bar()
+         // {
+         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+         //     Dispose(disposing: false);
+         // }
+
+         public void Dispose()
+         {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+         }
       }
 
-      public interface IBaz
+      public interface IBaz : IDisposable
       {
          int Foo { get; set; }
          bool IsDisposed { get; }
       }
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly
-      public class Baz : IBaz, IDisposable
-#pragma warning restore CA1063 // Implement IDisposable Correctly
+      public sealed class Baz : IBaz
       {
          public int Foo { get; set; }
          public bool IsDisposed { get; private set; }
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
          public void Dispose()
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
-#pragma warning restore CA1063 // Implement IDisposable Correctly
          {
             IsDisposed = true;
          }
       }
 
-      public interface IGrault
+      public interface IGrault : IDisposable
       {
          int Waldo { get; }
          IGarply Garply { get; }
@@ -416,6 +472,8 @@ namespace Tests
 
       public class Grault : IGrault
       {
+         private bool disposedValue;
+
          public Grault(int waldo, IGarply garply)
          {
             Waldo = waldo;
@@ -424,6 +482,35 @@ namespace Tests
 
          public int Waldo { get; }
          public IGarply Garply { get; }
+
+         protected virtual void Dispose(bool disposing)
+         {
+            if (!disposedValue)
+            {
+               if (disposing)
+               {
+                  // TODO: dispose managed state (managed objects)
+               }
+
+               // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+               // TODO: set large fields to null
+               disposedValue = true;
+            }
+         }
+
+         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+         // ~Grault()
+         // {
+         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+         //     Dispose(disposing: false);
+         // }
+
+         public void Dispose()
+         {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+         }
       }
 
 #pragma warning disable CA1040 // Avoid empty interfaces
