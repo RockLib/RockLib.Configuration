@@ -62,6 +62,16 @@ namespace Tests
       }
 
       [Fact]
+      public void NonDisposableInterfaceTypeThrowsArgumentException()
+      {
+         var configuration = GetConfig();
+         var interfaceType = typeof(IAmNotDisposable);
+
+         Assert.Equal("The Specified type does not implement IDisposable.",
+            Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType)).Message);
+      }
+
+      [Fact]
       public void EnumerableInterfaceTypeThrowsArgumentException()
       {
          var configuration = GetConfig();
@@ -339,6 +349,11 @@ namespace Tests
       }
 
 #pragma warning disable CA1034 // Nested types should not be visible
+      public interface IAmNotDisposable 
+      {
+         void Work();
+      }
+
       public interface IFooBase
       {
          int Bar { get; }
@@ -352,8 +367,6 @@ namespace Tests
 
       public sealed class Foo : IFoo
       {
-         private bool disposedValue;
-
          public Foo(int bar)
          {
             Bar = bar;
@@ -363,34 +376,7 @@ namespace Tests
          public int Baz() => Bar * 2;
          public string? Qux { get; set; }
 
-         private void Dispose(bool disposing)
-         {
-            if (!disposedValue)
-            {
-               if (disposing)
-               {
-                  // TODO: dispose managed state (managed objects)
-               }
-
-               // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-               // TODO: set large fields to null
-               disposedValue = true;
-            }
-         }
-
-         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-         // ~Foo()
-         // {
-         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-         //     Dispose(disposing: false);
-         // }
-
-         public void Dispose()
-         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-         }
+         public void Dispose() { }
       }
 
       public interface IBar : IDisposable
@@ -401,8 +387,6 @@ namespace Tests
 
       public sealed class Bar : IBar
       {
-         private bool disposedValue;
-
          public Bar(int qux)
          {
             Qux = qux;
@@ -417,34 +401,7 @@ namespace Tests
             Baz?.Invoke(this, EventArgs.Empty);
          }
 
-         private void Dispose(bool disposing)
-         {
-            if (!disposedValue)
-            {
-               if (disposing)
-               {
-                  // TODO: dispose managed state (managed objects)
-               }
-
-               // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-               // TODO: set large fields to null
-               disposedValue = true;
-            }
-         }
-
-         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-         // ~Bar()
-         // {
-         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-         //     Dispose(disposing: false);
-         // }
-
-         public void Dispose()
-         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-         }
+         public void Dispose() { }
       }
 
       public interface IBaz : IDisposable
@@ -470,10 +427,8 @@ namespace Tests
          IGarply Garply { get; }
       }
 
-      public class Grault : IGrault
+      public sealed class Grault : IGrault
       {
-         private bool disposedValue;
-
          public Grault(int waldo, IGarply garply)
          {
             Waldo = waldo;
@@ -483,34 +438,7 @@ namespace Tests
          public int Waldo { get; }
          public IGarply Garply { get; }
 
-         protected virtual void Dispose(bool disposing)
-         {
-            if (!disposedValue)
-            {
-               if (disposing)
-               {
-                  // TODO: dispose managed state (managed objects)
-               }
-
-               // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-               // TODO: set large fields to null
-               disposedValue = true;
-            }
-         }
-
-         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-         // ~Grault()
-         // {
-         //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-         //     Dispose(disposing: false);
-         // }
-
-         public void Dispose()
-         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-         }
+         public void Dispose() { }
       }
 
 #pragma warning disable CA1040 // Avoid empty interfaces

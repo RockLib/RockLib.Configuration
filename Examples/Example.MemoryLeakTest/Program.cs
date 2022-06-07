@@ -2,8 +2,11 @@
 using RockLib.Configuration.ObjectFactory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+
+var baseWorkingSet = Process.GetCurrentProcess().WorkingSet64;
 
 while (true)
 {
@@ -18,7 +21,9 @@ while (true)
 
 	await Task.WhenAll(tasks);
 
-	Console.WriteLine(Tester._total);
+	var currentWorkingSet = Process.GetCurrentProcess().WorkingSet64;
+	//Console.WriteLine($"Current count: {Tester._total}");
+	Console.WriteLine($"Current working set: {currentWorkingSet} - diff is {((currentWorkingSet - baseWorkingSet) / (double)baseWorkingSet) * 100}");
 	Console.ReadLine();
 }
 
@@ -42,40 +47,9 @@ public class Tester
 
 	public class Logger : ILogger
 	{
-		public Logger()
-		{
+		public Logger() { }
 
-		}
-		private bool disposedValue;
-
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposedValue)
-			{
-				if (disposing)
-				{
-					// TODO: dispose managed state (managed objects)
-				}
-
-				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-				// TODO: set large fields to null
-				disposedValue = true;
-			}
-		}
-
-		// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-		//~Logger()
-		//{
-		//    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		//    Dispose(disposing: false);
-		//}
-
-		public void Dispose()
-		{
-			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
+		public void Dispose() { }
 	}
 
 	public void Log(int i)
@@ -94,15 +68,14 @@ public class Tester
 		}
 		finally
 		{
-			//logger?.Dispose();
-			(logger as ConfigReloadingProxy<ILogger>)?.Dispose();
+			//logger.Dispose();
 		}
 		Interlocked.Decrement(ref _counter);
 		Interlocked.Increment(ref _total);
 
 		int count = _total;
 
-		if (count % 1000 == 0)
-			Console.WriteLine(count);
+		//if (count % 1000 == 0)
+		//	Console.WriteLine(count);
 	}
 }
