@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 
+**BREAKING CHANGES**
+
 - This is a bug fix that can be a breaking change. This fix eliminates a memory leak that can occur with `ConfigReloadingProxy`. The type passed to `CreateReloadingProxy()` must now implement `IDisposable`. Note that this is a runtime check, so you should check any `Type` objects passed to this method and make the appropriate updates in your code. Otherwise, your code will fail with `ArgumentException`-based exceptions. Review your code to ensure:
   - The interface passed to `CreateReloadingProxy()` must now implement `IDisposable`
   - This also means that you must call `Dispose()` on the object reference returned by `CreateReloadingProxy()`
