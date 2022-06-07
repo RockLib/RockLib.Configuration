@@ -139,7 +139,7 @@ namespace RockLib.Configuration.ObjectFactory
          if (!interfaceType.IsInterface)
             throw new ArgumentException($"Specified type is not an interface: '{interfaceType.FullName}'.", nameof(interfaceType));
          if (!typeof(IDisposable).IsAssignableFrom(interfaceType))
-            throw new ArgumentException("The Specified type does not implement IDisposable.");
+            throw new ArgumentException($"The specified type, {interfaceType.FullName}, does not implement IDisposable.", nameof(interfaceType));
          if (interfaceType == typeof(IEnumerable))
             throw new ArgumentException("The IEnumerable interface is not supported.");
          if (typeof(IEnumerable).IsAssignableFrom(interfaceType))

@@ -67,8 +67,15 @@ namespace Tests
          var configuration = GetConfig();
          var interfaceType = typeof(IAmNotDisposable);
 
-         Assert.Equal("The Specified type does not implement IDisposable.",
-            Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType)).Message);
+         var exception = Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
+
+#if NET48
+         Assert.Equal("The specified type, Tests.ConfigReloadingProxyFactoryTests+IAmNotDisposable, does not implement IDisposable.\r\nParameter name: interfaceType",
+            exception.Message);
+#else
+         Assert.Equal("The specified type, Tests.ConfigReloadingProxyFactoryTests+IAmNotDisposable, does not implement IDisposable. (Parameter 'interfaceType')",
+            exception.Message);
+#endif
       }
 
       [Fact]

@@ -16,9 +16,7 @@ namespace RockLib.Configuration.ObjectFactory
    /// The base class for reloading proxy classes.
    /// </summary>
    [DebuggerDisplay("{" + nameof(Object) + "}")]
-#pragma warning disable CA1063 // Implement IDisposable Correctly
    public abstract class ConfigReloadingProxy<TInterface> : IDisposable
-#pragma warning restore CA1063 // Implement IDisposable Correctly
    {
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly IConfiguration _section;
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly DefaultTypes _defaultTypes;
