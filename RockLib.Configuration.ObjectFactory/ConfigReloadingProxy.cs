@@ -3,7 +3,6 @@ using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -17,9 +16,7 @@ namespace RockLib.Configuration.ObjectFactory
    /// The base class for reloading proxy classes.
    /// </summary>
    [DebuggerDisplay("{" + nameof(Object) + "}")]
-#pragma warning disable CA1063 // Implement IDisposable Correctly
    public abstract class ConfigReloadingProxy<TInterface> : IDisposable
-#pragma warning restore CA1063 // Implement IDisposable Correctly
    {
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly IConfiguration _section;
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly DefaultTypes _defaultTypes;
@@ -28,6 +25,8 @@ namespace RockLib.Configuration.ObjectFactory
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly string _memberName;
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private readonly IResolver _resolver;
       [DebuggerBrowsable(DebuggerBrowsableState.Never)] private string _hash;
+
+      private readonly IDisposable _reloadedObject;
 
       private readonly object _thisLock = new();
 
@@ -66,7 +65,7 @@ namespace RockLib.Configuration.ObjectFactory
          _resolver = resolver ?? Resolver.Empty;
          _hash = GetHash();
          Object = CreateObject();
-         ChangeToken.OnChange(section.GetReloadToken, () => ReloadObject(false));
+         _reloadedObject = ChangeToken.OnChange(section.GetReloadToken, () => ReloadObject(false));
       }
 
       /// <summary>
@@ -93,13 +92,27 @@ namespace RockLib.Configuration.ObjectFactory
       public event EventHandler? Reloaded;
 
       /// <summary>
+      /// Standard implementation of Dispose
+      /// </summary>
+      public void Dispose()
+      {
+          Dispose(true);
+          GC.SuppressFinalize(this);
+      }
+
+      /// <summary>
       /// Dispose the underlying object if it implements <see cref="IDisposable"/>.
       /// </summary>
-#pragma warning disable CA1063 // Implement IDisposable Correctly
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
-      public void Dispose() => (Object as IDisposable)?.Dispose();
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
-#pragma warning restore CA1063 // Implement IDisposable Correctly
+      /// <param name="disposing"></param>
+      protected virtual void Dispose(bool disposing)
+      {
+          if (!disposing)
+          {
+              return;
+          }
+          _reloadedObject.Dispose();
+          (Object as IDisposable)?.Dispose();
+      }
 
       private TInterface CreateObject()
       {

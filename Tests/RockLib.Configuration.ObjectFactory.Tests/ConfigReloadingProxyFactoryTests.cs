@@ -23,7 +23,7 @@ namespace Tests
          var defaultTypes = new DefaultTypes().Add(typeof(IGrault), typeof(Grault));
          var resolver = new Resolver(t => garply, t => t == typeof(IGarply));
 
-         var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
+         using var grault = config.CreateReloadingProxy<IGrault>(defaultTypes, resolver: resolver);
 
          Assert.Same(garply, grault.Garply);
          Assert.Equal(123, grault.Waldo);
@@ -59,6 +59,23 @@ namespace Tests
          var interfaceType = typeof(int);
 
          Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
+      }
+
+      [Fact]
+      public void NonDisposableInterfaceTypeThrowsArgumentException()
+      {
+         var configuration = GetConfig();
+         var interfaceType = typeof(IAmNotDisposable);
+
+         var exception = Assert.Throws<ArgumentException>(() => configuration.CreateReloadingProxy(interfaceType));
+
+#if NET48
+         Assert.Equal("The specified type, Tests.ConfigReloadingProxyFactoryTests+IAmNotDisposable, does not implement IDisposable.\r\nParameter name: interfaceType",
+            exception.Message);
+#else
+         Assert.Equal("The specified type, Tests.ConfigReloadingProxyFactoryTests+IAmNotDisposable, does not implement IDisposable. (Parameter 'interfaceType')",
+            exception.Message);
+#endif
       }
 
       [Fact]
@@ -99,7 +116,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          Assert.Equal(123, foo.Bar);
 
@@ -113,7 +130,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          Assert.Equal(123 * 2, foo.Baz());
 
@@ -127,7 +144,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var bar = configuration.GetSection("bar").CreateReloadingProxy<IBar>();
+         using var bar = configuration.GetSection("bar").CreateReloadingProxy<IBar>();
 
          var qux = -1;
 
@@ -177,7 +194,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
          foo.Qux = "abc";
 
          ChangeConfig(configuration);
@@ -190,7 +207,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
          foo.Qux = "abc";
 
          ChangeConfig(configuration, new KeyValuePair<string, string>("foo:value:qux", "xyz"));
@@ -203,7 +220,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          ChangeConfig(configuration, new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
 
@@ -215,7 +232,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          var initialObject = foo.Object;
 
@@ -231,7 +248,7 @@ namespace Tests
       {
          var configuration = GetConfig(new KeyValuePair<string, string>("foo:reloadOnChange", "false"));
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          Assert.IsType<Foo>(foo);
       }
@@ -241,7 +258,7 @@ namespace Tests
       {
          var configuration = GetConfig(new KeyValuePair<string, string>("garply", "abc"));
 
-         var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = (ConfigReloadingProxy<IFoo>)configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          var initialObject = foo.Object;
 
@@ -257,7 +274,7 @@ namespace Tests
       {
          var configuration = GetConfig();
 
-         var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
+         using var foo = configuration.GetSection("foo").CreateReloadingProxy<IFoo>();
 
          var proxyFoo = (ConfigReloadingProxy<IFoo>)foo;
 
@@ -289,7 +306,7 @@ namespace Tests
             ["foo:reloadOnChange"] = "true",
          }).Build();
 
-         var foo = config.GetSection("foo").Create<IFoo>();
+         using var foo = config.GetSection("foo").Create<IFoo>();
 
          Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
       }
@@ -303,7 +320,7 @@ namespace Tests
             ["foo:reloadOnChange"] = "true",
          }).Build();
 
-         var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
+         using var foo = config.GetSection("foo").Create<IFoo>(new DefaultTypes().Add(typeof(IFoo), typeof(Foo)));
 
          Assert.IsAssignableFrom<ConfigReloadingProxy<IFoo>>(foo);
       }
@@ -339,18 +356,23 @@ namespace Tests
       }
 
 #pragma warning disable CA1034 // Nested types should not be visible
+      public interface IAmNotDisposable 
+      {
+         void Work();
+      }
+
       public interface IFooBase
       {
          int Bar { get; }
       }
 
-      public interface IFoo : IFooBase
+      public interface IFoo : IFooBase, IDisposable   
       {
          int Baz();
          string? Qux { get; set; }
       }
 
-      public class Foo : IFoo
+      public sealed class Foo : IFoo
       {
          public Foo(int bar)
          {
@@ -360,15 +382,17 @@ namespace Tests
          public int Bar { get; }
          public int Baz() => Bar * 2;
          public string? Qux { get; set; }
+
+         public void Dispose() { }
       }
 
-      public interface IBar
+      public interface IBar : IDisposable
       {
          int Qux { get; }
          event EventHandler? Baz;
       }
 
-      public class Bar : IBar
+      public sealed class Bar : IBar
       {
          public Bar(int qux)
          {
@@ -383,38 +407,34 @@ namespace Tests
          {
             Baz?.Invoke(this, EventArgs.Empty);
          }
+
+         public void Dispose() { }
       }
 
-      public interface IBaz
+      public interface IBaz : IDisposable
       {
          int Foo { get; set; }
          bool IsDisposed { get; }
       }
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly
-      public class Baz : IBaz, IDisposable
-#pragma warning restore CA1063 // Implement IDisposable Correctly
+      public sealed class Baz : IBaz
       {
          public int Foo { get; set; }
          public bool IsDisposed { get; private set; }
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly
-#pragma warning disable CA1816 // Dispose methods should call SuppressFinalize
          public void Dispose()
-#pragma warning restore CA1816 // Dispose methods should call SuppressFinalize
-#pragma warning restore CA1063 // Implement IDisposable Correctly
          {
             IsDisposed = true;
          }
       }
 
-      public interface IGrault
+      public interface IGrault : IDisposable
       {
          int Waldo { get; }
          IGarply Garply { get; }
       }
 
-      public class Grault : IGrault
+      public sealed class Grault : IGrault
       {
          public Grault(int waldo, IGarply garply)
          {
@@ -424,6 +444,8 @@ namespace Tests
 
          public int Waldo { get; }
          public IGarply Garply { get; }
+
+         public void Dispose() { }
       }
 
 #pragma warning disable CA1040 // Avoid empty interfaces

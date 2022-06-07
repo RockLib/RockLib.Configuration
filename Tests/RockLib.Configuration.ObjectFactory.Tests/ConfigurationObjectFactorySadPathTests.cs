@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using Xunit;
 
@@ -59,7 +60,7 @@ namespace Tests
             var expected = Exceptions.CannotConvertSectionValueToTargetType(fooSection.GetSection("bar"), typeof(string), expectedInner);
 
             Assert.Equal(expected.Message, ex.Message);
-            Assert.Equal(expectedInner.Message, ex.InnerException.Message);
+            Assert.Equal(expectedInner.Message, ex.InnerException!.Message);
 #endif
       }
 
@@ -402,7 +403,7 @@ namespace Tests
 #if DEBUG
             var constructorOrderInfo = new ConstructorOrderInfo(
                 typeof(TwoArgConstructor).GetTypeInfo().GetConstructors()[0],
-                new Dictionary<string, IConfigurationSection> { { "bar", null } },
+                new Dictionary<string, IConfigurationSection> { { "bar", null! } },
                 Resolver.Empty);
             var expected = Exceptions.MissingRequiredConstructorParameters(fooSection, constructorOrderInfo);
             Assert.Equal(expected.Message, actual.Message);

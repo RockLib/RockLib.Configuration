@@ -129,7 +129,7 @@ namespace RockLib.Configuration.ObjectFactory
          DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null, IResolver? resolver = null) =>
             configuration.CreateReloadingProxy(interfaceType, defaultTypes, valueConverters, null, null, resolver ?? Resolver.Empty);
 
-      internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType, 
+      internal static object CreateReloadingProxy(this IConfiguration configuration, Type interfaceType,
          DefaultTypes? defaultTypes, ValueConverters? valueConverters, Type? declaringType, string? memberName, IResolver? resolver)
       {
          if (configuration is null)
@@ -138,6 +138,8 @@ namespace RockLib.Configuration.ObjectFactory
             throw new ArgumentNullException(nameof(interfaceType));
          if (!interfaceType.IsInterface)
             throw new ArgumentException($"Specified type is not an interface: '{interfaceType.FullName}'.", nameof(interfaceType));
+         if (!typeof(IDisposable).IsAssignableFrom(interfaceType))
+            throw new ArgumentException($"The specified type, {interfaceType.FullName}, does not implement IDisposable.", nameof(interfaceType));
          if (interfaceType == typeof(IEnumerable))
             throw new ArgumentException("The IEnumerable interface is not supported.");
          if (typeof(IEnumerable).IsAssignableFrom(interfaceType))
@@ -183,7 +185,7 @@ namespace RockLib.Configuration.ObjectFactory
             AddEvent(proxyTypeBuilder, evt, baseGetObjectMethod, eventFields, implementedMethods);
 
          // Only add methods that weren't already created in AddProperty and AddEvent.
-         foreach (var method in interfaceType.GetAllMethods().Where(method => !implementedMethods.Contains(method)))
+         foreach (var method in interfaceType.GetAllMethods().Where(method => !implementedMethods.Contains(method) && method.Name is not "Dispose"))
             AddMethod(proxyTypeBuilder, method, baseGetObjectMethod);
 
          // The eventFields dictionary needs to be fully populated in order to correctly
