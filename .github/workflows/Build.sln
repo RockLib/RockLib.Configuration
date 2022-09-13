@@ -2,35 +2,35 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration", "RockLib.Configuration\RockLib.Configuration.csproj", "{33869C6F-C539-4FC7-89A6-114BFA3B05D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration", "..\..\RockLib.Configuration\RockLib.Configuration.csproj", "{33869C6F-C539-4FC7-89A6-114BFA3B05D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.CustomConfigTests", "Tests\RockLib.Configuration.CustomConfigTests\RockLib.Configuration.CustomConfigTests.csproj", "{39DDD7E6-739F-4631-AF64-7A7EB1D55A1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.CustomConfigTests", "..\..\Tests\RockLib.Configuration.CustomConfigTests\RockLib.Configuration.CustomConfigTests.csproj", "{39DDD7E6-739F-4631-AF64-7A7EB1D55A1A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AppSettingsConfigTests", "Tests\RockLib.Configuration.AppSettingsConfigTests\RockLib.Configuration.AppSettingsConfigTests.csproj", "{B256C4B7-00A4-4FB5-9820-96DDF5F16E30}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AppSettingsConfigTests", "..\..\Tests\RockLib.Configuration.AppSettingsConfigTests\RockLib.Configuration.AppSettingsConfigTests.csproj", "{B256C4B7-00A4-4FB5-9820-96DDF5F16E30}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory", "RockLib.Configuration.ObjectFactory\RockLib.Configuration.ObjectFactory.csproj", "{1A866445-42C8-4A9B-82C5-D3B34EBF9147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory", "..\..\RockLib.Configuration.ObjectFactory\RockLib.Configuration.ObjectFactory.csproj", "{1A866445-42C8-4A9B-82C5-D3B34EBF9147}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory.Tests", "Tests\RockLib.Configuration.ObjectFactory.Tests\RockLib.Configuration.ObjectFactory.Tests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ObjectFactory.Tests", "..\..\Tests\RockLib.Configuration.ObjectFactory.Tests\RockLib.Configuration.ObjectFactory.Tests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory", "RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj", "{668E5809-C181-4FFD-AF2B-29D342FD6909}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory", "..\..\RockLib.Configuration.ProxyFactory\RockLib.Configuration.ProxyFactory.csproj", "{668E5809-C181-4FFD-AF2B-29D342FD6909}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory.Tests", "Tests\RockLib.Configuration.ProxyFactory.Tests\RockLib.Configuration.ProxyFactory.Tests.csproj", "{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.ProxyFactory.Tests", "..\..\Tests\RockLib.Configuration.ProxyFactory.Tests\RockLib.Configuration.ProxyFactory.Tests.csproj", "{0AF2FE77-91AA-43C5-AC7E-7E3E31627283}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.MessagingProvider", "RockLib.Configuration.MessagingProvider\RockLib.Configuration.MessagingProvider.csproj", "{781069C8-8177-49FB-AC0C-F53AF9DB0553}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.MessagingProvider", "..\..\RockLib.Configuration.MessagingProvider\RockLib.Configuration.MessagingProvider.csproj", "{781069C8-8177-49FB-AC0C-F53AF9DB0553}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.MessagingProvider.Tests", "Tests\RockLib.Configuration.MessagingProvider.Tests\RockLib.Configuration.MessagingProvider.Tests.csproj", "{4A401E7F-F80C-466F-91ED-0B727841AF8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.MessagingProvider.Tests", "..\..\Tests\RockLib.Configuration.MessagingProvider.Tests\RockLib.Configuration.MessagingProvider.Tests.csproj", "{4A401E7F-F80C-466F-91ED-0B727841AF8D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Tests", "Tests\RockLib.Configuration.Tests\RockLib.Configuration.Tests.csproj", "{BC3E90D9-654C-4698-8823-8A200F4A156A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Tests", "..\..\Tests\RockLib.Configuration.Tests\RockLib.Configuration.Tests.csproj", "{BC3E90D9-654C-4698-8823-8A200F4A156A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore", "RockLib.Configuration.AspNetCore\RockLib.Configuration.AspNetCore.csproj", "{2BA700E3-C04B-4563-A847-AF73A0A67B9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore", "..\..\RockLib.Configuration.AspNetCore\RockLib.Configuration.AspNetCore.csproj", "{2BA700E3-C04B-4563-A847-AF73A0A67B9C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore.Tests", "Tests\RockLib.Configuration.AspNetCore.Tests\RockLib.Configuration.AspNetCore.Tests.csproj", "{498A8328-6B22-452E-9632-6B090B67F6B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNetCore.Tests", "..\..\Tests\RockLib.Configuration.AspNetCore.Tests\RockLib.Configuration.AspNetCore.Tests.csproj", "{498A8328-6B22-452E-9632-6B090B67F6B2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1B79F6E4-7029-4506-B0FB-39646E6DC35B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "..\..\Tests", "{1B79F6E4-7029-4506-B0FB-39646E6DC35B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional", "RockLib.Configuration.Messaging.Conditional\RockLib.Configuration.Messaging.Conditional.csproj", "{7B7BDBE1-C5FB-40F9-B2C0-6E858CB32F8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional", "..\..\RockLib.Configuration.Messaging.Conditional\RockLib.Configuration.Messaging.Conditional.csproj", "{7B7BDBE1-C5FB-40F9-B2C0-6E858CB32F8F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional.Tests", "Tests\RockLib.Configuration.Messaging.Conditional.Tests\RockLib.Configuration.Messaging.Conditional.Tests.csproj", "{35E08C94-296C-4DE4-9849-8F9F9370A497}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional.Tests", "..\..\Tests\RockLib.Configuration.Messaging.Conditional.Tests\RockLib.Configuration.Messaging.Conditional.Tests.csproj", "{35E08C94-296C-4DE4-9849-8F9F9370A497}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
