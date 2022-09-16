@@ -1,4 +1,4 @@
-# RockLib.Configuration.Messaging.Conditional Changelog
+# RockLib.Configuration.Conditional Changelog
 
 All notable changes to this project will be documented in this file.
 

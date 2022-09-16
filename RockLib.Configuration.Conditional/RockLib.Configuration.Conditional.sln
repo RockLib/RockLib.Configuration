@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32804.467
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional", "RockLib.Configuration.Messaging.Conditional.csproj", "{1A866445-42C8-4A9B-82C5-D3B34EBF9147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Conditional", "RockLib.Configuration.Conditional.csproj", "{1A866445-42C8-4A9B-82C5-D3B34EBF9147}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional.Tests", "..\Tests\RockLib.Configuration.Messaging.Conditional.Tests\RockLib.Configuration.Messaging.Conditional.Tests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Conditional.Tests", "..\Tests\RockLib.Configuration.Conditional.Tests\RockLib.Configuration.Conditional.Tests.csproj", "{9DA180C2-E6BD-42E3-B157-D3164F6F269F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

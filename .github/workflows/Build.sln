@@ -28,9 +28,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.AspNe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "..\..\Tests", "{1B79F6E4-7029-4506-B0FB-39646E6DC35B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional", "..\..\RockLib.Configuration.Messaging.Conditional\RockLib.Configuration.Messaging.Conditional.csproj", "{7B7BDBE1-C5FB-40F9-B2C0-6E858CB32F8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Conditional", "..\..\RockLib.Configuration.Conditional\RockLib.Configuration.Conditional.csproj", "{7B7BDBE1-C5FB-40F9-B2C0-6E858CB32F8F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Messaging.Conditional.Tests", "..\..\Tests\RockLib.Configuration.Messaging.Conditional.Tests\RockLib.Configuration.Messaging.Conditional.Tests.csproj", "{35E08C94-296C-4DE4-9849-8F9F9370A497}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Conditional.Tests", "..\..\Tests\RockLib.Configuration.Conditional.Tests\RockLib.Configuration.Conditional.Tests.csproj", "{35E08C94-296C-4DE4-9849-8F9F9370A497}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

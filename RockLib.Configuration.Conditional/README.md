@@ -1,4 +1,4 @@
-# RockLib.Configuration.Messaging.Conditional
+# RockLib.Configuration.Conditional
 
 Configuration based on Kafka messages.
 

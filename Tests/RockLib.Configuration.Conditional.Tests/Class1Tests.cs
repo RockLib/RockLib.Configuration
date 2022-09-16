@@ -1,9 +1,9 @@
-﻿namespace RockLib.Configuration.Messaging.Conditional;
+﻿namespace RockLib.Configuration.Conditional.Tests;
 
 /// <summary>
-/// Class1
+/// Class1Tests
 /// </summary>
-public static class Class1
+public static class Class1Tests
 {
     // TODO: Remove once real code is added (just a placeholder to CA1014, even though that is turned on in .editorconfig)
 }
