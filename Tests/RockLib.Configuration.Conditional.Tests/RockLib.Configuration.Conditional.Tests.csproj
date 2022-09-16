@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<IsPackable>false</IsPackable>
+		<AssemblyName>RockLib.Configuration.Messaging.Conditional.Tests</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
