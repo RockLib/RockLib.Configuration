@@ -1,4 +1,4 @@
-﻿namespace RockLib.Configuration.Messaging.Conditional;
+﻿namespace RockLib.Configuration.Conditional;
 
 /// <summary>
 /// Class1

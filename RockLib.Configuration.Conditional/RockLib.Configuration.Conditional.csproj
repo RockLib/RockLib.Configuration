@@ -8,10 +8,10 @@
 		<Description>TODO - Finish</Description>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<PackageId>RockLib.Configuration.Messaging.Conditional</PackageId>
+		<PackageId>RockLib.Configuration.Conditional</PackageId>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/main/RockLib.Configuration.Messaging.Conditional</PackageProjectUrl>
-		<PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.Messaging.Conditional/CHANGELOG.md.</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/main/RockLib.Configuration.Conditional</PackageProjectUrl>
+		<PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.Conditional/CHANGELOG.md.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageTags>Configuration Kafka IConfiguration IConfigurationSection</PackageTags>
 		<PackageVersion>1.0.0-alpha.1</PackageVersion>

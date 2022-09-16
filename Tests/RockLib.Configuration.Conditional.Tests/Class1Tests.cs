@@ -1,4 +1,4 @@
-﻿namespace RockLib.Configuration.Messaging.Conditional.Tests;
+﻿namespace RockLib.Configuration.Conditional.Tests;
 
 /// <summary>
 /// Class1Tests
