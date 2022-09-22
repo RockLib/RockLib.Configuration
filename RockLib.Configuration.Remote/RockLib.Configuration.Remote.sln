@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.Remote", "RockLib.Configuration.Remote.csproj", "{7EE9FD51-EFDB-4B16-869B-D0F825085310}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.Remote.Tests", "..\Tests\RockLib.Configuration.Remote.Tests\RockLib.Configuration.Remote.Tests.csproj", "{B66D7BFD-B2EC-4365-A227-63E6F9476754}"
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7EE9FD51-EFDB-4B16-869B-D0F825085310}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EE9FD51-EFDB-4B16-869B-D0F825085310}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EE9FD51-EFDB-4B16-869B-D0F825085310}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EE9FD51-EFDB-4B16-869B-D0F825085310}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B66D7BFD-B2EC-4365-A227-63E6F9476754}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B66D7BFD-B2EC-4365-A227-63E6F9476754}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B66D7BFD-B2EC-4365-A227-63E6F9476754}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B66D7BFD-B2EC-4365-A227-63E6F9476754}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

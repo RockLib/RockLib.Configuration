@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32126.317
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -31,6 +31,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Conditional", "..\..\RockLib.Configuration.Conditional\RockLib.Configuration.Conditional.csproj", "{7B7BDBE1-C5FB-40F9-B2C0-6E858CB32F8F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RockLib.Configuration.Conditional.Tests", "..\..\Tests\RockLib.Configuration.Conditional.Tests\RockLib.Configuration.Conditional.Tests.csproj", "{35E08C94-296C-4DE4-9849-8F9F9370A497}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.Remote", "..\..\RockLib.Configuration.Remote\RockLib.Configuration.Remote.csproj", "{8986F247-F9BE-4563-95A0-2E0877AA8401}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RockLib.Configuration.Remote.Tests", "..\..\Tests\RockLib.Configuration.Remote.Tests\RockLib.Configuration.Remote.Tests.csproj", "{D4765099-1C16-4099-95E0-47146F7A5408}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +127,18 @@ Global
 		{35E08C94-296C-4DE4-9849-8F9F9370A497}.ReferenceModel|Any CPU.Build.0 = Release|Any CPU
 		{35E08C94-296C-4DE4-9849-8F9F9370A497}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35E08C94-296C-4DE4-9849-8F9F9370A497}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8986F247-F9BE-4563-95A0-2E0877AA8401}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8986F247-F9BE-4563-95A0-2E0877AA8401}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8986F247-F9BE-4563-95A0-2E0877AA8401}.ReferenceModel|Any CPU.ActiveCfg = ReferenceModel|Any CPU
+		{8986F247-F9BE-4563-95A0-2E0877AA8401}.ReferenceModel|Any CPU.Build.0 = ReferenceModel|Any CPU
+		{8986F247-F9BE-4563-95A0-2E0877AA8401}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8986F247-F9BE-4563-95A0-2E0877AA8401}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4765099-1C16-4099-95E0-47146F7A5408}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4765099-1C16-4099-95E0-47146F7A5408}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4765099-1C16-4099-95E0-47146F7A5408}.ReferenceModel|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4765099-1C16-4099-95E0-47146F7A5408}.ReferenceModel|Any CPU.Build.0 = Debug|Any CPU
+		{D4765099-1C16-4099-95E0-47146F7A5408}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4765099-1C16-4099-95E0-47146F7A5408}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
