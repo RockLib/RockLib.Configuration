@@ -5,7 +5,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FluentAssertions" Version="6.7.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+		<PackageReference Include="Moq" Version="4.18.2" />
 		<PackageReference Include="xunit" Version="2.4.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
 		  <PrivateAssets>all</PrivateAssets>
@@ -22,6 +25,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\RockLib.Configuration.Conditional\RockLib.Configuration.Conditional.csproj" />
+	  <ProjectReference Include="..\..\RockLib.Configuration.Remote\RockLib.Configuration.Remote.csproj" />
 	</ItemGroup>
 </Project>

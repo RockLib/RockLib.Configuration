@@ -67,3 +67,7 @@ dotnet_diagnostic.CA1725.severity = suggestion
 # CA2227: Collection properties should be read only
 # https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2227
 dotnet_diagnostic.CA2227.severity = suggestion
+
+# CA1805: Member is explicitly initialized to its default value
+# https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1805
+dotnet_diagnostic.CA1805.severity = none
