@@ -7,8 +7,8 @@ using Microsoft.Extensions.Primitives;
 namespace RockLib.Configuration.Conditional;
 
 /// <summary>
-/// A ConfigurationSection that can use an alternate ConfigurationSection to
-/// override some values.
+/// A <see cref="IConfigurationSection" /> that can use an alternate
+/// <see cref="IConfigurationSection" /> to override some values.
 /// </summary>
 public class ConditionalConfigurationSection : IConfigurationSection
 {
@@ -22,11 +22,12 @@ public class ConditionalConfigurationSection : IConfigurationSection
     }
 
     /// <summary>
-    /// Create a ConditionalConfigurationSection instance with overrides from a
-    /// child section determined by a switching property.
+    /// Create a <see cref="ConditionalConfigurationSection" /> instance with
+    /// overrides from a child section determined by a switching property.
     /// </summary>
     /// <param name="baseSection">
-    ///   The base IConfigurationSection to use for this configuration
+    ///   The base <see cref="IConfigurationSection" /> to use for this
+    ///   configuration
     /// </param>
     /// <param name="switchingProperty">
     ///   A property name whose value determines which child section to use as
@@ -48,7 +49,7 @@ public class ConditionalConfigurationSection : IConfigurationSection
     public string Key => _baseSection.Key;
 
     /// <summary>
-    /// Gets the full path to this section's base within the IConfiguration.
+    /// Gets the full path to this section's base within the <see cref="IConfiguration" />.
     /// </summary>
     public string Path => _baseSection.Path;
 
@@ -78,10 +79,11 @@ public class ConditionalConfigurationSection : IConfigurationSection
     }
 
     /// <summary>
-    /// Returns a IChangeToken that can be used to observe when this configuration's base is reloaded.
+    /// Returns a <see cref="IChangeToken" /> that can be used to observe when
+    /// this configuration's base is reloaded.
     /// </summary>
     /// <returns>
-    /// A IChangeToken.
+    /// A <see cref="IChangeToken" />.
     /// </returns>
     public IChangeToken GetReloadToken()
     {
@@ -91,11 +93,12 @@ public class ConditionalConfigurationSection : IConfigurationSection
     /// <summary>
     /// Gets a configuration sub-section with the specified key.
     ///
-    /// The returned section will be a ConditionalConfigurationSection that
-    /// merges any override configuration into the base configuration.
+    /// The returned section will be a <see cref="ConditionalConfigurationSection" />
+    /// that merges any override configuration into the base configuration.
     ///
     /// This method will never return null. If no matching sub-section is found
-    /// with the specified key, an empty IConfigurationSection will be returned.
+    /// with the specified key, an empty <see cref="IConfigurationSection" />
+    /// will be returned.
     /// </summary>
     /// <returns>
     /// The IConfigurationSection.

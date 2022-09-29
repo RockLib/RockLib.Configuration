@@ -3,22 +3,22 @@
 namespace RockLib.Configuration.Conditional;
 
 /// <summary>
-/// Extension methods for creating ConditionalConfigurationSection from
-/// IConfigurationSection instances.
+/// Extension methods for creating <see cref="ConditionalConfigurationSection" />
+/// from <see cref="IConfigurationSection" /> instances.
 /// </summary>
 public static class ConfigurationSectionExtensions
 {
     /// <summary>
-    /// Create a ConditionalConfigurationSection using a switching property to
-    /// select an override section.
+    /// Create a <see cref="ConditionalConfigurationSection" /> using a
+    /// switching property to select an override section.
     /// </summary>
-    /// <param name="config">The base IConfigurationSection</param>
+    /// <param name="config">The base <see cref="IConfigurationSection" /></param>
     /// <param name="switchingProperty">
     ///   A property name whose value determines which child section to use as
     ///   the override section
     /// </param>
     /// <returns>
-    /// A ConditionalConfigurationSection
+    /// A <see cref="ConditionalConfigurationSection" />
     /// </returns>
     public static IConfigurationSection SwitchingOn(this IConfigurationSection config, string switchingProperty)
     {
