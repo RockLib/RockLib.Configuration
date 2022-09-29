@@ -8,10 +8,10 @@ using Xunit;
 
 namespace RockLib.Configuration.Conditional.Tests;
 
-public class ConditionalConfigurationSectionTests
+public static class ConditionalConfigurationSectionTests
 {
     [Fact]
-    public void KeyPropertyHasSameValueAsBaseSectionKeyProperty()
+    public static void KeyPropertyHasSameValueAsBaseSectionKeyProperty()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -31,7 +31,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void GetIndexReturnsValueFromBaseSectionWhenOnlyBaseSectionContainsRequestedKey()
+    public static void GetIndexReturnsValueFromBaseSectionWhenOnlyBaseSectionContainsRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -52,7 +52,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void GetIndexReturnsValueFromOverrideSectionWhenOnlyOverrideSectionContainsRequestedKey()
+    public static void GetIndexReturnsValueFromOverrideSectionWhenOnlyOverrideSectionContainsRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -73,7 +73,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void GetIndexReturnsValueFromOverrideSectionWhenBothSectionsContainRequestedKey()
+    public static void GetIndexReturnsValueFromOverrideSectionWhenBothSectionsContainRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -95,7 +95,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void GetIndexReturnsNullWhenNeitherSectionContainsRequestedKey()
+    public static void GetIndexReturnsNullWhenNeitherSectionContainsRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -115,7 +115,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void SetIndexSetsValueOnBaseSectionWhenOnlyBaseSectionContainsRequestedKey()
+    public static void SetIndexSetsValueOnBaseSectionWhenOnlyBaseSectionContainsRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -138,7 +138,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void SetIndexSetsValueOnOverrideSectionWhenOnlyOverrideSectionContainsRequestedKey()
+    public static void SetIndexSetsValueOnOverrideSectionWhenOnlyOverrideSectionContainsRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -161,7 +161,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void SetIndexSetsValueOnOverrideSectionWhenBothSectionsContainRequestedKey()
+    public static void SetIndexSetsValueOnOverrideSectionWhenBothSectionsContainRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -185,7 +185,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void SetIndexSetsValueOnBaseSectionWhenNeitherSectionContainsRequestedKey()
+    public static void SetIndexSetsValueOnBaseSectionWhenNeitherSectionContainsRequestedKey()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -207,7 +207,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void SetValueSetsValueOnBaseSection()
+    public static void SetValueSetsValueOnBaseSection()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -229,7 +229,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void ConditionalConfigurationSectionMergesOverrideSectionIntoBaseSectionWhenExplicitlyBoundToConfigType()
+    public static void ConditionalConfigurationSectionMergesOverrideSectionIntoBaseSectionWhenExplicitlyBoundToConfigType()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -257,7 +257,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void ConditionalConfigurationSectionMergesOverrideSectionIntoBaseSectionWhenAccessThroughServiceProvider()
+    public static void ConditionalConfigurationSectionMergesOverrideSectionIntoBaseSectionWhenAccessThroughServiceProvider()
     {
         // Arrange
         var data = new Dictionary<string, string>()
@@ -287,7 +287,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void ConditionalConfigurationSectionReplacesMergedSectionAfterConditionalPropertyHasChanged()
+    public static void ConditionalConfigurationSectionReplacesMergedSectionAfterConditionalPropertyHasChanged()
     {
         // Arrange
         var source = new ModifiableConfigurationSource(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -318,7 +318,7 @@ public class ConditionalConfigurationSectionTests
     }
 
     [Fact]
-    public void ConditionalConfigurationSectionReturnsNullForThatKeyWhenNewSectionIsMissingKey()
+    public static void ConditionalConfigurationSectionReturnsNullForThatKeyWhenNewSectionIsMissingKey()
     {
         // Arrange
         var source = new ModifiableConfigurationSource(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
