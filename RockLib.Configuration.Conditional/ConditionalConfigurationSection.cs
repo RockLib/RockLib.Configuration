@@ -10,7 +10,7 @@ namespace RockLib.Configuration.Conditional;
 /// A <see cref="IConfigurationSection" /> that can use an alternate
 /// <see cref="IConfigurationSection" /> to override some values.
 /// </summary>
-public class ConditionalConfigurationSection : IConfigurationSection
+public sealed class ConditionalConfigurationSection : IConfigurationSection
 {
     private readonly IConfigurationSection _baseSection;
     private readonly Func<IConfigurationSection> _getOverrideSection;
