@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace RockLib.Configuration.Remote;
 
@@ -37,14 +36,14 @@ public class JsonConfigurationParser : IConfigurationParser
             return ImmutableDictionary<string, string>.Empty;
         }
 
-        return ToKeyValuePairs(_section, JsonConvert.DeserializeObject<JToken>(raw))
+        return ToKeyValuePairs(_section, JsonNode.Parse(raw))
             .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 
-    private IEnumerable<KeyValuePair<string, string>> ToKeyValuePairs(string path, JToken? data)
+    private IEnumerable<KeyValuePair<string, string>> ToKeyValuePairs(string path, JsonNode? data)
     {
         var elementPrefix = !string.IsNullOrEmpty(path) ? $"{path}{SectionSeparator}" : "";
-        if (data is JArray items)
+        if (data is JsonArray items)
         {
             for (var i = 0; i < items.Count; i++)
             {
@@ -54,7 +53,7 @@ public class JsonConfigurationParser : IConfigurationParser
                 }
             }
         }
-        else if (data is JObject properties)
+        else if (data is JsonObject properties)
         {
             foreach (var property in properties)
             {
@@ -64,14 +63,9 @@ public class JsonConfigurationParser : IConfigurationParser
                 }
             }
         }
-        else if (data is JValue value)
+        else if (data is JsonValue value)
         {
-            // Disabling CA1305 because the only IFormatProvider I could find
-            // that seemed suitable actually changed the serialization to
-            // include double quotes (as in a JSON string).
-            #pragma warning disable CA1305 // Specify IFormatProvider
             yield return new KeyValuePair<string, string>($"{path}", value.ToString());
-            #pragma warning restore CA1305 // Specify IFormatProvider
         }
     }
 }

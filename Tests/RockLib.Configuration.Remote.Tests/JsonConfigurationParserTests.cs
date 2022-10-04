@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Text.Json;
 using FluentAssertions;
-using Newtonsoft.Json;
 using Xunit;
 
 namespace RockLib.Configuration.Remote.Tests;
@@ -11,7 +11,7 @@ public class JsonConfigurationParserTests
     public void ParseReturnsDictionaryWhenRawIsValidJson()
     {
         // Arrange
-        var json = JsonConvert.SerializeObject(new
+        var json = JsonSerializer.Serialize(new
         {
             word = "hello",
             number = 123,
@@ -38,9 +38,9 @@ public class JsonConfigurationParserTests
         actual.Should().Contain(
             KeyValue("Section:Prefix:word", "hello"),
             KeyValue("Section:Prefix:number", "123"),
-            KeyValue("Section:Prefix:list:0:flag", "True"),
+            KeyValue("Section:Prefix:list:0:flag", "true"),
             KeyValue("Section:Prefix:list:0:value", "x"),
-            KeyValue("Section:Prefix:list:1:flag", "False"),
+            KeyValue("Section:Prefix:list:1:flag", "false"),
             KeyValue("Section:Prefix:list:1:value", "y"));
     }
 
