@@ -1,4 +1,4 @@
-# RockLib.Configuration.ObjectFactory [![Build status](https://ci.appveyor.com/api/projects/status/0hb1lqus37ny3tep?svg=true)](https://ci.appveyor.com/project/RockLib/rocklib-configuration-qcxxq)
+# RockLib.Configuration.ObjectFactory
 
 An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-default constructors and other features commonly found in JSON and XML serializers.
 
@@ -12,7 +12,7 @@ An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-
 - [Default Types](#default-types)
 - [Value Converters](#value-converters)
 
-### Overview
+## Overview
 
 The `RockLib.Configuration.ObjectFactory` package defines a `Create` extension method that behaves very similar to the `Get` extension method from the `Microsoft.Extensions.Configuration.Binder` package. Both extension methods extend the `IConfiguration` interface and create an object of a specified type with values contained in the `IConfiguration` intstance. The `Create` extension method also has additional features, as described in later sections.
 
@@ -30,7 +30,7 @@ For example, an `IConfiguration` created with this json file:
 
 can be mapped to an instance of the `Foo` class:
 
-```c#
+```csharp
 public class Foo
 {
     public int Bar { get; set; }
@@ -46,7 +46,7 @@ public class Baz
 
 by making this call:
 
-```c#
+```csharp
 IConfiguration configuration; // TODO: load from json
 Foo foo = configuration.Create<Foo>();
 
@@ -54,7 +54,7 @@ Foo foo = configuration.Create<Foo>();
 Foo foo2 = (Foo)configuration.Create(typeof(Foo));
 ```
 
-### Non-default constructors
+## Non-default constructors
 
 The `Create` extension method supports mapping to types without default constructors. It does so by matching config setting names to constructor parameter names. For example:
 
@@ -70,7 +70,7 @@ The `Create` extension method supports mapping to types without default construc
 
 can be mapped to an instance of the `Foo` class:
 
-```c#
+```csharp
 public class Foo
 {
     public Foo(int bar, Baz baz)
@@ -98,7 +98,7 @@ public class Baz
 
 Note that a public property corresponding to the constructor parameter does not have to exist in order for the mapping to occur. The same configuration can be mapped to this version of `Foo` as well:
 
-```c#
+```csharp
 public class Foo
 {
     public Foo(int bar, Baz baz)
@@ -114,11 +114,11 @@ public class Baz
 }
 ```
 
-### Type-specified values
+## Type-specified values
 
 Sometimes, it is necessary to specify a derived type for a value in the configuration. For example, given the following types defined in assembly `MyAssembly`:
 
-```c#
+```csharp
 namespace MyNamespace
 {
     public class Foo
@@ -156,7 +156,7 @@ a instance of `Foo` can be created with a `Baz` property with a value of type `B
 
 Being able to specify a type means that interfaces and abstract classes are supported.
 
-```c#
+```csharp
 public class Foo
 {
     public IBar Bar { get; set; }
@@ -201,7 +201,7 @@ is mappable from:
 }
 ```
 
-### Lists
+## Lists
 
 RockLib.Configuration.ObjectFactory currently supports the following list types:
 
@@ -223,7 +223,7 @@ If a list property is readonly, one of the following conditions must be met:
 
 If a class has a list-type property, but the application only wants to define one item, the configuration can be flattened. For the `Foo` class:
 
-```c#
+```csharp
 public class Foo
 {
     public IEnumerable<Bar> Bars { get; set; }
@@ -260,7 +260,7 @@ can be rewritten like this:
 }
 ```
 
-### Dictionaries
+## Dictionaries
 
 RockLib.Configuration.ObjectFactory currently supports the following dictionary types - note that the key of each dictionary type must be `string`:
 
@@ -274,14 +274,14 @@ If a dictionary property is readonly, it must be one of the following dictionary
 
 Dictionaries take the form of regular objects in configuration. For example, in the following Foo class:
 
-```c#
+```csharp
 public class Foo
 {
     public Foo(IReadOnlyDictionary<string, int> bar)
     {
         Bar = bar;
     }
-    
+
     public IReadOnlyDictionary<string, int> Bar { get; }
 }
 ```
@@ -297,11 +297,11 @@ A configuration might look like this:
 }
 ```
 
-### Default Types
+## Default Types
 
 Given a type `Foo` that has an abstract property `Bar`:
 
-```c#
+```csharp
 public class Foo
 {
     public IBar Bar { get; set; }
@@ -321,30 +321,30 @@ We would like to be able to define the `DefaultBar` type as the default type - i
 
 To programmatically set `DefaultBar` as the default type for the `Foo.Bar` property, call the `Create` extension method as follows:
 
-```c#
+```csharp
 DefaultTypes defaultTypes =
     new DefaultTypes().Add(typeof(Foo), nameof(Foo.Bar), typeof(DefaultBar));
-    
+
 Foo foo = configuration.Create<Foo>(defaultTypes: defaultTypes);
 ```
 
 To programmatically set `DefaultBar` as the default type for the `IBar`, call the `Create` extension method as follows:
 
-```c#
+```csharp
 DefaultTypes defaultTypes =
     new DefaultTypes().Add(typeof(IBar), typeof(DefaultBar));
 
 var foo = configuration.Create<Foo>(defaultTypes: defaultTypes);
 ```
 
-Default types can also be specified via attributes, so that the `defaultTypes` parameter in the `Create` extension method can be omitted. 
+Default types can also be specified via attributes, so that the `defaultTypes` parameter in the `Create` extension method can be omitted.
 
-```c#
+```csharp
 public class Foo
 {
     [DefaultType(typeof(DefaultBar))]
     public IBar Bar { get; set; }
-    
+
     public IBaz Baz { get; set; }
 }
 
@@ -368,13 +368,13 @@ public class Baz : IBaz
 }
 ```
 
-### Value Converters
+## Value Converters
 
 RockLib converts most configuration string values to the target type by using the `TypeConverter` obtained by calling `TypeDescriptor.GetConverter(targetType)`. In addition, there is support for target types `Encoding` and `Type`. If value conversions need to be supported for additional types, value converters can be registered. These value converters are functions that have a single string parameter and return the target type. Similar to default types, they can be registered by property or by type.
 
 This example defines a class that has a property of type `System.Numerics.BigInteger`, which does not have a `TypeConverter` defined.
 
-```c#
+```csharp
 public class Foo
 {
     public BigInteger Bar { get; set; }
@@ -383,16 +383,16 @@ public class Foo
 
 The `BigInteger.Parse` method meets the criteria for a convert function - it has an overload with one string parameter and returns our target type. To do this programmatically for all `BigInteger` values:
 
-```c#
+```csharp
 ValueConverters valueConverters =
     new ValueConverters().Add(typeof(BigInteger), BigInteger.Parse);
-    
+
 Foo foo = configuration.Create<Foo>(valueConverters: valueConverters);
 ```
 
 We could also target just the `Foo.Bar` property:
 
-```c#
+```csharp
 ValueConverters valueConverters =
     new ValueConverters().Add(typeof(Foo), nameof(Foo.Bar), BigInteger.Parse);
 
@@ -401,14 +401,14 @@ Foo foo = config.Create<Foo>(valueConverters: valueConverters);
 
 There are attributes for value converters, as with default types. In this case, the value of the attribute should be the name of a convert method. The method *must* be static, but can be either public or private.
 
-```c#
+```csharp
 public class Foo
 {
     public Bar Bar { get; set; }
 
     [ConvertMethod(nameof(ParseBaz))]
     public Baz Baz { get; set; }
-    
+
     private static Baz ParseBaz(string value) => new Baz(bool.Parse(value));
 }
 
@@ -416,16 +416,16 @@ public class Foo
 public struct Bar
 {
     public Bar(int qux) => Qux = qux;
-    
+
     public int Qux { get; }
-    
+
     public static Bar Parse(string value) => new Bar(int.Parse(value));
 }
 
 public struct Baz
 {
     public Baz(bool corge) => Corge = corge;
-    
+
     public bool Corge { get; }
 }
 ```

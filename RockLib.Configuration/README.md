@@ -1,8 +1,8 @@
-# RockLib.Configuration [![Build status](https://ci.appveyor.com/api/projects/status/cqxs63x57368a08w?svg=true)](https://ci.appveyor.com/project/RockLib/rocklib-configuration-9b1x8)
+# RockLib.Configuration
 
 Defines a static `Config` class as a general replacement for the old .NET Framework `ConfigurationManager` class.
 
-##### Table of Contents
+## Table of Contents
 - [Overview](#overview)
 - [Library Usage](#library-usage)
 - [Application Usage](#application-usage)
@@ -19,7 +19,7 @@ The old .NET Framework `ConfigurationManager` class was very useful for librarie
 
 Libraries are expected to access the `Config.Root` and `Config.AppSettings` properties in order to retrieve their settings.
 
-```c#
+```csharp
 IConfigurationSection fooSection = Config.Root.GetSection("foo");
 string bar = Config.AppSettings["bar"];
 ```
@@ -30,7 +30,7 @@ Applications are expected to provide an instance - the "Root" - of the `IConfigu
 
 To explicitly set the configuration root, call the `SetRoot` method. ASP.NET Core Applications should call this method in their `Startup` constructor.
 
-```c#
+```csharp
 public Startup(IConfiguration configuration)
 {
     Configuration = configuration;
