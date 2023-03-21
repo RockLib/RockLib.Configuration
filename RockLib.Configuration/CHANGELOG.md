@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 3.1.0-alpha01 - 2023-03-21
 	
 #### Added
-- Added support for generic host to allow loading of correct enviornment appsettings files.
+- Added support for generic host projects to allow loading of correct environment appsettings files.
 
 ## 3.0.0 - 2022-02-10
 	
