@@ -42,7 +42,7 @@ If the configuration root is not explicitly set, it will load configuration sett
 
 1) If the application is a .NET Framework app, from `ConfigurationManager` (see [.NET Framework Application Usage](#net-framework-application-usage) for details);
 2) A `'appsettings.json'` file, relative to the current working directory;
-3) A `'appsettings.{environment}.json file'`, relative to the current working directory, where `environment` is the value of the `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable;
+3) A `'appsettings.{environment}.json file'`, relative to the current working directory, where `environment` is the value of the `DOTNET_ENVIRONMENT`, `ASPNETCORE_ENVIRONMENT` or `ROCKLIB_ENVIRONMENT` environment variable;
 4) Environment variables.
 
 **Note that ASP.NET Core applications do not automatically load settings from `'appsettings.json'` - the configuration root must be set explicitly as described above.**
