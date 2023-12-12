@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace RockLib.Configuration
 {
-    internal class CompositeConfigurationSection : IConfigurationSection
+    internal sealed class CompositeConfigurationSection : IConfigurationSection
     {
         private readonly Lazy<IReadOnlyCollection<IConfigurationSection>> _allSections;
         private readonly Lazy<IConfigurationSection> _primarySection;
@@ -56,11 +56,23 @@ namespace RockLib.Configuration
 
         public string Value
         {
+#if NET8_0_OR_GREATER
+#pragma warning disable CS8603 // Possible null reference return.
+#endif
             get => _primarySection.Value.Value;
+#if NET8_0_OR_GREATER
+#pragma warning restore CS8603 // Possible null reference return.
+#endif
+#if NET8_0_OR_GREATER
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+#endif
             set => _primarySection.Value.Value = value;
+#if NET8_0_OR_GREATER
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+#endif
         }
 
-        private class CompositeSectionKeyComparer : IComparer<string>
+        private sealed class CompositeSectionKeyComparer : IComparer<string>
         {
             public static readonly IComparer<string> Instance = new CompositeSectionKeyComparer();
 
