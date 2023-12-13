@@ -191,28 +191,28 @@ namespace Tests
       }
 
 #pragma warning disable CA1812
-      private class DefaultConstructor { }
-      private class OneParameter { public OneParameter(int bar) { } }
-      private class OneOptionalParameter { public OneOptionalParameter(int bar = -1) { } }
-      private class TwoParameters { public TwoParameters(int bar, int baz) { } }
-      private class OneParameterOneOptionalParameter { public OneParameterOneOptionalParameter(int bar, int baz = -1) { } }
-      private class TwoOptionalParameters { public TwoOptionalParameters(int bar = -1, int baz = -1) { } }
-      private class ThreeOptionalParameters { public ThreeOptionalParameters(int bar = -1, int baz = -1, int qux = -1) { } }
-      private class ThreeParametersOneRequired { public ThreeParametersOneRequired(int foo, int baz = -1, int qux = -1) { } }
+      private sealed class DefaultConstructor { }
+      private sealed class OneParameter { public OneParameter(int bar) { } }
+      private sealed class OneOptionalParameter { public OneOptionalParameter(int bar = -1) { } }
+      private sealed class TwoParameters { public TwoParameters(int bar, int baz) { } }
+      private sealed class OneParameterOneOptionalParameter { public OneParameterOneOptionalParameter(int bar, int baz = -1) { } }
+      private sealed class TwoOptionalParameters { public TwoOptionalParameters(int bar = -1, int baz = -1) { } }
+      private sealed class ThreeOptionalParameters { public ThreeOptionalParameters(int bar = -1, int baz = -1, int qux = -1) { } }
+      private sealed class ThreeParametersOneRequired { public ThreeParametersOneRequired(int foo, int baz = -1, int qux = -1) { } }
 
-      private class OneAlternateName
+      private sealed class OneAlternateName
       {
          public OneAlternateName([AlternateName("bar")] int foo) => Foo = foo;
          public int Foo { get; }
       }
 
-      private class MultipleAlternateNames
+      private sealed class MultipleAlternateNames
       {
          public MultipleAlternateNames([AlternateName("bar"), AlternateName("baz")] int foo) => Foo = foo;
          public int Foo { get; }
       }
 
-      private class ConstructorsWithMatchingParamCount
+      private sealed class ConstructorsWithMatchingParamCount
       {
          public ConstructorsWithMatchingParamCount(int one = 1, double two = 2, decimal three = 3, object? four = null) { }
          public ConstructorsWithMatchingParamCount(string notOne, double two = 2, decimal three = 3, object? four = null) { }

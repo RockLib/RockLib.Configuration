@@ -4,7 +4,7 @@
 	</PropertyGroup>
 	<PropertyGroup>
 		<PackageId>RockLib.Configuration.ObjectFactory</PackageId>
-		<PackageVersion>2.0.2</PackageVersion>
+		<PackageVersion>3.0.0-alpha.1</PackageVersion>
 		<Authors>RockLib</Authors>
 		<Description>Creates objects from IConfiguration and IConfigurationSection objects. A replacement for some of the functionality of Microsoft.Extensions.Configuration.Binder.</Description>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -12,9 +12,9 @@
 		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ObjectFactory</PackageProjectUrl>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<PackageIcon>icon.png</PackageIcon>
-		<Copyright>Copyright 2017-2021 (c) Rocket Mortgage. All rights reserved.</Copyright>
+		<Copyright>Copyright 2017-2023 (c) Rocket Mortgage. All rights reserved.</Copyright>
 		<PackageTags>Configuration Factory Binder IConfiguration IConfigurationSection</PackageTags>
-		<Version>2.0.2</Version>
+		<Version>3.0.0-alpha.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
@@ -35,11 +35,12 @@
 	</ItemGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
 		<DefineConstants>TRACE;REFERENCE_MODEL</DefineConstants>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)'=='ReferenceModel'">
 		<Optimize>true</Optimize>
 	</PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'net6.0' ">
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="[6.0.1, 8)" />
+	</ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.*" />
 	</ItemGroup>
 </Project>

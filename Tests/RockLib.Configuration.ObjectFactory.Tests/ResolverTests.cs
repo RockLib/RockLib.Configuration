@@ -13,7 +13,7 @@ namespace Tests
          public void CanResolveInterfaceMethodReturnsTrue()
          {
             var bar = new Bar();
-            IResolver resolver = new Resolver(t => bar, t => true);
+            var resolver = new Resolver(t => bar, t => true);
             Assert.True(resolver.CanResolve(BarParameter));
          }
 
@@ -23,7 +23,7 @@ namespace Tests
             public void TryResolveInterfaceMethodReturnsTrue()
             {
                var bar = new Bar();
-               IResolver resolver = new Resolver(t => bar, t => true);
+               var resolver = new Resolver(t => bar, t => true);
                Assert.True(resolver.TryResolve(BarParameter, out var dummy));
             }
 
@@ -31,7 +31,7 @@ namespace Tests
             public void TryResolveInterfaceMethodAssignsTheValueToTheOutParameter()
             {
                var bar = new Bar();
-               IResolver resolver = new Resolver(t => bar, t => true);
+               var resolver = new Resolver(t => bar, t => true);
                resolver.TryResolve(BarParameter, out var resolved);
                Assert.Same(bar, resolved);
             }
@@ -42,14 +42,14 @@ namespace Tests
             [Fact]
             public void TryResolveInterfaceMethodReturnsFalse()
             {
-               IResolver resolver = new Resolver(t => null!, t => true);
+               var resolver = new Resolver(t => null!, t => true);
                Assert.False(resolver.TryResolve(BarParameter, out var dummy));
             }
 
             [Fact]
             public void TryResolveInterfaceMethodAssignsNullToTheOutParameter()
             {
-               IResolver resolver = new Resolver(t => null!, t => true);
+               var resolver = new Resolver(t => null!, t => true);
                resolver.TryResolve(BarParameter, out var resolved);
                Assert.Null(resolved);
             }
@@ -62,7 +62,7 @@ namespace Tests
          public void CanResolveInterfaceMethodReturnsFalse()
          {
             var bar = new Bar();
-            IResolver resolver = new Resolver(t => bar, t => false);
+            var resolver = new Resolver(t => bar, t => false);
             Assert.False(resolver.CanResolve(BarParameter));
          }
 
@@ -70,7 +70,7 @@ namespace Tests
          public void TryResolveInterfaceMethodReturnsFalse()
          {
             var bar = new Bar();
-            IResolver resolver = new Resolver(t => bar, t => false);
+            var resolver = new Resolver(t => bar, t => false);
             Assert.False(resolver.TryResolve(BarParameter, out var dummy));
          }
 
@@ -78,7 +78,7 @@ namespace Tests
          public void TryResolveInterfaceMethodAssignsNullToTheOutParameter()
          {
             var bar = new Bar();
-            IResolver resolver = new Resolver(t => bar, t => false);
+            var resolver = new Resolver(t => bar, t => false);
             resolver.TryResolve(BarParameter, out var resolved);
             Assert.Null(resolved);
          }

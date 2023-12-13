@@ -4,184 +4,201 @@ using System.Reflection;
 
 namespace RockLib.Configuration.ObjectFactory
 {
-   /// <summary>
-   /// An adapter implementation of <see cref="IResolver"/> that can
-   /// support most dependency injection containers.
-   /// </summary>
-   public class Resolver : IResolver
-   {
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Resolver"/> class.
-      /// <para>
-      /// Use this constructor when your dependency injection container does not
-      /// have a "CanResolve" method and support for named parameters is not
-      /// required or supported.
-      /// </para>
-      /// </summary>
-      /// <param name="resolve">
-      /// A delegate that returns a dependency for the specified type.
-      /// </param>
-      public Resolver(Func<Type, object> resolve)
-      {
-         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+    /// <summary>
+    /// An adapter implementation of <see cref="IResolver"/> that can
+    /// support most dependency injection containers.
+    /// </summary>
+    public class Resolver : IResolver
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Resolver"/> class.
+        /// <para>
+        /// Use this constructor when your dependency injection container does not
+        /// have a "CanResolve" method and support for named parameters is not
+        /// required or supported.
+        /// </para>
+        /// </summary>
+        /// <param name="resolve">
+        /// A delegate that returns a dependency for the specified type.
+        /// </param>
+        public Resolver(Func<Type, object> resolve)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(resolve);
+#else
+            if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+#endif
+            CanResolve = p =>
+            {
+                return resolve(p.ParameterType) is not null;
+            };
 
-         CanResolve = p =>
-         {
-            return resolve(p.ParameterType) is not null;
-         };
+            Resolve = p =>
+            {
+                return resolve(p.ParameterType);
+            };
+        }
 
-         Resolve = p =>
-         {
-            return resolve(p.ParameterType);
-         };
-      }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Resolver"/> class.
+        /// <para>
+        /// Use this constructor when support for named parameters is not
+        /// required or supported.
+        /// </para>
+        /// </summary>
+        /// <param name="resolve">
+        /// A delegate that returns a dependency for the specified type.
+        /// </param>
+        /// <param name="canResolve">
+        /// A delegate that returns a value indicating whether a dependency can
+        /// be resolved for the specified type.
+        /// </param>
+        public Resolver(Func<Type, object> resolve, Func<Type, bool> canResolve)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(resolve);
+            ArgumentNullException.ThrowIfNull(canResolve);
+#else
+            if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+            if (canResolve is null) throw new ArgumentNullException(nameof(canResolve));
+#endif
+            CanResolve = p =>
+            {
+                return canResolve(p.ParameterType);
+            };
 
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Resolver"/> class.
-      /// <para>
-      /// Use this constructor when support for named parameters is not
-      /// required or supported.
-      /// </para>
-      /// </summary>
-      /// <param name="resolve">
-      /// A delegate that returns a dependency for the specified type.
-      /// </param>
-      /// <param name="canResolve">
-      /// A delegate that returns a value indicating whether a dependency can
-      /// be resolved for the specified type.
-      /// </param>
-      public Resolver(Func<Type, object> resolve, Func<Type, bool> canResolve)
-      {
-         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
-         if (canResolve is null) throw new ArgumentNullException(nameof(canResolve));
+            Resolve = p =>
+            {
+                return resolve(p.ParameterType);
+            };
+        }
 
-         CanResolve = p =>
-         {
-            return canResolve(p.ParameterType);
-         };
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Resolver"/> class.
+        /// <para>
+        /// Use this constructor when your dependency injection container does not
+        /// have a "CanResolve" method and support for named parameters is required.
+        /// </para>
+        /// </summary>
+        /// <param name="resolve">
+        /// A delegate that returns a dependency for the specified type.
+        /// </param>
+        /// <param name="resolveNamed">
+        /// A delegate that returns a dependency for the specified type and parameter name.
+        /// </param>
+        public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(resolve);
+            ArgumentNullException.ThrowIfNull(resolveNamed);
+#else
+            if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+            if (resolveNamed is null) throw new ArgumentNullException(nameof(resolveNamed));
+#endif
+            CanResolve = p =>
+            {
+                if (resolveNamed(p.ParameterType, p.Name!) is not null)
+                    return true;
 
-         Resolve = p =>
-         {
-            return resolve(p.ParameterType);
-         };
-      }
+                return resolve(p.ParameterType) is not null;
+            };
 
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Resolver"/> class.
-      /// <para>
-      /// Use this constructor when your dependency injection container does not
-      /// have a "CanResolve" method and support for named parameters is required.
-      /// </para>
-      /// </summary>
-      /// <param name="resolve">
-      /// A delegate that returns a dependency for the specified type.
-      /// </param>
-      /// <param name="resolveNamed">
-      /// A delegate that returns a dependency for the specified type and parameter name.
-      /// </param>
-      public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed)
-      {
-         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
-         if (resolveNamed is null) throw new ArgumentNullException(nameof(resolveNamed));
+            Resolve = p =>
+            {
+                var obj = resolveNamed(p.ParameterType, p.Name!);
+                if (obj is not null)
+                    return obj;
 
-         CanResolve = p =>
-         {
-            if (resolveNamed(p.ParameterType, p.Name!) is not null)
-               return true;
+                return resolve(p.ParameterType);
+            };
+        }
 
-            return resolve(p.ParameterType) is not null;
-         };
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Resolver"/> class.
+        /// <para>
+        /// Use this constructor when support for named parameters is required.
+        /// </para>
+        /// </summary>
+        /// <param name="resolve">
+        /// A delegate that returns a dependency for the specified type.
+        /// </param>
+        /// <param name="resolveNamed">
+        /// A delegate that returns a dependency for the specified type and parameter name.
+        /// </param>
+        /// <param name="canResolve">
+        /// A delegate that returns a value indicating whether a dependency can
+        /// be resolved for the specified type.
+        /// </param>
+        /// <param name="canResolveNamed">
+        /// A delegate that returns a value indicating whether a dependency can
+        /// be resolved for the specified type and parameter name.
+        /// </param>
+        public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed,
+            Func<Type, bool> canResolve, Func<Type, string, bool> canResolveNamed)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(resolve);
+            ArgumentNullException.ThrowIfNull(resolveNamed);
+            ArgumentNullException.ThrowIfNull(canResolve);
+            ArgumentNullException.ThrowIfNull(canResolveNamed);
+#else
+            if (resolve is null) throw new ArgumentNullException(nameof(resolve));
+            if (resolveNamed is null) throw new ArgumentNullException(nameof(resolveNamed));
+            if (canResolve is null) throw new ArgumentNullException(nameof(canResolve));
+            if (canResolveNamed is null) throw new ArgumentNullException(nameof(canResolveNamed));
+#endif
+            CanResolve = p =>
+            {
+                if (canResolveNamed(p.ParameterType, p.Name!))
+                    return true;
 
-         Resolve = p =>
-         {
-            var obj = resolveNamed(p.ParameterType, p.Name!);
-            if (obj is not null)
-               return obj;
+                return canResolve(p.ParameterType);
+            };
 
-            return resolve(p.ParameterType);
-         };
-      }
+            Resolve = p =>
+            {
+                var obj = resolveNamed(p.ParameterType, p.Name!);
+                if (obj is not null)
+                    return obj;
 
-      /// <summary>
-      /// Initializes a new instance of the <see cref="Resolver"/> class.
-      /// <para>
-      /// Use this constructor when support for named parameters is required.
-      /// </para>
-      /// </summary>
-      /// <param name="resolve">
-      /// A delegate that returns a dependency for the specified type.
-      /// </param>
-      /// <param name="resolveNamed">
-      /// A delegate that returns a dependency for the specified type and parameter name.
-      /// </param>
-      /// <param name="canResolve">
-      /// A delegate that returns a value indicating whether a dependency can
-      /// be resolved for the specified type.
-      /// </param>
-      /// <param name="canResolveNamed">
-      /// A delegate that returns a value indicating whether a dependency can
-      /// be resolved for the specified type and parameter name.
-      /// </param>
-      public Resolver(Func<Type, object> resolve, Func<Type, string, object> resolveNamed,
-          Func<Type, bool> canResolve, Func<Type, string, bool> canResolveNamed)
-      {
-         if (resolve is null) throw new ArgumentNullException(nameof(resolve));
-         if (resolveNamed is null) throw new ArgumentNullException(nameof(resolveNamed));
-         if (canResolve is null) throw new ArgumentNullException(nameof(canResolve));
-         if (canResolveNamed is null) throw new ArgumentNullException(nameof(canResolveNamed));
+                return resolve(p.ParameterType);
+            };
+        }
 
-         CanResolve = p =>
-         {
-            if (canResolveNamed(p.ParameterType, p.Name!))
-               return true;
+        /// <summary>
+        /// Gets a <see cref="Resolver"/> that cannot resolve for any constructor parameters.
+        /// </summary>
+        public static Resolver Empty { get; } = new Resolver(t => new object(), t => false);
 
-            return canResolve(p.ParameterType);
-         };
+        /// <summary>
+        /// Gets the function that determines whether a dependency can be resolved
+        /// for a given constructor parameter.
+        /// </summary>
+        public Func<ParameterInfo, bool> CanResolve { get; }
 
-         Resolve = p =>
-         {
-            var obj = resolveNamed(p.ParameterType, p.Name!);
-            if (obj is not null)
-               return obj;
+        /// <summary>
+        /// Gets the function that retrieves a dependency for a given constructor
+        /// parameter.
+        /// </summary>
+        public Func<ParameterInfo, object> Resolve { get; }
 
-            return resolve(p.ParameterType);
-         };
-      }
-
-      /// <summary>
-      /// Gets a <see cref="Resolver"/> that cannot resolve for any constructor parameters.
-      /// </summary>
-      public static Resolver Empty { get; } = new Resolver(t => new object(), t => false);
-
-      /// <summary>
-      /// Gets the function that determines whether a dependency can be resolved
-      /// for a given constructor parameter.
-      /// </summary>
-      public Func<ParameterInfo, bool> CanResolve { get; }
-
-      /// <summary>
-      /// Gets the function that retrieves a dependency for a given constructor
-      /// parameter.
-      /// </summary>
-      public Func<ParameterInfo, object> Resolve { get; }
-
-      // Since there's already a CanResolve property on the class definition
-      // we can't resolve these CA issues.
+        // Since there's already a CanResolve property on the class definition
+        // we can't resolve these CA issues.
 #pragma warning disable CA1033 // Interface methods should be callable by child types
-      bool IResolver.CanResolve(ParameterInfo parameter) => CanResolve(parameter);
+        bool IResolver.CanResolve(ParameterInfo parameter) => CanResolve(parameter);
 #pragma warning restore CA1033 // Interface methods should be callable by child types
 
-      /// <inheritdoc/>
-      public bool TryResolve(ParameterInfo parameter, [MaybeNullWhen(false)] out object value)
-      {
-         if (CanResolve(parameter))
-         {
-            value = Resolve(parameter);
-            return value is not null;
-         }
+        /// <inheritdoc/>
+        public bool TryResolve(ParameterInfo parameter, [MaybeNullWhen(false)] out object value)
+        {
+            if (CanResolve(parameter))
+            {
+                value = Resolve(parameter);
+                return value is not null;
+            }
 
-         value = null;
-         return false;
-      }
-   }
+            value = null;
+            return false;
+        }
+    }
 }
