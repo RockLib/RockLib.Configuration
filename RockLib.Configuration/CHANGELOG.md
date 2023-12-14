@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Changed
 - Removed .NET Core 3.1 as a TFM and added .NET 8. Supported targets are now .NET 4.8, .NET 6, and .NET 8.
-- Removed RockLib.Immutable as a dependency.
+- Removed RockLib.Immutable as a dependency, and added `Semimutable<>` and `SoftLock<>` internally.
 
 ## 3.1.0 - 2023-03-24
 	
