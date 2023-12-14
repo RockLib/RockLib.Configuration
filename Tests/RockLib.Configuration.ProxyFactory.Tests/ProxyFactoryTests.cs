@@ -13,7 +13,7 @@ namespace Tests
         public void NonGenericCanCreateProxyForReadonlyProperties()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -34,7 +34,7 @@ namespace Tests
         public void NonGenericCanCreateProxyForReadWriteProperties()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -62,7 +62,7 @@ namespace Tests
         public void GenericCanCreateProxyForReadonlyProperties()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -79,7 +79,7 @@ namespace Tests
         public void GenericCanCreateProxyForReadWriteProperties()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -111,7 +111,7 @@ namespace Tests
         public void NonGenericGivenNullTypeThrowsArgumentNullException()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -134,7 +134,7 @@ namespace Tests
         public void GivenTypeIsNotAnInterfaceThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -154,7 +154,7 @@ namespace Tests
         public void GivenInterfaceTypeDefinesAMethodThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -174,7 +174,7 @@ namespace Tests
         public void GivenInterfaceTypeDefinesAnEventThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -194,7 +194,7 @@ namespace Tests
         public void GivenInterfaceTypeDefinesAnIndexerPropertyThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
@@ -214,7 +214,7 @@ namespace Tests
         public void GivenInterfaceTypeDefinesAWriteOnlyPropertyThrowsArgumentException()
         {
             var config = new ConfigurationBuilder()
-               .AddInMemoryCollection(new Dictionary<string, string>
+               .AddInMemoryCollection(new Dictionary<string, string?>
                {
                     { "foo:bar", "abcdefg" },
                     { "foo:baz", "123" },
