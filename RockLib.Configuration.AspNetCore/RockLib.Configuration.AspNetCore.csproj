@@ -25,7 +25,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-		<PackageReference Include="RockLib.Configuration" Version="3.1.0" />
+		<PackageReference Include="RockLib.Configuration" Version="4.0.0-alpha.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
 	</ItemGroup>
 </Project>
