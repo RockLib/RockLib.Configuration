@@ -17,10 +17,14 @@ namespace RockLib.Configuration.AspNetCore
         /// <returns>The <see cref="IWebHostBuilder"/>.</returns>
         public static IWebHostBuilder SetConfigRoot(this IWebHostBuilder builder)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(builder);
+#else
             if (builder is null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
+#endif
             builder.ConfigureServices((context, services) =>
             {
                 if (!Config.IsLocked && Config.IsDefault)
