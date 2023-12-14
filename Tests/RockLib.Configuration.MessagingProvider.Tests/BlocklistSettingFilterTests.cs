@@ -8,6 +8,8 @@ namespace RockLib.Configuration.MessagingProvider.Tests
 {
     public static class BlocklistSettingFilterTests
     {
+        private static readonly string[] blockedSettings = new[] { "foo" };
+
         [Fact]
         public static void ConstructorThrowsIfBlockedSettingsIsNull()
         {
@@ -30,7 +32,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var innerFilter = Mock.Of<ISettingFilter>();// new FakeSettingFilter();
 
-            var filter = new BlocklistSettingFilter(new[] { "foo" }, innerFilter);
+            var filter = new BlocklistSettingFilter(blockedSettings, innerFilter);
 
             filter.InnerFilter.Should().BeSameAs(innerFilter);
         }
@@ -43,7 +45,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
                 .Setup(m => m.ShouldProcessSettingChange(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object>>()))
                 .Returns(false);
 
-            var filter = new BlocklistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+            var filter = new BlocklistSettingFilter(blockedSettings, mockInnerFilter.Object);
 
             var receivedMessageHeaders = new Dictionary<string, object>();
 
@@ -59,7 +61,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
 
-            var filter = new BlocklistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+            var filter = new BlocklistSettingFilter(blockedSettings, mockInnerFilter.Object);
 
             filter.ShouldProcessSettingChange("foo", new Dictionary<string, object>())
                 .Should().Be(false);
@@ -73,7 +75,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
 
-            var filter = new BlocklistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+            var filter = new BlocklistSettingFilter(blockedSettings, mockInnerFilter.Object);
 
             filter.ShouldProcessSettingChange("foo:bar", new Dictionary<string, object>())
                 .Should().Be(false);
