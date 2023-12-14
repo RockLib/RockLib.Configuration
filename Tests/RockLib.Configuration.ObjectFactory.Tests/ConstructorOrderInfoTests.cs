@@ -1,19 +1,14 @@
 ﻿using Microsoft.Extensions.Configuration;
 using RockLib.Configuration.ObjectFactory;
-using RockLib.Dynamic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Xunit;
 
 namespace Tests
 {
    public class ConstructorOrderInfoTests
    {
-      private static Type _constructorOrderInfoType =
-         Type.GetType("RockLib.Configuration.ObjectFactory.ConstructorOrderInfo, RockLib.Configuration.ObjectFactory")!;
-
       [Theory]
       [InlineData(typeof(DefaultConstructor), 0)]
       [InlineData(typeof(OneParameter), 1)]
@@ -26,9 +21,9 @@ namespace Tests
 #pragma warning restore CA1062 // Validate arguments of public methods
          var members = new Dictionary<string, IConfigurationSection>();
 
-         var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
+         var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
-         Assert.Same(constructor, orderInfo.Constructor.Object);
+         Assert.Same(constructor, orderInfo.Constructor);
          Assert.Equal(expectedTotalParameters, orderInfo.TotalParameters);
       }
 
@@ -57,9 +52,9 @@ namespace Tests
 #pragma warning restore CA1062 // Validate arguments of public methods
          var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null!);
 
-         var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
+         var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
-         Assert.Same(constructor, orderInfo.Constructor.Object);
+         Assert.Same(constructor, orderInfo.Constructor);
          Assert.Equal(expectedIsInvokableWithoutDefaultParameters, orderInfo.IsInvokableWithoutDefaultParameters);
       }
 
@@ -88,9 +83,9 @@ namespace Tests
 #pragma warning restore CA1062 // Validate arguments of public methods
          var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null!);
 
-         var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
+         var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
-         Assert.Same(constructor, orderInfo.Constructor.Object);
+         Assert.Same(constructor, orderInfo.Constructor);
          Assert.Equal(expectedIsInvokableWithDefaultParameters, orderInfo.IsInvokableWithDefaultParameters);
       }
 
@@ -116,8 +111,8 @@ namespace Tests
 
          var members = resolvableMemberNames.ToDictionary(x => x, x => (IConfigurationSection)null!);
 
-         var lhs = _constructorOrderInfoType.New(lhsConstructor, members, Resolver.Empty);
-         var rhs = _constructorOrderInfoType.New(rhsConstructor, members, Resolver.Empty);
+         var lhs = new ConstructorOrderInfo(lhsConstructor, members, Resolver.Empty);
+         var rhs = new ConstructorOrderInfo(rhsConstructor, members, Resolver.Empty);
 
          var actual = lhs.CompareTo(rhs);
 
@@ -137,12 +132,12 @@ namespace Tests
 #pragma warning restore CA1062 // Validate arguments of public methods
          var members = new Dictionary<string, IConfigurationSection>() { { configurationMemberName, null! } };
 
-         var orderInfo = _constructorOrderInfoType.New(constructor, members, Resolver.Empty);
+         var orderInfo = new ConstructorOrderInfo(constructor, members, Resolver.Empty);
 
          Assert.True(orderInfo.IsInvokableWithoutDefaultParameters);
          Assert.True(orderInfo.IsInvokableWithDefaultParameters);
          Assert.Equal(1, orderInfo.MatchedParameters);
-         Assert.Empty(orderInfo.MissingParameterNames.Object);
+         Assert.Empty(orderInfo.MissingParameterNames);
       }
 
       [Fact]
@@ -156,8 +151,8 @@ namespace Tests
             };
          var resolver = new Resolver(t => t, t => t == typeof(string) ? true : false);
 
-         var orderInfo1 = _constructorOrderInfoType.New(constructors[0], members, resolver);
-         var orderInfo2 = _constructorOrderInfoType.New(constructors[1], members, resolver);
+         var orderInfo1 = new ConstructorOrderInfo(constructors[0], members, resolver);
+         var orderInfo2 = new ConstructorOrderInfo(constructors[1], members, resolver);
 
          Assert.Equal(2, orderInfo1.MatchedParameters);
          Assert.Equal(2, orderInfo2.MatchedParameters);
@@ -184,8 +179,8 @@ namespace Tests
             };
          var resolver = new Resolver(t => t, t => t == typeof(string) ? true : false);
 
-         var orderInfo1 = _constructorOrderInfoType.New(constructors[constructorOneIndex], members, resolver);
-         var orderInfo2 = _constructorOrderInfoType.New(constructors[constructorTwoIndex], members, resolver);
+         var orderInfo1 = new ConstructorOrderInfo(constructors[constructorOneIndex], members, resolver);
+         var orderInfo2 = new ConstructorOrderInfo(constructors[constructorTwoIndex], members, resolver);
 
          Assert.Equal(expectedComparisonValue, orderInfo1.CompareTo(orderInfo2));
       }
