@@ -282,7 +282,7 @@ namespace Tests
       }
 
 #pragma warning disable CA1812
-      private class Foo
+      private sealed class Foo
 #pragma warning restore CA1812
       {
          public Bar Bar { get; set; }

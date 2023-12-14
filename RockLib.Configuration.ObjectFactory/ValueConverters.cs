@@ -7,146 +7,161 @@ using System.Reflection;
 
 namespace RockLib.Configuration.ObjectFactory
 {
-   /// <summary>
-   /// A container for functions that are used to convert a configuration string value to a
-   /// target type.
-   /// </summary>
-   public sealed class ValueConverters : IEnumerable<KeyValuePair<string, Type>>
-   {
-      private readonly Dictionary<string, ValueConverter> _converters = new Dictionary<string, ValueConverter>(StringComparer.OrdinalIgnoreCase);
+    /// <summary>
+    /// A container for functions that are used to convert a configuration string value to a
+    /// target type.
+    /// </summary>
+    public sealed class ValueConverters : IEnumerable<KeyValuePair<string, Type>>
+    {
+        private readonly Dictionary<string, ValueConverter> _converters = new Dictionary<string, ValueConverter>(StringComparer.OrdinalIgnoreCase);
 
-      /// <summary>
-      /// Configures a converter for the member (property or constructor parameter) specified by the
-      /// provided declaring type and member name. Use this method when you need different members of
-      /// a target type to each use a different converter. If you want all members of a target type to
-      /// use the same converter, use the other <see cref="Add{T}(Type, Func{string, T})"/> method.
-      /// </summary>
-      /// <param name="declaringType">The declaring type of a member that needs a converter.</param>
-      /// <param name="memberName">The name of a member that needs a converter.</param>
-      /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
-      /// <returns>This instance of <see cref="ValueConverters"/>.</returns>
-      /// <typeparam name="T">The concrete type of the object returned by the <paramref name="convertFunc"/> function.</typeparam>
-      /// <exception cref="ArgumentNullException">
-      /// If <paramref name="declaringType"/>, <paramref name="memberName"/>, or <paramref name="convertFunc"/> is null.
-      /// </exception>
-      /// <exception cref="ArgumentException">
-      /// If there are no members of <paramref name="declaringType"/> that match <paramref name="memberName"/>, or
-      /// if the <typeparamref name="T"/> type is not assignable to any of the matching members.
-      /// </exception>
-      public ValueConverters Add<T>(Type declaringType, string memberName, Func<string, T> convertFunc)
-      {
-         if (convertFunc is null)
-         {
-            throw new ArgumentNullException(nameof(convertFunc));
-         }
-         return Add(declaringType, memberName, typeof(T), value => convertFunc(value)!);
-      }
+        /// <summary>
+        /// Configures a converter for the member (property or constructor parameter) specified by the
+        /// provided declaring type and member name. Use this method when you need different members of
+        /// a target type to each use a different converter. If you want all members of a target type to
+        /// use the same converter, use the other <see cref="Add{T}(Type, Func{string, T})"/> method.
+        /// </summary>
+        /// <param name="declaringType">The declaring type of a member that needs a converter.</param>
+        /// <param name="memberName">The name of a member that needs a converter.</param>
+        /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
+        /// <returns>This instance of <see cref="ValueConverters"/>.</returns>
+        /// <typeparam name="T">The concrete type of the object returned by the <paramref name="convertFunc"/> function.</typeparam>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="declaringType"/>, <paramref name="memberName"/>, or <paramref name="convertFunc"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If there are no members of <paramref name="declaringType"/> that match <paramref name="memberName"/>, or
+        /// if the <typeparamref name="T"/> type is not assignable to any of the matching members.
+        /// </exception>
+        public ValueConverters Add<T>(Type declaringType, string memberName, Func<string, T> convertFunc)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(convertFunc);
+#else
+            if (convertFunc is null)
+            {
+                throw new ArgumentNullException(nameof(convertFunc));
+            }
+#endif
+            return Add(declaringType, memberName, typeof(T), value => convertFunc(value)!);
+        }
 
-      /// <summary>
-      /// Configures a converter for the specified target type. Use this method when you want all
-      /// instances of the target type to use the same converter. If you need instances of the target
-      /// type to each use a different converter depending on which member is being populated, use
-      /// the other <see cref="Add{T}(Type, string, Func{string, T})"/> method.
-      /// </summary>
-      /// <param name="targetType">A type that needs a converter.</param>
-      /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
-      /// <returns>This instance of <see cref="ValueConverters"/>.</returns>
-      /// <exception cref="ArgumentNullException">
-      /// If <paramref name="targetType"/> or <paramref name="convertFunc"/> is null.
-      /// </exception>
-      /// <exception cref="ArgumentException">
-      /// If the <typeparamref name="T"/> type is not assignable to <paramref name="targetType"/>.
-      /// </exception>
-      public ValueConverters Add<T>(Type targetType, Func<string, T> convertFunc)
-      {
-         if (convertFunc is null)
-         {
-            throw new ArgumentNullException(nameof(convertFunc));
-         }
+        /// <summary>
+        /// Configures a converter for the specified target type. Use this method when you want all
+        /// instances of the target type to use the same converter. If you need instances of the target
+        /// type to each use a different converter depending on which member is being populated, use
+        /// the other <see cref="Add{T}(Type, string, Func{string, T})"/> method.
+        /// </summary>
+        /// <param name="targetType">A type that needs a converter.</param>
+        /// <param name="convertFunc">A function that does the conversion from string to <typeparamref name="T"/>.</param>
+        /// <returns>This instance of <see cref="ValueConverters"/>.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="targetType"/> or <paramref name="convertFunc"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// If the <typeparamref name="T"/> type is not assignable to <paramref name="targetType"/>.
+        /// </exception>
+        public ValueConverters Add<T>(Type targetType, Func<string, T> convertFunc)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(convertFunc);
+#else
+            if (convertFunc is null)
+            {
+                throw new ArgumentNullException(nameof(convertFunc));
+            }
+#endif
+            return Add(targetType, typeof(T), value => convertFunc(value)!);
+        }
 
-         return Add(targetType, typeof(T), value => convertFunc(value)!);
-      }
+        /// <summary>
+        /// Attempt to get a convert function for a member (property or construtor parameter) specified by
+        /// its declaring type and name.
+        /// </summary>
+        /// <param name="declaringType">A declaring type of the member to find a converter for.</param>
+        /// <param name="memberName">The name of the member to find a converter for.</param>
+        /// <param name="convertFunc">
+        /// When a match is found for the member, contains the convert function that is used to convert a
+        /// configuration value to the member's type.
+        /// </param>
+        /// <returns>
+        /// True, if a converter was found for the member. Otherwise, false if a converter could not be found.
+        /// </returns>
+        public bool TryGet(Type? declaringType, string? memberName, [MaybeNullWhen(false)] out Func<string, object>? convertFunc) =>
+            _converters.TryGetValue(GetKey(declaringType, memberName), out var converter)
+                ? (convertFunc = converter.ConvertFunc) is not null
+                : (convertFunc = null) is not null;
 
-      /// <summary>
-      /// Attempt to get a convert function for a member (property or construtor parameter) specified by
-      /// its declaring type and name.
-      /// </summary>
-      /// <param name="declaringType">A declaring type of the member to find a converter for.</param>
-      /// <param name="memberName">The name of the member to find a converter for.</param>
-      /// <param name="convertFunc">
-      /// When a match is found for the member, contains the convert function that is used to convert a
-      /// configuration value to the member's type.
-      /// </param>
-      /// <returns>
-      /// True, if a converter was found for the member. Otherwise, false if a converter could not be found.
-      /// </returns>
-      public bool TryGet(Type? declaringType, string? memberName, [MaybeNullWhen(false)] out Func<string, object>? convertFunc) =>
-          _converters.TryGetValue(GetKey(declaringType, memberName), out var converter)
-              ? (convertFunc = converter.ConvertFunc) is not null
-              : (convertFunc = null) is not null;
+        /// <summary>
+        /// Attempt to get a convert function for a specified target type.
+        /// </summary>
+        /// <param name="targetType">The type to find a converter for.</param>
+        /// <param name="convertFunc">
+        /// When a match is found for the member, contains the convert function that is used to convert a
+        /// configuration value to the target type.
+        /// </param>
+        /// <returns>
+        /// True, if a converter was found for the member. Otherwise, false if a converter could not be found.
+        /// </returns>
+        public bool TryGet(Type targetType, [MaybeNullWhen(false)] out Func<string, object>? convertFunc) =>
+            _converters.TryGetValue(GetKey(targetType), out var converter)
+                ? (convertFunc = converter.ConvertFunc) is not null
+                : (convertFunc = null) is not null;
 
-      /// <summary>
-      /// Attempt to get a convert function for a specified target type.
-      /// </summary>
-      /// <param name="targetType">The type to find a converter for.</param>
-      /// <param name="convertFunc">
-      /// When a match is found for the member, contains the convert function that is used to convert a
-      /// configuration value to the target type.
-      /// </param>
-      /// <returns>
-      /// True, if a converter was found for the member. Otherwise, false if a converter could not be found.
-      /// </returns>
-      public bool TryGet(Type targetType, [MaybeNullWhen(false)] out Func<string, object>? convertFunc) =>
-          _converters.TryGetValue(GetKey(targetType), out var converter)
-              ? (convertFunc = converter.ConvertFunc) is not null
-              : (convertFunc = null) is not null;
+        private ValueConverters Add(Type declaringType, string memberName, Type returnType, Func<string, object> convertFunc)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(declaringType);
+            ArgumentNullException.ThrowIfNull(memberName);
+#else
+            if (declaringType is null) throw new ArgumentNullException(nameof(declaringType));
+            if (memberName is null) throw new ArgumentNullException(nameof(memberName));
+#endif
+            var matchingMembers = Members.Find(declaringType, memberName).ToList();
 
-      private ValueConverters Add(Type declaringType, string memberName, Type returnType, Func<string, object> convertFunc)
-      {
-         if (declaringType is null) throw new ArgumentNullException(nameof(declaringType));
-         if (memberName is null) throw new ArgumentNullException(nameof(memberName));
+            if (matchingMembers.Count == 0)
+                throw Exceptions.NoMatchingMembers(declaringType, memberName);
 
-         var matchingMembers = Members.Find(declaringType, memberName).ToList();
+            var notAssignableMembers = matchingMembers.Where(m => !m.Type.IsAssignableFrom(returnType)).ToList();
+            if (notAssignableMembers.Count > 0)
+                throw Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(declaringType, memberName, returnType, notAssignableMembers);
 
-         if (matchingMembers.Count == 0)
-            throw Exceptions.NoMatchingMembers(declaringType, memberName);
+            _converters.Add(GetKey(declaringType, memberName), new ValueConverter(returnType, convertFunc));
+            return this;
+        }
 
-         var notAssignableMembers = matchingMembers.Where(m => !m.Type.IsAssignableFrom(returnType)).ToList();
-         if (notAssignableMembers.Count > 0)
-            throw Exceptions.ReturnTypeOfConvertFuncNotAssignableToMembers(declaringType, memberName, returnType, notAssignableMembers);
+        private ValueConverters Add(Type targetType, Type returnType, Func<string, object> convertFunc)
+        {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(targetType);
+#else
+            if (targetType is null) throw new ArgumentNullException(nameof(targetType));
+#endif
+            if (!targetType.IsAssignableFrom(returnType)) throw Exceptions.ReturnTypeOfConvertFuncIsNotAssignableToTargetType(targetType, returnType);
+            _converters.Add(GetKey(targetType), new ValueConverter(returnType, convertFunc));
+            return this;
+        }
 
-         _converters.Add(GetKey(declaringType, memberName), new ValueConverter(returnType, convertFunc));
-         return this;
-      }
+        private static string GetKey(Type? declaringType, string? memberName) =>
+           (declaringType is not null && memberName is not null) ? declaringType.FullName + "::" + memberName : "";
 
-      private ValueConverters Add(Type targetType, Type returnType, Func<string, object> convertFunc)
-      {
-         if (targetType is null) throw new ArgumentNullException(nameof(targetType));
-         if (!targetType.IsAssignableFrom(returnType)) throw Exceptions.ReturnTypeOfConvertFuncIsNotAssignableToTargetType(targetType, returnType);
-         _converters.Add(GetKey(targetType), new ValueConverter(returnType, convertFunc));
-         return this;
-      }
+        private static string GetKey(Type targetType) => targetType is not null ? targetType.FullName! : "";
 
-      private static string GetKey(Type? declaringType, string? memberName) =>
-         (declaringType is not null && memberName is not null) ? declaringType.FullName + "::" + memberName : "";
+        private sealed class ValueConverter
+        {
+            public readonly Type ReturnType;
+            public readonly Func<string, object> ConvertFunc;
 
-      private static string GetKey(Type targetType) => targetType is not null ? targetType.FullName! : "";
+            public ValueConverter(Type returnType, Func<string, object> convertFunc)
+            {
+                ReturnType = returnType;
+                ConvertFunc = convertFunc;
+            }
+        }
 
-      private class ValueConverter
-      {
-         public readonly Type ReturnType;
-         public readonly Func<string, object> ConvertFunc;
-
-         public ValueConverter(Type returnType, Func<string, object> convertFunc)
-         {
-            ReturnType = returnType;
-            ConvertFunc = convertFunc;
-         }
-      }
-
-      IEnumerator<KeyValuePair<string, Type>> IEnumerable<KeyValuePair<string, Type>>.GetEnumerator() => Enumerable.GetEnumerator();
-      IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Enumerable).GetEnumerator();
-      private IEnumerable<KeyValuePair<string, Type>> Enumerable =>
-          _converters.Select(x => new KeyValuePair<string, Type>(x.Key, x.Value.ReturnType));
-   }
+        IEnumerator<KeyValuePair<string, Type>> IEnumerable<KeyValuePair<string, Type>>.GetEnumerator() => Enumerable.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Enumerable).GetEnumerator();
+        private IEnumerable<KeyValuePair<string, Type>> Enumerable =>
+            _converters.Select(x => new KeyValuePair<string, Type>(x.Key, x.Value.ReturnType));
+    }
 }

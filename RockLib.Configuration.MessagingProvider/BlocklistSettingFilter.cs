@@ -23,10 +23,14 @@ namespace RockLib.Configuration.MessagingProvider
         /// </param>
         public BlocklistSettingFilter(IEnumerable<string> blockedSettings, ISettingFilter? innerFilter = null)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(blockedSettings);
+#else
             if (blockedSettings is null)
             {
                 throw new ArgumentNullException(nameof(blockedSettings));
             }
+#endif
             _blockedSettings = new HashSet<string>(blockedSettings, StringComparer.OrdinalIgnoreCase);
             InnerFilter = innerFilter ?? NullSettingFilter.Instance;
         }

@@ -1,9 +1,9 @@
 using FluentAssertions;
 using Microsoft.Extensions.Primitives;
 using Moq;
-using RockLib.Dynamic;
 using RockLib.Messaging;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -17,7 +17,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
 
             provider.Receiver.Should().BeSameAs(receiver);
         }
@@ -28,7 +28,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             using var receiver = new Mock<Receiver>("fake").Object;
             var filter = Mock.Of<ISettingFilter>();
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, filter);
+            var provider = new MessagingConfigurationProvider(receiver, filter);
 
             provider.SettingFilter.Should().BeSameAs(filter);
         }
@@ -40,7 +40,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
 
             receiver.MessageHandler.Should().BeNull();
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
 
             receiver.MessageHandler.Should().NotBeNull();
         }
@@ -50,7 +50,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
 
             GetData(provider).Should().BeEmpty();
         }
@@ -60,7 +60,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
 
             var newSettings = @"{
   ""foo"": ""abc""
@@ -99,7 +99,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
             GetData(provider).Add("foo", "xyz");
 
             var newSettings = @"{
@@ -139,7 +139,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
             GetData(provider).Add("foo", "abc");
 
             var newSettings = @"{}";
@@ -176,7 +176,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
             GetData(provider).Add("foo", "abc");
 
             var reloaded = false;
@@ -218,7 +218,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             using var receiver = new Mock<Receiver>("fake").Object;
 
-            MessagingConfigurationProvider provider = typeof(MessagingConfigurationProvider).New(receiver, null!);
+            var provider = new MessagingConfigurationProvider(receiver, null!);
 
             var reloaded = false;
             ChangeToken.OnChange(provider.GetReloadToken, () => reloaded = true);
@@ -248,6 +248,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
             messageMock.VerifyAll();
         }
 
-        private static IDictionary<string, string> GetData(MessagingConfigurationProvider provider) => provider.Unlock().Data;
+        private static IDictionary<string, string> GetData(MessagingConfigurationProvider provider) =>
+            (IDictionary<string, string>)provider.GetType().GetProperty("Data", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(provider)!;
     }
 }

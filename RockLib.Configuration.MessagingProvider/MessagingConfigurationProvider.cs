@@ -59,6 +59,15 @@ namespace RockLib.Configuration.MessagingProvider
         {
             foreach (var newSetting in newSettings)
             {
+#if NET8_0_OR_GREATER
+                if (Data.TryGetValue(newSetting.Key, out var value))
+                {
+                    if (value != newSetting.Value)
+                    {
+                        return true;
+                    }
+                }
+#else
                 if (Data.ContainsKey(newSetting.Key))
                 {
                     if (Data[newSetting.Key] != newSetting.Value)
@@ -66,6 +75,7 @@ namespace RockLib.Configuration.MessagingProvider
                         return true;
                     }
                 }
+#endif
                 else if (SettingFilter.ShouldProcessSettingChange(newSetting.Key, headers))
                 {
                     return true;

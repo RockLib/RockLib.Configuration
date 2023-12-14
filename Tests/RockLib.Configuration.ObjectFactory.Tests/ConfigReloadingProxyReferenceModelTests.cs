@@ -282,7 +282,7 @@ namespace Tests
 
       private static IConfigurationRoot GetNonTypeSpecifiedConfig()
       {
-         return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+         return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
          {
             ["foo:bar"] = "123",
          }).Build();
@@ -290,7 +290,7 @@ namespace Tests
 
       private static IConfigurationRoot GetReloadingConfig(Type? type = null)
       {
-         var initialData = new Dictionary<string, string>
+         var initialData = new Dictionary<string, string?>
          {
             ["foo:reloadOnChange"] = "true",
             ["foo:value:bar"] = "123",
@@ -306,7 +306,7 @@ namespace Tests
 
       private static IConfigurationRoot GetConfig(string? type = null)
       {
-         return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string>
+         return new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
          {
             ["foo:type"] = type ?? typeof(Foo).AssemblyQualifiedName!,
             ["foo:value:bar"] = "123",
@@ -342,7 +342,7 @@ namespace Tests
       }
 
 #pragma warning disable CA1812
-      private class Foo : IFoo, IDisposable
+      private sealed class Foo : IFoo, IDisposable
 #pragma warning restore CA1812
       {
          public Foo(int bar) => Bar = bar;

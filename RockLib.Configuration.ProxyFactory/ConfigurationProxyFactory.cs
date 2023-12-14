@@ -77,8 +77,13 @@ namespace RockLib.Configuration.ProxyFactory
         /// </exception>
         public static object? CreateProxy(this IConfiguration configuration, Type type, DefaultTypes? defaultTypes = null, ValueConverters? valueConverters = null)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(configuration);
+            ArgumentNullException.ThrowIfNull(type);
+#else
             if (configuration is null) throw new ArgumentNullException(nameof(configuration));
             if (type is null) throw new ArgumentNullException(nameof(type));
+#endif
             var proxyType = _proxyCache.GetOrAdd(type, CreateProxyType);
             return configuration.Create(proxyType, defaultTypes, valueConverters, null);
         }

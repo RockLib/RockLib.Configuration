@@ -1,45 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <PackageId>RockLib.Configuration.AspNetCore</PackageId>
-    <PackageVersion>2.0.0</PackageVersion>
-    <Description>Extension methods for RockLib.Configuration and ASP.NET Core.</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.AspNetCore/CHANGELOG.md.</PackageReleaseNotes>
-    <PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.AspNetCore</PackageProjectUrl>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageTags>RockLib Configuration AspNetCore Extensions</PackageTags>
-    <Version>2.0.0</Version>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PublishRepositoryUrl>True</PublishRepositoryUrl>
-    <EmbedUntrackedSources>True</EmbedUntrackedSources>
-    <DebugType>Embedded</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\LICENSE.md" Pack="true" PackagePath="" />
-    <None Include="..\icon.png" Pack="true" PackagePath="" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="RockLib.Configuration" Version="3.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
-  </ItemGroup>
-
+	<PropertyGroup>
+		<PackageId>RockLib.Configuration.AspNetCore</PackageId>
+		<PackageVersion>3.0.0-alpha.1</PackageVersion>
+		<Description>Extension methods for RockLib.Configuration and ASP.NET Core.</Description>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.AspNetCore/CHANGELOG.md.</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.AspNetCore</PackageProjectUrl>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageTags>RockLib Configuration AspNetCore Extensions</PackageTags>
+		<Version>3.0.0-alpha.1</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<PublishRepositoryUrl>True</PublishRepositoryUrl>
+		<EmbedUntrackedSources>True</EmbedUntrackedSources>
+		<DebugType>Embedded</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="..\LICENSE.md" Pack="true" PackagePath="" />
+		<None Include="..\icon.png" Pack="true" PackagePath="" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+		<PackageReference Include="RockLib.Configuration" Version="3.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
+	</ItemGroup>
 </Project>

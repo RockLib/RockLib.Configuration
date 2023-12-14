@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using RockLib.Immutable;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -57,7 +56,11 @@ namespace RockLib.Configuration
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void SetRoot(IConfiguration configurationRoot)
         {
-            if (configurationRoot is null) throw new ArgumentNullException(nameof(configurationRoot));
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(configurationRoot);
+#else
+            if (configurationRoot is null) { throw new ArgumentNullException(nameof(configurationRoot)); }
+#endif
             SetRoot(() => configurationRoot);
         }
 
@@ -76,7 +79,11 @@ namespace RockLib.Configuration
         /// <exception cref="InvalidOperationException">If the <see cref="IsLocked"/> property is true.</exception>
         public static void SetRoot(Func<IConfiguration> getRoot)
         {
-            if (getRoot is null) throw new ArgumentNullException(nameof(getRoot));
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(getRoot);
+#else
+            if (getRoot is null) { throw new ArgumentNullException(nameof(getRoot)); }
+#endif
             _root.SetValue(getRoot);
         }
 
@@ -130,7 +137,13 @@ namespace RockLib.Configuration
 
             if (additionalValues is not null)
             {
+#if NET8_0_OR_GREATER
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+#endif
                 builder.AddInMemoryCollection(additionalValues);
+#if NET8_0_OR_GREATER
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+#endif
             }
 
             builder.AddRockLibSecrets();

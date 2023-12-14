@@ -42,7 +42,7 @@ namespace Tests
       public void GivenValueConverterThatReturnsNullThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                     { "foo:bar", "abcdefg" },
             })
@@ -68,7 +68,7 @@ namespace Tests
       public void GivenConfigurationValueNotAssignableToTargetTypeThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar", "wtf is this even supposed to be?" },
              })
@@ -87,7 +87,7 @@ namespace Tests
       public void GivenTypeSpecifiedObjectWithTypeNotAssignableToTargetTypeThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     // SimplePropertyClass does not inherit EmptyClass
                     { "foo:bar:type", typeof(SimplePropertyClass).AssemblyQualifiedName! },
@@ -108,7 +108,7 @@ namespace Tests
       public void GivenAnArrayTargetTypeWithARankGreaterThanOneThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:0", "123.45" },
                     { "foo:bar:1", "456.78" },
@@ -128,7 +128,7 @@ namespace Tests
       public void GivenAnAbstractTargetTypeThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:baz", "wtf is this even supposed to be?" },
              })
@@ -147,7 +147,7 @@ namespace Tests
       public void GivenObjectTargetTypeThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:baz", "wtf is this even supposed to be?" },
              })
@@ -166,7 +166,7 @@ namespace Tests
       public void GivenUnsupportedCollectionTargetTypeThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:baz", "wtf is this even supposed to be?" },
              })
@@ -185,7 +185,7 @@ namespace Tests
       public void GivenNonCollectionTargetTypeWhenConfigurationRepresentsListThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:0", "123.45" },
                     { "foo:bar:1", "123.45" },
@@ -205,7 +205,7 @@ namespace Tests
       public void GivenAMemberDecoratedWithDefaultTypeAttributeWithAValueNotAssignableToTheMemberTypeThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:bar", "123.45" },
              })
@@ -224,7 +224,7 @@ namespace Tests
       public void GivenATypeDecoratedWithDefaultTypeAttributeWithAValueNotAssignableToTheDecoratedTypeThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:bar", "123.45" },
              })
@@ -243,7 +243,7 @@ namespace Tests
       public void GivenAMemberDecoratedWithDefaultTypeAttributeWithAnAbstractValueThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:bar", "123.45" },
              })
@@ -262,7 +262,7 @@ namespace Tests
       public void GivenATypeDecoratedWithDefaultTypeAttributeWithAnAbstractValueThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:bar", "123.45" },
              })
@@ -281,7 +281,7 @@ namespace Tests
       public void GivenATypeWithMultipleMembersWithTheSameNameAndDifferentDefaultTypeAttributeValuesThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:baz", "123.45" },
              })
@@ -300,7 +300,7 @@ namespace Tests
       public void GivenATargetTypeWithNoPublicConstructorsThrowsInvalidOperationException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar", "123.45" },
              })
@@ -333,7 +333,7 @@ namespace Tests
          var classType = typeof(GenericPropertyClass<>).MakeGenericType(type);
 
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar:baz", "123.45" },
                     { "foo:bar:qux", "456" },
@@ -353,7 +353,7 @@ namespace Tests
       public void GivenTheReturnTypeOfTheMethodSpecifiedByAConvertMethodAttributeIsNotAssignableToTheTargetTypeThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:qux", "123" },
              })
@@ -372,7 +372,7 @@ namespace Tests
       public void GivenNoSuitableMethodFoundForMethodSpecifiedByConvertMethodAttributeThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:qux", "123" },
              })
@@ -391,7 +391,7 @@ namespace Tests
       public void GivenTheBestMatchingConstructorHasParametersNotMappedToAConfigurationChildThrowsArgumentException()
       {
          var config = new ConfigurationBuilder()
-             .AddInMemoryCollection(new Dictionary<string, string>
+             .AddInMemoryCollection(new Dictionary<string, string?>
              {
                     { "foo:bar", "123" },
              })
@@ -411,20 +411,20 @@ namespace Tests
       }
 
 #pragma warning disable CA1812
-      private class EmptyClass { }
+      private sealed class EmptyClass { }
 
-      private class SimplePropertyClass
+      private sealed class SimplePropertyClass
       {
          public double Bar { get; set; }
       }
 
-      private class GenericPropertyClass<T>
+      private sealed class GenericPropertyClass<T>
       {
          public T? Bar { get; set; }
       }
 
       [ConvertMethod(nameof(Convert))]
-      private class IsDecoratedWithConvertMethod
+      private sealed class IsDecoratedWithConvertMethod
       {
          public IsDecoratedWithConvertMethod(double baz) => Baz = baz;
          public double Baz { get; }
@@ -433,57 +433,57 @@ namespace Tests
 
       private enum Corge { Garply, Grault }
 
-      private class EmptyClassPropertyClass
+      private sealed class EmptyClassPropertyClass
       {
          public EmptyClass? Bar { get; set; }
       }
 
-      private class ArrayPropertyClass
+      private sealed class ArrayPropertyClass
       {
          public double[]? Bar { get; set; }
       }
 
-      private class MultiDimensionalArrayPropertyClass
+      private sealed class MultiDimensionalArrayPropertyClass
       {
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
          public double[,]? Bar { get; set; }
 #pragma warning restore CA1814 // Prefer jagged arrays over multidimensional
       }
 
-      private class ListPropertyClass
+      private sealed class ListPropertyClass
       {
          public List<double>? Bar { get; set; }
       }
 
-      private class InterfacePropertyClass
+      private sealed class InterfacePropertyClass
       {
          public IBar? Bar { get; set; }
       }
 
       private interface IBar { }
 
-      private class ObjectPropertyClass
+      private sealed class ObjectPropertyClass
       {
          public object? Bar { get; set; }
       }
 
-      private class ArrayListPropertyClass
+      private sealed class ArrayListPropertyClass
       {
          public ArrayList? Bar { get; set; }
       }
 
-      private class NestedSimplePropertyClass
+      private sealed class NestedSimplePropertyClass
       {
          public SimplePropertyClass? Bar { get; set; }
       }
 
-      private class NoPublicConstructorsClass
+      private sealed class NoPublicConstructorsClass
       {
          private NoPublicConstructorsClass() { }
          public double Bar { get; set; }
       }
 
-      private class AmbiguousConstructorsClass
+      private sealed class AmbiguousConstructorsClass
       {
          public AmbiguousConstructorsClass(double bar) => Bar = bar;
          public AmbiguousConstructorsClass(int baz) => Baz = baz;
@@ -491,24 +491,24 @@ namespace Tests
          public int Baz { get; set; }
       }
 
-      private class InvalidDefaultTypeForPropertyClass
+      private sealed class InvalidDefaultTypeForPropertyClass
       {
          [DefaultType(typeof(EmptyClass))]
          public SimplePropertyClass? Bar { get; set; }
       }
 
-      private class InvalidDefaultTypeForPropertyTypeClass
+      private sealed class InvalidDefaultTypeForPropertyTypeClass
       {
          public InvalidDefaultType? Bar { get; set; }
       }
 
       [DefaultType(typeof(EmptyClass))]
-      private class InvalidDefaultType
+      private sealed class InvalidDefaultType
       {
          public double Bar { get; set; }
       }
 
-      private class InconsistentDefaultTypesClass
+      private sealed class InconsistentDefaultTypesClass
       {
          public InconsistentDefaultTypesClass([DefaultType(typeof(Bar1))] IBar bar)
          {
@@ -519,12 +519,12 @@ namespace Tests
          public IBar Bar { get; set; }
       }
 
-      private class Bar1 : IBar
+      private sealed class Bar1 : IBar
       {
          public string? Baz { get; set; }
       }
 
-      private class Bar2 : IBar
+      private sealed class Bar2 : IBar
       {
          public string? Baz { get; set; }
       }
@@ -541,14 +541,14 @@ namespace Tests
          public int Baz { get; }
       }
 
-      private class HasInvalidConvertMethodAttribute
+      private sealed class HasInvalidConvertMethodAttribute
       {
          public HasInvalidConvertMethodAttribute([ConvertMethod(nameof(IllegalConvertMethod))] SomeStruct qux) => Qux = qux;
          public SomeStruct Qux { get; }
          internal static AnotherStruct IllegalConvertMethod(string value) => new AnotherStruct(int.Parse(value, CultureInfo.InvariantCulture));
       }
 
-      private class HasNoMethodMatchingTheArgumentFromAConvertMethodAttribute
+      private sealed class HasNoMethodMatchingTheArgumentFromAConvertMethodAttribute
       {
          [ConvertMethod("ThisMethodDoesNotExist")] public SomeStruct Qux { get; set; }
       }
@@ -561,18 +561,18 @@ namespace Tests
 
       private abstract class AbstractClassImplementingInterface : IInterfaceDecoratedWithAbstractDefaultType { }
 
-      private class AbstractDefaultTypeForPropertyClass
+      private sealed class AbstractDefaultTypeForPropertyClass
       {
          [DefaultType(typeof(AbstractClass))]
          public IInterface? Bar { get; set; }
       }
 
-      private class AbstractDefaultTypeForPropertyTypeClass
+      private sealed class AbstractDefaultTypeForPropertyTypeClass
       {
          public IInterfaceDecoratedWithAbstractDefaultType? Bar { get; set; }
       }
 
-      private class TwoArgConstructor
+      private sealed class TwoArgConstructor
       {
          public TwoArgConstructor(int bar, int baz) { }
       }

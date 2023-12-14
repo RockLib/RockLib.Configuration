@@ -48,7 +48,11 @@ namespace RockLib.Configuration
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         public static IConfigurationBuilder AddAppSettingsJson(this IConfigurationBuilder builder, bool reloadOnChange)
         {
-            if (builder is null) throw new ArgumentNullException(nameof(builder));
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(builder);
+#else
+            if (builder is null) { throw new ArgumentNullException(nameof(builder)); }
+#endif
 
             // we want the optional value to be true so that it will not throw a runtime exception if the file is not found
             builder = builder.AddJsonFile("appsettings.json", optional: true, reloadOnChange: reloadOnChange);

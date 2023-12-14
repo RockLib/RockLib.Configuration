@@ -30,10 +30,14 @@ namespace RockLib.Configuration.MessagingProvider
         /// </remarks>
         public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, string receiverName, ISettingFilter? settingFilter = null)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(builder);
+#else
             if (builder is null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
+#endif
             return builder.AddRockLibMessagingProvider(builder.Build().GetSection("RockLib.Messaging").CreateReceiver(receiverName), settingFilter);
         }
 
@@ -52,10 +56,14 @@ namespace RockLib.Configuration.MessagingProvider
         /// <returns>The <see cref="IConfigurationBuilder"/>.</returns>
         public static IConfigurationBuilder AddRockLibMessagingProvider(this IConfigurationBuilder builder, IReceiver receiver, ISettingFilter? settingFilter = null)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(builder);
+#else
             if (builder is null)
             {
                 throw new ArgumentNullException(nameof(builder));
             }
+#endif
             return builder.Add(new MessagingConfigurationSource(receiver, settingFilter));
         }
     }

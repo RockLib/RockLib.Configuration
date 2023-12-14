@@ -254,19 +254,19 @@ namespace Tests
       }
 
 #pragma warning disable CA1812
-      private class Foo
+      private sealed class Foo
       {
          public IBar? Bar { get; set; }
          public IBaz? Baz { get; set; }
       }
 
       private interface IBar { }
-      private class Bar : IBar { }
+      private sealed class Bar : IBar { }
 
       private interface IBaz { }
-      private class Baz : IBaz { }
+      private sealed class Baz : IBaz { }
 
-      private class Qux { }
+      private sealed class Qux { }
 
       private abstract class AbstractBar : IBar { }
 #pragma warning restore CA1812

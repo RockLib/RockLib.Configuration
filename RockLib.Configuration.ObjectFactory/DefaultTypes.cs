@@ -34,10 +34,15 @@ namespace RockLib.Configuration.ObjectFactory
         /// </exception>
         public DefaultTypes Add(Type declaringType, string memberName, Type defaultType)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(declaringType);
+            ArgumentNullException.ThrowIfNull(memberName);
+            ArgumentNullException.ThrowIfNull(defaultType);
+#else
             if (declaringType is null) throw new ArgumentNullException(nameof(declaringType));
             if (memberName is null) throw new ArgumentNullException(nameof(memberName));
             if (defaultType is null) throw new ArgumentNullException(nameof(defaultType));
-
+#endif
             if (defaultType.IsAbstract)
                 throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
@@ -67,9 +72,13 @@ namespace RockLib.Configuration.ObjectFactory
         /// <exception cref="ArgumentException">If <paramref name="defaultType"/> is not assignable to <paramref name="targetType"/>.</exception>
         public DefaultTypes Add(Type targetType, Type defaultType)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(targetType);
+            ArgumentNullException.ThrowIfNull(defaultType);
+#else
             if (targetType is null) throw new ArgumentNullException(nameof(targetType));
             if (defaultType is null) throw new ArgumentNullException(nameof(defaultType));
-
+#endif
             if (defaultType.IsAbstract) throw Exceptions.DefaultTypeCannotBeAbstract(defaultType);
 
             if (!targetType.IsAssignableFrom(defaultType))

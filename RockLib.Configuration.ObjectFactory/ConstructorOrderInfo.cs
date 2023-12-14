@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace RockLib.Configuration.ObjectFactory
 {
-   internal class ConstructorOrderInfo : IComparable<ConstructorOrderInfo>
+   internal sealed class ConstructorOrderInfo : IComparable<ConstructorOrderInfo>
    {
       public ConstructorOrderInfo(ConstructorInfo constructor, Dictionary<string, IConfigurationSection> availableMembers, IResolver? resolver)
       {

@@ -24,10 +24,14 @@ namespace RockLib.Configuration.MessagingProvider
         /// </param>
         public SafelistSettingFilter(IEnumerable<string> safeSettings, ISettingFilter? innerFilter = null)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(safeSettings);
+#else
             if (safeSettings is null)
             {
                 throw new ArgumentNullException(nameof(safeSettings));
             }
+#endif
             _safeSettings = new HashSet<string>(safeSettings, StringComparer.OrdinalIgnoreCase);
             InnerFilter = innerFilter ?? NullSettingFilter.Instance;
         }

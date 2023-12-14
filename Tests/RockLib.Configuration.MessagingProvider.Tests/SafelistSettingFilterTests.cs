@@ -8,6 +8,8 @@ namespace RockLib.Configuration.MessagingProvider.Tests
 {
     public static class SafelistSettingFilterTests
     {
+        private static readonly string[] safeSettings = new[] { "foo" };
+
         [Fact]
         public static void ConstructorThrowsIfSafeSettingsIsNull()
         {
@@ -30,7 +32,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var innerFilter = Mock.Of<ISettingFilter>();
 
-            var filter = new SafelistSettingFilter(new[] { "foo" }, innerFilter);
+            var filter = new SafelistSettingFilter(safeSettings, innerFilter);
 
             filter.InnerFilter.Should().BeSameAs(innerFilter);
         }
@@ -43,7 +45,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
                 .Setup(m => m.ShouldProcessSettingChange(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object>>()))
                 .Returns(false);
 
-            var filter = new SafelistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+            var filter = new SafelistSettingFilter(safeSettings, mockInnerFilter.Object);
 
             var receivedMessageHeaders = new Dictionary<string, object>();
 
@@ -62,7 +64,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
                 .Setup(m => m.ShouldProcessSettingChange(It.IsAny<string>(), It.IsAny<IReadOnlyDictionary<string, object>>()))
                 .Returns(false);
 
-            var filter = new SafelistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+            var filter = new SafelistSettingFilter(safeSettings, mockInnerFilter.Object);
 
             var receivedMessageHeaders = new Dictionary<string, object>();
 
@@ -78,7 +80,7 @@ namespace RockLib.Configuration.MessagingProvider.Tests
         {
             var mockInnerFilter = new Mock<ISettingFilter>();
 
-            var filter = new SafelistSettingFilter(new[] { "foo" }, mockInnerFilter.Object);
+            var filter = new SafelistSettingFilter(safeSettings, mockInnerFilter.Object);
 
             filter.ShouldProcessSettingChange("bar", new Dictionary<string, object>())
                 .Should().Be(false);

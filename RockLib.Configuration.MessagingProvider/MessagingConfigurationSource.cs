@@ -28,10 +28,14 @@ namespace RockLib.Configuration.MessagingProvider
         /// </param>
         public MessagingConfigurationSource(IReceiver receiver, ISettingFilter? settingFilter = null)
         {
+#if NET6_0_OR_GREATER
+            ArgumentNullException.ThrowIfNull(receiver);
+#else
             if (receiver is null)
             {
                 throw new ArgumentNullException(nameof(receiver));
             }
+#endif
             if (!ReferenceEquals(this, _validationCache.GetValue(receiver, r => this)))
             {
                 throw new ArgumentException("The same instance of IReceiver cannot be used to create multiple instances of MessagingConfigurationSource.", nameof(receiver));

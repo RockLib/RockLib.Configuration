@@ -45,7 +45,7 @@ namespace RockLib.Configuration.ObjectFactory
                 || p.PropertyType.GetGenericTypeDefinition() == typeof(IDictionary<,>));
     }
 
-    internal class Member
+    internal sealed class Member
     {
         public Member(string name, Type type, MemberType memberType)
         {
