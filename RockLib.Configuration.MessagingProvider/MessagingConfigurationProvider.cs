@@ -34,7 +34,7 @@ namespace RockLib.Configuration.MessagingProvider
 
         private async Task OnMessageReceivedAsync(IReceiverMessage message)
         {
-            var newSettings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var newSettings = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
 
             try
             {
@@ -55,7 +55,7 @@ namespace RockLib.Configuration.MessagingProvider
             await message.AcknowledgeAsync().ConfigureAwait(false);
         }
 
-        private bool IsChanged(Dictionary<string, string> newSettings, HeaderDictionary headers)
+        private bool IsChanged(Dictionary<string, string?> newSettings, HeaderDictionary headers)
         {
             foreach (var newSetting in newSettings)
             {
