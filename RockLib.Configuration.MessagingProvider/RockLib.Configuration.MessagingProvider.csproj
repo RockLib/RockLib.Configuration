@@ -11,9 +11,9 @@
 		<PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration.MessagingProvider/CHANGELOG.md.</PackageReleaseNotes>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageTags>Configuration Messaging</PackageTags>
-		<PackageVersion>3.1.0-alpha.1</PackageVersion>
+		<PackageVersion>3.1.0</PackageVersion>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
-		<Version>3.1.0-alpha.1</Version>
+		<Version>3.1.0</Version>
 	</PropertyGroup>
 	<PropertyGroup>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
