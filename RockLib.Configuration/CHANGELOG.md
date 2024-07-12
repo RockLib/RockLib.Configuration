@@ -8,12 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 4.0.1 - 2024-07-12
 
 #### Added
-- Direct dependency on System.Text.Jason to resolve vulnerability.
+- Direct dependency on System.Text.Jason to .NET 8 package to resolve vulnerability.
 
 ## 4.0.1-alpha.1 - 2024-07-12
 
 #### Added
-- Direct dependency on System.Text.Jason to resolve vulnerability.
+- Direct dependency on System.Text.Jason to .NET 8 package to resolve vulnerability.
 
 ## 4.0.0 - 2024-02-14
 
