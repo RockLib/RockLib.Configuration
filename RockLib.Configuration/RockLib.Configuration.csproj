@@ -24,7 +24,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-		<PackageReference Include="System.Text.Json" Version="8.0.4" />
 	</ItemGroup>
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'net6.0' ">
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="[6.0.1, 8)" />
@@ -35,6 +34,7 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.*" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.*" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.*" />
+		<PackageReference Include="System.Text.Json" Version="8.*" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="..\LICENSE.md" Pack="true" PackagePath="" />
