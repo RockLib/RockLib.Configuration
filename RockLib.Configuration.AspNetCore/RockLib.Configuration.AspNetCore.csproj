@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<PackageId>RockLib.Configuration.AspNetCore</PackageId>
-		<PackageVersion>3.0.0</PackageVersion>
+		<PackageVersion>3.0.1</PackageVersion>
 		<Description>Extension methods for RockLib.Configuration and ASP.NET Core.</Description>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -10,7 +10,7 @@
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageTags>RockLib Configuration AspNetCore Extensions</PackageTags>
-		<Version>3.0.0</Version>
+		<Version>3.0.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
@@ -25,7 +25,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-		<PackageReference Include="RockLib.Configuration" Version="4.0.0" />
+		<PackageReference Include="RockLib.Configuration" Version="4.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.2.0" />
 	</ItemGroup>
 </Project>
