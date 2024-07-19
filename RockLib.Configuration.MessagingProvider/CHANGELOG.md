@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 3.1.1 - 2024-07-19
 
 #### Changed
-- RockLib.Configuration.MessagingProvider.4.0.0 -> RockLib.Configuration.MessagingProvider.4.0.1 for vulnerability fix.
+- RockLib.Messaging.4.0.0 -> RockLib.Messaging.4.0.1 for vulnerability fix.
 
 ## 3.1.0 - 2024-03-12
 
