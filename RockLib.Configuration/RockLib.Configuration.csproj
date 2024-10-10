@@ -10,11 +10,11 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration/CHANGELOG.md.</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration</PackageProjectUrl>
-		<PackageVersion>4.0.1</PackageVersion>
+		<PackageVersion>4.0.2</PackageVersion>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageTags>Configuration ConfigurationRoot IConfigurationRoot ConfigurationManager AppSettings</PackageTags>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
-		<Version>4.0.1</Version>
+		<Version>4.0.2</Version>
 	</PropertyGroup>
 	<PropertyGroup>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
