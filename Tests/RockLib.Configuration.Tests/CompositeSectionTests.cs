@@ -15,7 +15,7 @@ public class CompositeSectionTests
     public void CompositeSectionCombinesSections()
     {
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "foo.bar:garply:baz", "123" },
                 { "foo_bar:garply:qux", "abc" },
@@ -40,7 +40,7 @@ public class CompositeSectionTests
     public void CompositeSectionPathOrderIsSignificant()
     {
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "foo_bar:garply:baz", "abc" }, // Both of these settings have
                 { "foo.bar:garply:baz", "123" }, // the same composite path.
@@ -63,7 +63,7 @@ public class CompositeSectionTests
     public void GetChildrenMaintainsOrderWhenTheChildAreListItemsAndTheSecondItemComesFromTheFirstSectionOfTheCompositeSection()
     {
         var config = new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "second_section:0:baz", "abc" },
                 { "first_section:1:baz", "xyz" },
