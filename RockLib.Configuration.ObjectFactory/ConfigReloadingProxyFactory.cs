@@ -354,7 +354,7 @@ namespace RockLib.Configuration.ObjectFactory
         }
 
         private static void AddTransferStateOverrideMethod(TypeBuilder proxyTypeBuilder, Type interfaceType,
-           IReadOnlyDictionary<EventInfo, FieldBuilder> eventFields, MethodInfo baseTransferStateMethod)
+           Dictionary<EventInfo, FieldBuilder> eventFields, MethodInfo baseTransferStateMethod)
         {
             var transferStateMethod = proxyTypeBuilder.DefineMethod("TransferState", TransferStateAttributes, typeof(void), new[] { interfaceType, interfaceType });
 
