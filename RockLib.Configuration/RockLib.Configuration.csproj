@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Copyright>Copyright 2017-2023 (c) Rocket Mortgage. All rights reserved.</Copyright>
+		<Copyright>Copyright 2017-2025 (c) Rocket Mortgage. All rights reserved.</Copyright>
 		<DebugType>Embedded</DebugType>
 		<Description>Provides a central location for an instance of IConfigurationRoot to be used as the "default" configuration by .NET libraries and applications. Replaces some of the functionality of the .NET Framework System.Configuration.ConfigurationManager class.</Description>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
@@ -10,11 +10,11 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReleaseNotes>A changelog is available at https://github.com/RockLib/RockLib.Configuration/blob/main/RockLib.Configuration/CHANGELOG.md.</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration</PackageProjectUrl>
-		<PackageVersion>4.0.3</PackageVersion>
+		<PackageVersion>5.0.0</PackageVersion>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageTags>Configuration ConfigurationRoot IConfigurationRoot ConfigurationManager AppSettings</PackageTags>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
-		<Version>4.0.3</Version>
+		<Version>5.0.0</Version>
 	</PropertyGroup>
 	<PropertyGroup>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
@@ -25,13 +25,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
 	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="[6.0.1, 8)" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="[6.0.1, 8)" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="[6.0.0, 8)" />
-		<PackageReference Include="System.Text.Json" Version="6.*" />		
-	</ItemGroup>
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' ">
+	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.*" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.*" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.*" />

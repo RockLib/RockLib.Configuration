@@ -15,7 +15,7 @@ public class ConfigTests
     {
         _configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(
-                new Dictionary<string, string>
+                new Dictionary<string, string?>
                 {
                     { "AppSettings:Environment", "Test" },
                     { "AppSettings:ApplicationId", "200001" }

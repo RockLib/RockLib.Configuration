@@ -95,7 +95,7 @@ namespace RockLib.Configuration
         /// </summary>
         /// <param name="additionalValues">When specified, these key/value pairs are applied to the resulting
         /// instance of <see cref="IConfiguration"/>.</param>
-        public static void ResetRoot(IEnumerable<KeyValuePair<string, string>>? additionalValues = null)
+        public static void ResetRoot(IEnumerable<KeyValuePair<string, string?>>? additionalValues = null)
         {
             if (additionalValues is null)
             {
@@ -122,7 +122,7 @@ namespace RockLib.Configuration
             _basePath = basePath ?? Directory.GetCurrentDirectory();
         }
 
-        private static IConfiguration GetDefaultRoot(IEnumerable<KeyValuePair<string, string>>? additionalValues)
+        private static IConfiguration GetDefaultRoot(IEnumerable<KeyValuePair<string, string?>>? additionalValues)
         {
             var builder = new ConfigurationBuilder();
 

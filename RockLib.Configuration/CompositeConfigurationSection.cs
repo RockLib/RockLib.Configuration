@@ -54,7 +54,7 @@ namespace RockLib.Configuration
 
         public string Path => _primarySection.Value.Path;
 
-        public string Value
+        public string? Value
         {
 #if NET8_0_OR_GREATER
 #pragma warning disable CS8603 // Possible null reference return.
