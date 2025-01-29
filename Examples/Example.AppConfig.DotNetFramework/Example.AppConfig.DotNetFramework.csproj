@@ -4,8 +4,8 @@
 		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="RockLib.Configuration" Version="4.0.3" />
-		<PackageReference Include="RockLib.Configuration.ObjectFactory" Version="3.0.0" />
+		<PackageReference Include="RockLib.Configuration" Version="5.0.0" />
+		<PackageReference Include="RockLib.Configuration.ObjectFactory" Version="4.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="App.config">
