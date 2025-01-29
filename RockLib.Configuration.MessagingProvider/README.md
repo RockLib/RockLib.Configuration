@@ -2,7 +2,8 @@
 
 A configuration provider that reloads when it receives a message containing configuration changes from a `RockLib.Messaging.IReceiver`.
 
-Note: The 3.0.0 release of this library will be the final version with upgrades and changes. Bug fixes will continue to be released as needed. We strongly encourage developers to use standard .NET configuration libraries directly like `Microsoft.Extensions.Configuration` in place of `RockLib.Configuration`.
+> [!WARNING]  
+> The 4.0.0 release of this library will be the final version with upgrades and changes. Bug fixes will continue to be released as needed. We strongly encourage developers to use standard .NET configuration libraries directly like `Microsoft.Extensions.Configuration` in place of `RockLib.Configuration`.
 
 ## Setup
 

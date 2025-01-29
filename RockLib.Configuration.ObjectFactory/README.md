@@ -2,7 +2,8 @@
 
 An alternative to `Microsoft.Extensions.Configuration.Binder` that supports non-default constructors and other features commonly found in JSON and XML serializers.
 
-Note: The 3.0.0 release of this library will be the final version with upgrades and changes. Bug fixes will continue to be released as needed. We strongly encourage developers to use standard .NET configuration libraries directly like `Microsoft.Extensions.Configuration` in place of `RockLib.Configuration`.
+> [!WARNING]  
+> The 4.0.0 release of this library will be the final version with upgrades and changes. Bug fixes will continue to be released as needed. We strongly encourage developers to use standard .NET configuration libraries directly like `Microsoft.Extensions.Configuration` in place of `RockLib.Configuration`.
 
 ## Table Of Contents
 
