@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<PackageId>RockLib.Configuration.ProxyFactory</PackageId>
-		<PackageVersion>3.0.0</PackageVersion>
+		<PackageVersion>4.0.0-alpha.1</PackageVersion>
 		<Description>Creates proxy objects from interfaces using IConfiguration and IConfigurationSection objects.</Description>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(PackageId).xml</DocumentationFile>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -9,9 +9,9 @@
 		<PackageProjectUrl>https://github.com/RockLib/RockLib.Configuration/tree/master/RockLib.Configuration.ProxyFactory</PackageProjectUrl>
 		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
 		<PackageIcon>icon.png</PackageIcon>
-		<Copyright>Copyright 2023 (c) Rocket Mortgage. All rights reserved.</Copyright>
+		<Copyright>Copyright 2025 (c) Rocket Mortgage. All rights reserved.</Copyright>
 		<PackageTags>Configuration Factory Proxy IConfiguration IConfigurationSection</PackageTags>
-		<Version>3.0.0</Version>
+		<Version>4.0.0-alpha.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PublishRepositoryUrl>True</PublishRepositoryUrl>
 		<EmbedUntrackedSources>True</EmbedUntrackedSources>
@@ -26,6 +26,6 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-		<PackageReference Include="RockLib.Configuration.ObjectFactory" Version="3.0.0" />
+		<PackageReference Include="RockLib.Configuration.ObjectFactory" Version="4.0.0" />
 	</ItemGroup>
 </Project>
